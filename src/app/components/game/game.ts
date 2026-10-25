@@ -44,7 +44,7 @@ export class Game {
   private frameId = 0;
   private lastTimestamp = 0;
 
-  public readonly world: World = new World(40); // le monde est instancié avec une taille de 40 GameMeter !
+  public readonly world: World = new World(3); // rayon de 3 cases autour de la case centrale, soit 7 cases
   private readonly character = new Character(this.world.center, GROUND_Y);
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.character.x, y: this.character.y })
 

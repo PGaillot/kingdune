@@ -12,10 +12,10 @@ export class World {
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
-     * @param width 
+     * @param radius 
      */
-    constructor(public readonly width: GameMeter, treeCount: number = 10) {
-        this.ground = new Ground(width);
+    constructor(public readonly radius: GameMeter, treeCount: number = 4) {
+        this.ground = new Ground(this.leftEnd, this.width);
         this.trees = this.getRandomTreePositions(treeCount).map((x) => new Tree(x));
     }
 
@@ -23,10 +23,9 @@ export class World {
 
 
     getRandomTreePositions(treeCount: number): GameMeter[] {
-
         const available: GameMeter[] = [];
-        for (let x = this.leftEnd; x < this.rightEnd; x++) {
-            available.push(x);
+        for (let i = 0; i < this.width; i++) {
+            available.push(this.leftEnd + i);
         }
 
         if (treeCount > available.length) {
@@ -42,15 +41,19 @@ export class World {
         return positions;
     }
 
+    public get width(): GameMeter {
+        return (this.radius * 2) + 1;
+    }
+
     public get rightEnd(): GameMeter {
-        return this.width / 2
+        return this.radius + 0.5;
     }
 
     public get leftEnd(): GameMeter {
-        return -this.rightEnd
+        return -this.rightEnd;
     }
 
-    draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
+    public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         this.ground.draw(ctx, camera);
