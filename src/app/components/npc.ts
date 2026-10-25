@@ -1,4 +1,6 @@
-import { Character, Direction } from "./components/game/character";
+import { getRandomBetweenMinMax } from "../utils/random.utils";
+import { Character, Direction } from "./character";
+import { GameMeter } from "./game/config";
 
 export class Npc extends Character {
 
@@ -7,18 +9,13 @@ export class Npc extends Character {
 
     private timeUntilNextDecision: number = this.nextDecisionDuration;
     private currentDirection: Direction = 0;
-    hitbox: { height: number, width: number, position: { x: number, y: number } } | undefined;
 
-    constructor(x: number, y: number, width: number, height: number, speed: number, nextDecisionDurationMin: number, nextDecisionDurationMax: number, color: string) {
+    constructor(x: GameMeter, y: GameMeter, width: GameMeter, height: GameMeter, speed: GameMeter, nextDecisionDurationMin: number, nextDecisionDurationMax: number, color: string) {
         super(x, y, width, height, speed, color);
-        this.nextDecisionDuration = this.getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
+        this.nextDecisionDuration = getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
     }
 
-    getRandomBetweenMinMax(min: number, max: number): number {
-        return Math.random() * (max - min) + min;
-    }
-
-    update(deltaSeconds: number, minX: number, maxX: number): void {
+    update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
         this.timeUntilNextDecision -= deltaSeconds;
 
         if (this.timeUntilNextDecision <= 0) {

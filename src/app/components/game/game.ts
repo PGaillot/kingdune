@@ -7,13 +7,12 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import { Character, Direction } from './character';
-import { Rabbit } from '../../rabbit';
-import { Hunter } from '../../hunter';
-
-const WIDTH = 800;
-const HEIGHT = 450;
-const GROUND_Y = 390;
+import { Character, Direction } from '../character';
+import { Rabbit } from '../rabbit';
+import { Hunter } from '../hunter';
+import { World } from '../world';
+import { Camera } from '../camera';
+import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from './config';
 
 @Component({
   selector: 'app-game',
@@ -21,8 +20,8 @@ const GROUND_Y = 390;
   template: `
     <canvas
       #game
-      width="800"
-      height="450"
+      [width]="SCREEN_WIDTH"
+      [height]="SCREEN_HEIGHT"
       role="img"
       aria-label="Zone de jeu : utilisez les flèches gauche et droite pour déplacer le personnage."
     ></canvas>
@@ -37,21 +36,27 @@ const GROUND_Y = 390;
 })
 export class Game {
   private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('game');
-  private readonly character = new Character(WIDTH / 2 - 15, GROUND_Y);
-  // private readonly rabbit = new Rabbit(WIDTH / 2 - 100, 425)
-  private readonly rabbits: Rabbit[] = [];
-  private readonly hunter = new Hunter(WIDTH / 2 - 100, 390)
   private readonly pressedKeys = new Set<string>();
-
   private ctx: CanvasRenderingContext2D | null = null;
   private frameId = 0;
   private lastTimestamp = 0;
 
+  public readonly world: World = new World(40); // le monde est instancié avec une taille de 40 GameMeter !
+  private readonly character = new Character(this.world.center, GROUND_Y);
+  public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.character.x, y: this.character.y })
+
+  private readonly rabbits: Rabbit[] = [];
+  private readonly hunter = new Hunter(this.world.center, GROUND_Y)
+  protected readonly SCREEN_WIDTH: Pixel = SCREEN_WIDTH;
+  protected readonly SCREEN_HEIGHT: Pixel = SCREEN_HEIGHT;
+
+
+
   constructor() {
 
     for (let index = 0; index < 5; index++) {
-      const position: number = Math.round((Math.random()) * WIDTH)
-      this.rabbits.push(new Rabbit(position, 425))
+      const position: number = Math.round((Math.random()) * this.world.width)
+      this.rabbits.push(new Rabbit(position, GROUND_Y))
     }
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
@@ -87,11 +92,12 @@ export class Game {
     const deltaSeconds = this.lastTimestamp ? (timestamp - this.lastTimestamp) / 1000 : 0;
     this.lastTimestamp = timestamp;
 
-    this.character.move(this.direction, deltaSeconds, 0, WIDTH);
+    this.character.move(this.direction, deltaSeconds, this.world.leftEnd, this.world.rightEnd);
+    this.camera.follow({ x: this.character.x, y: this.character.y })
     this.rabbits.forEach((rabbit) => {
-      rabbit.update(deltaSeconds, 0, WIDTH);
+      rabbit.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     });
-    this.hunter.update(deltaSeconds, 0, WIDTH)
+    this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
     this.render();
 
     this.frameId = requestAnimationFrame((next) => this.loop(next));
@@ -101,11 +107,12 @@ export class Game {
     if (!this.ctx) {
       return;
     }
+
     const ctx = this.ctx;
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    this.character.draw(ctx);
-    this.rabbits.forEach((rabbit) => rabbit.draw(ctx));
-    this.hunter.draw(ctx);
+    this.world.draw(ctx, this.camera);
+
+    this.character.draw(ctx, this.camera);
+    this.rabbits.forEach((rabbit) => rabbit.draw(ctx, this.camera));
+    this.hunter.draw(ctx, this.camera);
   }
 }

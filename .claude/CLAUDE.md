@@ -1,4 +1,75 @@
 
+# paperGame
+
+## Contexte du projet
+
+- **paperGame** est un nom provisoire. C'est un jeu web en 2D, projet perso, inspiré de la série
+  **Kingdom** (Kingdom Classic, New Lands, Two Crowns…).
+- Le personnage court sur un **terrain plat et borné à gauche et à droite**. C'est un segment, pas
+  un monde infini ni ouvert. Il ne saute pas.
+- **Rendu** : tout est dessiné à la main dans un `<canvas>` (boucle `requestAnimationFrame` +
+  `deltaSeconds`). Les entités du jeu (`Character`, `Npc`, `Rabbit`, `Hunter`…) sont des classes
+  TypeScript simples, pas des composants Angular. Angular sert de coquille (composant `Game`,
+  entrées clavier, UI autour du canvas).
+- **Graphismes** : pas encore définis (papier, pixel art, 3D… on verra). Pour l'instant, on dessine
+  des **blocs de couleur** et ça suffit. Ne pas investir dans le visuel.
+- **Aucune librairie** : pas de moteur de jeu (Phaser, PixiJS…), pas de librairie de physique ni
+  d'UI. Tout est fait à la main.
+
+## Rôle de Claude : mentor, pas développeur
+
+Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
+
+- **Ne pas écrire ni modifier le code du jeu** sauf demande explicite (« écris-le », « fais-le »).
+- Par défaut : expliquer les concepts, poser des questions pour faire réfléchir, proposer des pistes
+  et comparer des approches (avec leurs avantages et inconvénients), donner des indices progressifs
+  plutôt que la solution.
+- Pour illustrer un concept, préférer un **petit exemple générique** plutôt que la solution exacte
+  à coller dans le projet.
+- Relire le code de l'utilisateur quand il le demande : signaler les bugs, les mauvaises pratiques,
+  les améliorations possibles, et **expliquer pourquoi**.
+- Rester pédagogue : nommer les concepts (game loop, delta time, AABB, héritage vs composition…)
+  pour que l'utilisateur puisse creuser de son côté.
+
+## Conventions
+
+- **Commentaires de code en français.**
+- Les règles Angular ci-dessous s'appliquent à la partie Angular (composants, services). La logique
+  de jeu reste en classes TypeScript pures.
+
+## Conventions du monde et du rendu
+
+- **Unités** : toute la logique de jeu (positions, tailles, vitesses) est en mètres (`GameMeter`).
+  Seul le dessin parle en pixels (`Pixel`). Échelle : `METER_UNIT` (1 m = 40 px). Les types et
+  constantes vivent dans `src/app/components/game/config.ts` (`WorldPoint`, `ScreenPoint`,
+  `SCREEN_WIDTH`, `SCREEN_HEIGHT`, `GROUND_Y`…).
+- **Repère du monde** : centré sur `x = 0` (de `-width/2` à `+width/2`), sol à `y = 0`, la hauteur
+  **monte**. Dans le canvas, `y` **descend** : la conversion inverse le signe.
+- **Caméra** (`Camera`) : `follow()` décide où regarder (cible + `offset`, en mètres), `convert()`
+  traduit un point du monde en pixels, le point regardé étant au milieu de l'écran. On ne touche pas
+  à la formule de `convert()` : glissement, tremblement, etc. passent par le point regardé.
+- **Dessin** : chaque objet se dessine avec `draw(ctx, camera)`. Les positions passent par
+  `camera.convert()`, les tailles sont multipliées par `METER_UNIT`. La position d'un personnage
+  désigne ses pieds, donc on remonte de sa hauteur pour trouver le coin haut-gauche de `fillRect`.
+
+## État d'avancement (à mettre à jour)
+
+**Fait** : `World` (largeur, bornes `leftEnd`/`rightEnd`, contient un `Ground` et la couleur du
+ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi du personnage avec
+décalage vertical), entités converties en mètres et posées sur le sol.
+
+**Pistes ouvertes / prochaines étapes possibles** :
+- Faire apparaître les lapins entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
+- Lier `width`/`height` du `<canvas>` aux constantes `SCREEN_WIDTH`/`SCREEN_HEIGHT` (encore en dur
+  dans le template de `Game`).
+- Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
+  les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
+- La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
+- Les entités sont dans `src/app/components/` alors que ce ne sont pas des composants Angular :
+  un dossier dédié (`entities/`, `game/`…) serait plus clair.
+
+---
+
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
