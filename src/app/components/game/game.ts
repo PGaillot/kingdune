@@ -12,7 +12,7 @@ import { Rabbit } from '../../game/entities/rabbit';
 import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
-import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
+import { GROUND, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
 import { Coin } from '../../game/entities/coins';
 
 @Component({
@@ -44,19 +44,19 @@ export class Game {
   private frameId = 0;
   private lastTimestamp = 0;
 
-  public readonly world: World = new World(3); // rayon de 3 cases autour de la case centrale, soit 7 cases
-  private readonly character = new Character(this.world.center, GROUND_Y);
+  public readonly world: World = new World(15); // rayon de 15 cases autour de la case centrale, soit 31 cases
+  private readonly character = new Character(this.world.center - 0.5, GROUND);
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.character.x, y: this.character.y })
 
   private readonly rabbits: Rabbit[] = [];
-  private readonly hunter = new Hunter(this.world.center, GROUND_Y)
+  private readonly hunter = new Hunter(this.world.center, GROUND)
   private coins: Coin[] = [];
 
   constructor() {
 
     for (let index = 0; index < 5; index++) {
       const position: number = Math.round((Math.random()) * this.world.width)
-      this.rabbits.push(new Rabbit(position, GROUND_Y))
+      this.rabbits.push(new Rabbit(position, GROUND))
     }
 
     this.coins.push(new Coin(3));

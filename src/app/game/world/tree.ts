@@ -1,6 +1,6 @@
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Camera } from "../camera";
-import { GameMeter, GROUND_Y, METER_UNIT, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 
 export class Tree {
     private color: string = 'brown'
@@ -12,7 +12,7 @@ export class Tree {
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {
         ctx.fillStyle = this.color;
-        const positionInCamera: ScreenPoint = camera.convert({ x: this.positionX, y: GROUND_Y })
+        const positionInCamera: ScreenPoint = camera.convert({ x: this.positionX, y: GROUND })
         ctx.fillRect(positionInCamera.x, (positionInCamera.y - (this.height * METER_UNIT)), this.width * METER_UNIT, this.height * METER_UNIT)
     }
 

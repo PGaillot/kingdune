@@ -3,7 +3,7 @@ export type Pixel = number;
 
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
-export const GROUND_Y = 0;
+export const GROUND = 0;
 
 /** Un point dans le monde du jeu, en mètres. Le sol est à y = 0 et la hauteur monte. */
 export type WorldPoint = { x: GameMeter, y: GameMeter }

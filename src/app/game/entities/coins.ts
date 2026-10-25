@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { GameMeter, GROUND_Y, METER_UNIT, Pixel, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 
 export class Coin {
 
@@ -12,7 +12,7 @@ export class Coin {
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {
         ctx.fillStyle = this.color;
-        const positionInCamera: ScreenPoint = camera.convert({ x: this.positionX, y: GROUND_Y })
+        const positionInCamera: ScreenPoint = camera.convert({ x: this.positionX, y: GROUND })
         ctx.fillRect(positionInCamera.x, (positionInCamera.y - (this.size * METER_UNIT)), this.size * METER_UNIT, this.size * METER_UNIT)
     }
 }
