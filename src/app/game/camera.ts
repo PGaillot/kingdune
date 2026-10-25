@@ -1,4 +1,4 @@
-import { GameMeter, METER_UNIT, Pixel, ScreenPoint, WorldPoint } from "./game/config";
+import { GameMeter, METER_UNIT, Pixel, ScreenPoint, WorldPoint } from "./config";
 
 /**
  * La caméra est définie par la taille de l'écran qu'elle remplit (en pixels)

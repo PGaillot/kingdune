@@ -1,6 +1,6 @@
-import { getRandomBetweenMinMax } from "../utils/random.utils";
-import { Camera } from "./camera";
-import { GameMeter, GROUND_Y, METER_UNIT, ScreenPoint } from "./game/config";
+import { getRandomBetweenMinMax } from "../../utils/random.utils";
+import { Camera } from "../camera";
+import { GameMeter, GROUND_Y, METER_UNIT, ScreenPoint } from "../config";
 
 export class Tree {
     private color: string = 'brown'

@@ -1,6 +1,6 @@
-import { getRandomBetweenMinMax } from "../utils/random.utils";
-import { Camera } from "./camera";
-import { GROUND_Y, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter, type ScreenPoint } from "./game/config";
+import { getRandomBetweenMinMax } from "../../utils/random.utils";
+import { Camera } from "../camera";
+import { GROUND_Y, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter, type ScreenPoint } from "../config";
 import { Ground } from "./ground";
 import { Tree } from "./tree";
 

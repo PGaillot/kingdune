@@ -7,12 +7,12 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import { Character, Direction } from '../character';
-import { Rabbit } from '../rabbit';
-import { Hunter } from '../hunter';
-import { World } from '../world';
-import { Camera } from '../camera';
-import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from './config';
+import { Character, Direction } from '../../game/entities/character';
+import { Rabbit } from '../../game/entities/rabbit';
+import { Hunter } from '../../game/entities/hunter';
+import { World } from '../../game/world/world';
+import { Camera } from '../../game/camera';
+import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
 
 @Component({
   selector: 'app-game',

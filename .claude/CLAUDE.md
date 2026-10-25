@@ -37,11 +37,20 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 - Les règles Angular ci-dessous s'appliquent à la partie Angular (composants, services). La logique
   de jeu reste en classes TypeScript pures.
 
+## Organisation des fichiers
+
+- `src/app/components/` : uniquement les composants Angular (`game/` = la coquille autour du canvas).
+- `src/app/game/` : la logique de jeu en TypeScript pur.
+  - `config.ts` (unités, constantes), `camera.ts` (systèmes transverses) à la racine.
+  - `world/` : le décor (`World`, `Ground`, `Tree`).
+  - `entities/` : ce qui bouge et a un comportement (`Character`, `Npc`, `Rabbit`, `Hunter`).
+- `src/app/utils/` : fonctions utilitaires génériques.
+
 ## Conventions du monde et du rendu
 
 - **Unités** : toute la logique de jeu (positions, tailles, vitesses) est en mètres (`GameMeter`).
   Seul le dessin parle en pixels (`Pixel`). Échelle : `METER_UNIT` (1 m = 40 px). Les types et
-  constantes vivent dans `src/app/components/game/config.ts` (`WorldPoint`, `ScreenPoint`,
+  constantes vivent dans `src/app/game/config.ts` (`WorldPoint`, `ScreenPoint`,
   `SCREEN_WIDTH`, `SCREEN_HEIGHT`, `GROUND_Y`…).
 - **Repère du monde** : centré sur `x = 0` (de `-width/2` à `+width/2`), sol à `y = 0`, la hauteur
   **monte**. Dans le canvas, `y` **descend** : la conversion inverse le signe.
@@ -65,8 +74,7 @@ décalage vertical), entités converties en mètres et posées sur le sol.
 - Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
   les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
 - La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
-- Les entités sont dans `src/app/components/` alors que ce ne sont pas des composants Angular :
-  un dossier dédié (`entities/`, `game/`…) serait plus clair.
+- `src/app/hitbox.ts` n'est utilisé nulle part : à brancher (collisions AABB) ou à retirer.
 
 ---
 

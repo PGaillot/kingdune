@@ -1,5 +1,5 @@
-import { Camera } from "./camera";
-import { GameMeter, METER_UNIT, ScreenPoint } from "./game/config";
+import { Camera } from "../camera";
+import { GameMeter, METER_UNIT, ScreenPoint } from "../config";
 
 /** -1 = gauche, 0 = immobile, 1 = droite */
 export type Direction = -1 | 0 | 1;

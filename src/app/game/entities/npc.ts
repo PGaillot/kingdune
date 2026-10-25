@@ -1,6 +1,6 @@
-import { getRandomBetweenMinMax } from "../utils/random.utils";
+import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Character, Direction } from "./character";
-import { GameMeter } from "./game/config";
+import { GameMeter } from "../config";
 
 export class Npc extends Character {
 

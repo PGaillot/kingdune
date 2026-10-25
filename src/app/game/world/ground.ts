@@ -1,5 +1,5 @@
-import { Camera } from "./camera";
-import { GameMeter, GROUND_Y, METER_UNIT, Pixel, ScreenPoint } from "./game/config";
+import { Camera } from "../camera";
+import { GameMeter, GROUND_Y, METER_UNIT, Pixel, ScreenPoint } from "../config";
 
 export class Ground {
 

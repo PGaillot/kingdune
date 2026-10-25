@@ -1,4 +1,4 @@
-import { GameMeter } from "./game/config";
+import { GameMeter } from "../config";
 import { Npc } from "./npc";
 
 export class Hunter extends Npc {
