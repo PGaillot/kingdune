@@ -13,6 +13,7 @@ import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
 import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
+import { Coin } from '../../game/entities/coins';
 
 @Component({
   selector: 'app-game',
@@ -35,6 +36,8 @@ import { GROUND_Y, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config'
   },
 })
 export class Game {
+  protected readonly SCREEN_WIDTH: Pixel = SCREEN_WIDTH;
+  protected readonly SCREEN_HEIGHT: Pixel = SCREEN_HEIGHT;
   private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('game');
   private readonly pressedKeys = new Set<string>();
   private ctx: CanvasRenderingContext2D | null = null;
@@ -47,10 +50,7 @@ export class Game {
 
   private readonly rabbits: Rabbit[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND_Y)
-  protected readonly SCREEN_WIDTH: Pixel = SCREEN_WIDTH;
-  protected readonly SCREEN_HEIGHT: Pixel = SCREEN_HEIGHT;
-
-
+  private coins: Coin[] = [];
 
   constructor() {
 
@@ -58,6 +58,10 @@ export class Game {
       const position: number = Math.round((Math.random()) * this.world.width)
       this.rabbits.push(new Rabbit(position, GROUND_Y))
     }
+
+    this.coins.push(new Coin(3));
+    this.coins.push(new Coin(3.3))
+
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
       this.frameId = requestAnimationFrame((timestamp) => this.loop(timestamp));
@@ -112,7 +116,8 @@ export class Game {
     this.world.draw(ctx, this.camera);
 
     this.character.draw(ctx, this.camera);
-    this.rabbits.forEach((rabbit) => rabbit.draw(ctx, this.camera));
+    this.rabbits.forEach((rabbit: Rabbit) => rabbit.draw(ctx, this.camera));
+    this.coins.forEach((coin: Coin) => coin.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
   }
 }
