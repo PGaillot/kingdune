@@ -1,15 +1,14 @@
-
 # Kingdune
 
 ## Contexte du projet
 
 - **Kingdune** est un jeu web en 2D, projet perso, inspiré de la série **Kingdom** (Kingdom
-  Classic, New Lands, Two Crowns…). Le nom mélange *Kingdom* et *Dune* : on reprend les principes
+  Classic, New Lands, Two Crowns…). Le nom mélange _Kingdom_ et _Dune_ : on reprend les principes
   de Kingdom sans tout copier, dans un univers inspiré des romans de **Dune**.
 - Le personnage court sur un **terrain plat et borné à gauche et à droite**. C'est un segment, pas
   un monde infini ni ouvert. Il ne saute pas.
 - **Rendu** : tout est dessiné à la main dans un `<canvas>` (boucle `requestAnimationFrame` +
-  `deltaSeconds`). Les entités du jeu (`Character`, `Npc`, `Rabbit`, `Hunter`…) sont des classes
+  `deltaSeconds`). Les entités du jeu (`Character`, `Npc`, `Muaddib`, `Hunter`…) sont des classes
   TypeScript simples, pas des composants Angular. Angular sert de coquille (composant `Game`,
   entrées clavier, UI autour du canvas).
 - **Graphismes** : pas encore définis (papier, pixel art, 3D… on verra). Pour l'instant, on dessine
@@ -23,6 +22,7 @@ Principe : **garder les mécaniques de Kingdom et ne changer que leur sens.** Co
 reste simple : peu de touches et **une seule ressource**.
 
 **Décidé :**
+
 - **Camp** : on joue une tribu **Fremen**, menée par un naib (le monarque de Kingdom).
 - **Ressource unique : l'eau.** Les pièces sont représentées par des **anneaux d'eau** (les anneaux
   qui comptent l'eau d'un Fremen). Pas d'épice comme monnaie.
@@ -41,6 +41,7 @@ reste simple : peu de touches et **une seule ressource**.
   tue (ils se replient, ou les leurs emportent leurs morts).
 
 **Pistes ouvertes (rien de décidé) :**
+
 - Équivalent de l'arbre (obstacle à dégager qui rapporte de l'eau) : **caches d'eau dans la roche**,
   creusées par les bâtisseurs.
 - Grosse proie rare (le sanglier de Kingdom) : la **truite des sables**.
@@ -77,7 +78,7 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 - `src/app/game/` : la logique de jeu en TypeScript pur.
   - `config.ts` (unités, constantes), `camera.ts` (systèmes transverses) à la racine.
   - `world/` : le décor (`World`, `Ground`, `Tree`).
-  - `entities/` : ce qui bouge et a un comportement (`Character`, `Npc`, `Rabbit`, `Hunter`).
+  - `entities/` : ce qui bouge et a un comportement (`Character`, `Npc`, `Muaddib`, `Hunter`).
 - `src/app/utils/` : fonctions utilitaires génériques.
 
 ## Conventions du monde et du rendu
@@ -102,6 +103,7 @@ ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi
 décalage vertical), entités converties en mètres et posées sur le sol.
 
 **Pistes ouvertes / prochaines étapes possibles** :
+
 - Faire apparaître les lapins entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
 - Lier `width`/`height` du `<canvas>` aux constantes `SCREEN_WIDTH`/`SCREEN_HEIGHT` (encore en dur
   dans le template de `Game`).

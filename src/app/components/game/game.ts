@@ -8,7 +8,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Character, Direction } from '../../game/entities/character';
-import { Rabbit } from '../../game/entities/rabbit';
+import { Muaddib } from '../../game/entities/muaddib';
 import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
@@ -48,7 +48,7 @@ export class Game {
   private readonly character = new Character(this.world.center - 0.5, GROUND);
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.character.x, y: this.character.y })
 
-  private readonly rabbits: Rabbit[] = [];
+  private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
   private coins: Coin[] = [];
 
@@ -56,7 +56,7 @@ export class Game {
 
     for (let index = 0; index < 5; index++) {
       const position: number = Math.round((Math.random()) * this.world.width)
-      this.rabbits.push(new Rabbit(position, GROUND))
+      this.muaddibs.push(new Muaddib(position, GROUND))
     }
 
     this.coins.push(new Coin(3));
@@ -98,8 +98,8 @@ export class Game {
 
     this.character.move(this.direction, deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     this.camera.follow({ x: this.character.x, y: this.character.y })
-    this.rabbits.forEach((rabbit) => {
-      rabbit.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
+    this.muaddibs.forEach((muaddib) => {
+      muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     });
     this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
     this.render();
@@ -116,7 +116,7 @@ export class Game {
     this.world.draw(ctx, this.camera);
 
     this.character.draw(ctx, this.camera);
-    this.rabbits.forEach((rabbit: Rabbit) => rabbit.draw(ctx, this.camera));
+    this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.coins.forEach((coin: Coin) => coin.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
   }
