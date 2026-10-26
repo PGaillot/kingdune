@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "paperGame": {
+    "kingdune": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -62,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "paperGame:build:production"
+              "buildTarget": "kingdune:build:production"
             },
             "development": {
-              "buildTarget": "paperGame:build:development"
+              "buildTarget": "kingdune:build:development"
             }
           },
           "defaultConfiguration": "development"

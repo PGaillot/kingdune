@@ -8,5 +8,5 @@ import { Game } from './components/game/game';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('paperGame');
+  protected readonly title = signal('Kingdune');
 }

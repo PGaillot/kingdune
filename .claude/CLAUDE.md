@@ -1,10 +1,14 @@
 
-# paperGame
+# Kingdune
 
 ## Contexte du projet
 
-- **paperGame** est un nom provisoire. C'est un jeu web en 2D, projet perso, inspiré de la série
-  **Kingdom** (Kingdom Classic, New Lands, Two Crowns…).
+- **Kingdune** est un jeu web en 2D, projet perso, inspiré de la série **Kingdom** (Kingdom
+  Classic, New Lands, Two Crowns…). Le nom mélange *Kingdom* et *Dune* : on reprend les principes
+  de Kingdom sans tout copier, dans un univers inspiré des romans de **Dune**.
+- Idées d'univers (futur, rien de décidé) : casser des rochers pour récolter de l'**épice** au lieu
+  de couper des arbres pour des pièces ; l'épice pourrait devenir la monnaie (ou cohabiter avec les
+  pièces).
 - Le personnage court sur un **terrain plat et borné à gauche et à droite**. C'est un segment, pas
   un monde infini ni ouvert. Il ne saute pas.
 - **Rendu** : tout est dessiné à la main dans un `<canvas>` (boucle `requestAnimationFrame` +
