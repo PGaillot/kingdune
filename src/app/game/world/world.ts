@@ -4,6 +4,7 @@ import { Sietch } from "./sietch";
 import { DuneBiome } from "./biomes/dune.biome";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
+import { RockBiome } from "./biomes/rock.biome";
 
 export class World {
 
@@ -22,7 +23,7 @@ export class World {
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch(this.center);
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
-        this.ground.setZone(sietchIndex, this.sietch.width, new DuneBiome())
+        this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome())
     }
 
     public readonly center: GameMeter = 0;

@@ -7,7 +7,7 @@ export class WaterRing {
     size: GameMeter = 0.7;
 
     constructor(
-        private positionX: Pixel
+        private positionX: GameMeter
     ) { }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {

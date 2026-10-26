@@ -81,7 +81,7 @@ export class Game {
     this.pressedKeys.delete(event.key);
   }
 
-  /** Évite qu'une touche reste "waterRingcée" si la fenêtre perd le focus. */
+  /** Évite qu'une touche reste "coincé" si la fenêtre perd le focus. */
   protected onBlur(): void {
     this.pressedKeys.clear();
   }

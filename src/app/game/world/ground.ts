@@ -15,10 +15,10 @@ export class Ground {
 
     constructor(private leftEnd: GameMeter, cellCount: number) {
         for (let i = 0; i < cellCount; i++) {
-            this.groundGrid.push(new RockBiome())
+            this.groundGrid.push(new DuneBiome())
         }
-        this.setZone(0, this.borderWidth, new DuneBiome());
-        this.setZone(cellCount - this.borderWidth, this.borderWidth, new DuneBiome());
+        this.setZone(0, this.borderWidth, new RockBiome());
+        this.setZone(cellCount - this.borderWidth, this.borderWidth, new RockBiome());
     }
 
     private drawBiome(ctx: CanvasRenderingContext2D, camera: Camera, index: number, biome: Biome): void {
