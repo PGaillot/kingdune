@@ -1,6 +1,6 @@
 import { Camera } from "../camera";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter, type ScreenPoint } from "../config";
-import { Sietch } from "../entities/sietch";
+import { Sietch } from "./sietch";
 import { DuneBiome } from "./biomes/dune.biome";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
