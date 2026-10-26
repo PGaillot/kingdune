@@ -3,13 +3,13 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter, type ScreenPoint } from ".
 import { Campfire } from "../entities/campfire";
 import { MeadowBiome } from "./biomes/meadow.biome";
 import { Ground } from "./ground";
-import { Tree } from "./tree";
+import { Catchbasin } from "./catchbasin";
 
 export class World {
 
     backgroundColor: string = 'blue';
     ground: Ground;
-    trees: Tree[] = [];
+    catchbasins: Catchbasin[] = [];
     campfire: Campfire;
 
     /**
@@ -17,9 +17,9 @@ export class World {
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, treeCount: number = 4) {
+    constructor(public readonly radius: GameMeter, catchbasinCount: number = 4) {
         this.ground = new Ground(this.leftEnd, this.width);
-        this.trees = this.getRandomTreePositions(treeCount).map((x) => new Tree(x));
+        this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.campfire = new Campfire(this.center);
         const campfireIndex: number = this.ground.toIndex(this.campfire.position - this.campfire.width / 2);
         this.ground.setZone(campfireIndex, this.campfire.width, new MeadowBiome())
@@ -28,18 +28,18 @@ export class World {
     public readonly center: GameMeter = 0;
 
 
-    getRandomTreePositions(treeCount: number): GameMeter[] {
+    getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
         const available: GameMeter[] = [];
         for (let i = 0; i < this.width; i++) {
             available.push(this.leftEnd + i);
         }
 
-        if (treeCount > available.length) {
-            throw new Error(`Impossible de placer ${treeCount} arbres : seulement ${available.length} places.`);
+        if (catchbasinCount > available.length) {
+            throw new Error(`Impossible de placer ${catchbasinCount} bassin de captage : seulement ${available.length} places.`);
         }
 
         const positions: GameMeter[] = [];
-        for (let i = 0; i < treeCount; i++) {
+        for (let i = 0; i < catchbasinCount; i++) {
             const index = Math.floor(Math.random() * available.length);
             const [position] = available.splice(index, 1);
             positions.push(position);
@@ -63,7 +63,7 @@ export class World {
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         this.ground.draw(ctx, camera);
-        this.trees.forEach((tree: Tree) => tree.draw(ctx, camera))
+        this.catchbasins.forEach((catchbasin: Catchbasin) => catchbasin.draw(ctx, camera))
         this.campfire.draw(ctx, camera)
 
     }

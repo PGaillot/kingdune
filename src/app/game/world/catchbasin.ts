@@ -2,7 +2,7 @@ import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 
-export class Tree {
+export class Catchbasin {
     private color: string = 'brown'
     private width: GameMeter = 1;
     private height: GameMeter = Math.round(getRandomBetweenMinMax(5, 10))

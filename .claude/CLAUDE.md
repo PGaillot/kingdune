@@ -77,7 +77,7 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 - `src/app/components/` : uniquement les composants Angular (`game/` = la coquille autour du canvas).
 - `src/app/game/` : la logique de jeu en TypeScript pur.
   - `config.ts` (unités, constantes), `camera.ts` (systèmes transverses) à la racine.
-  - `world/` : le décor (`World`, `Ground`, `Tree`).
+  - `world/` : le décor (`World`, `Ground`, `Catchbasin`).
   - `entities/` : ce qui bouge et a un comportement (`Character`, `Npc`, `Muaddib`, `Hunter`).
 - `src/app/utils/` : fonctions utilitaires génériques.
 
