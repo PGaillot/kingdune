@@ -6,9 +6,6 @@
 - **Kingdune** est un jeu web en 2D, projet perso, inspiré de la série **Kingdom** (Kingdom
   Classic, New Lands, Two Crowns…). Le nom mélange *Kingdom* et *Dune* : on reprend les principes
   de Kingdom sans tout copier, dans un univers inspiré des romans de **Dune**.
-- Idées d'univers (futur, rien de décidé) : casser des rochers pour récolter de l'**épice** au lieu
-  de couper des arbres pour des pièces ; l'épice pourrait devenir la monnaie (ou cohabiter avec les
-  pièces).
 - Le personnage court sur un **terrain plat et borné à gauche et à droite**. C'est un segment, pas
   un monde infini ni ouvert. Il ne saute pas.
 - **Rendu** : tout est dessiné à la main dans un `<canvas>` (boucle `requestAnimationFrame` +
@@ -19,6 +16,39 @@
   des **blocs de couleur** et ça suffit. Ne pas investir dans le visuel.
 - **Aucune librairie** : pas de moteur de jeu (Phaser, PixiJS…), pas de librairie de physique ni
   d'UI. Tout est fait à la main.
+
+## Univers : on joue les Fremen
+
+Principe : **garder les mécaniques de Kingdom et ne changer que leur sens.** Comme Kingdom, le jeu
+reste simple : peu de touches et **une seule ressource**.
+
+**Décidé :**
+- **Camp** : on joue une tribu **Fremen**, menée par un naib (le monarque de Kingdom).
+- **Ressource unique : l'eau.** Les pièces sont représentées par des **anneaux d'eau** (les anneaux
+  qui comptent l'eau d'un Fremen). Pas d'épice comme monnaie.
+- **Cœur du royaume : le siètch**, qui remplace le feu de camp et en garde tous les rôles : point
+  de départ, centre améliorable, refuge, lumière (des brilleurs au lieu de flammes). Il est creusé
+  dans une **île rocheuse** au centre du monde. Plus on va vers `leftEnd`/`rightEnd`, plus le sable
+  est ouvert et dangereux (les vers ne vont pas sur la roche).
+- **Équivalences avec Kingdom :**
+  - lapins → **muad'dib** (souris du désert), chassés par les archers pour l'eau de leur corps ;
+  - fermes → **pièges à vent / collecteurs de rosée**, à l'arrêt pendant la saison des tempêtes
+    (l'équivalent de l'hiver) ;
+  - banquier → **maître de l'eau du siètch** (la réserve de la tribu) ;
+  - marchand → **contrebandiers** ;
+  - coffres → **caches d'eau abandonnées**.
+- **Ennemis** : Harkonnen et/ou Sardaukar. Comme les Greed, ils **ne donnent aucune eau** quand on les
+  tue (ils se replient, ou les leurs emportent leurs morts).
+
+**Pistes ouvertes (rien de décidé) :**
+- Équivalent de l'arbre (obstacle à dégager qui rapporte de l'eau) : **caches d'eau dans la roche**,
+  creusées par les bâtisseurs.
+- Grosse proie rare (le sanglier de Kingdom) : la **truite des sables**.
+- Niveaux du siètch : distille-tente → entrée scellée → siètch avec réservoir.
+- Monture : **chevaucher un ver** appelé avec un marteleur (thumper), sur le sable uniquement.
+- Inverser le danger jour/nuit (les Fremen se déplacent la nuit) : plus original, moins intuitif.
+- Naib anonyme avec Paul Atreides en toile de fond, ou incarner Paul (plus scénarisé).
+- L'épice : simple élément de décor ou de lore, peut-être échangée aux contrebandiers plus tard.
 
 ## Rôle de Claude : mentor, pas développeur
 
