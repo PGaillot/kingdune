@@ -1,7 +1,7 @@
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 
-export class Campfire {
+export class Sietch {
     height: GameMeter = 1;
     width: GameMeter = 3;
     color: string = 'orange';
