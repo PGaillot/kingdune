@@ -2,7 +2,7 @@ import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 import { Biome } from "./biomes/biome";
 import { RockBiome } from "./biomes/rock.biome";
-import { MeadowBiome } from "./biomes/meadow.biome";
+import { DuneBiome } from "./biomes/dune.biome";
 
 export class Ground {
 
@@ -17,8 +17,8 @@ export class Ground {
         for (let i = 0; i < cellCount; i++) {
             this.groundGrid.push(new RockBiome())
         }
-        this.setZone(0, this.borderWidth, new MeadowBiome());
-        this.setZone(cellCount - this.borderWidth, this.borderWidth, new MeadowBiome());
+        this.setZone(0, this.borderWidth, new DuneBiome());
+        this.setZone(cellCount - this.borderWidth, this.borderWidth, new DuneBiome());
     }
 
     private drawBiome(ctx: CanvasRenderingContext2D, camera: Camera, index: number, biome: Biome): void {

@@ -1,7 +1,7 @@
 import { Camera } from "../camera";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter, type ScreenPoint } from "../config";
 import { Sietch } from "../entities/sietch";
-import { MeadowBiome } from "./biomes/meadow.biome";
+import { DuneBiome } from "./biomes/dune.biome";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
 
@@ -22,7 +22,7 @@ export class World {
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch(this.center);
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
-        this.ground.setZone(sietchIndex, this.sietch.width, new MeadowBiome())
+        this.ground.setZone(sietchIndex, this.sietch.width, new DuneBiome())
     }
 
     public readonly center: GameMeter = 0;
