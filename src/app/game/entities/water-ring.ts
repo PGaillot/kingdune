@@ -1,14 +1,15 @@
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
+import { Collectible } from "./collectible";
 
-export class WaterRing {
+export class WaterRing extends Collectible {
 
     color: string = 'silver';
     size: GameMeter = 0.7;
 
-    constructor(
-        private positionX: GameMeter
-    ) { }
+    constructor(positionX: GameMeter) {
+        super(positionX)
+    }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {
         ctx.fillStyle = this.color;

@@ -1,8 +1,6 @@
 import { Camera } from "../camera";
 import { GameMeter, METER_UNIT, ScreenPoint } from "../config";
-
-/** -1 = gauche, 0 = immobile, 1 = droite */
-export type Direction = -1 | 0 | 1;
+import { Direction } from "./player-controller";
 
 export class Character {
   constructor(
@@ -13,6 +11,8 @@ export class Character {
     readonly speed: GameMeter = 3,
     readonly color: string = 'red',
   ) { }
+
+
 
   /** Déplace le personnage en restant dans les bornes [minX, maxX]. */
   move(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
