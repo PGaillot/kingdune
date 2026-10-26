@@ -13,7 +13,7 @@ import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
 import { GROUND, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
-import { Coin } from '../../game/entities/coins';
+import { WaterRing } from '../../game/entities/waterRing';
 
 @Component({
   selector: 'app-game',
@@ -50,7 +50,7 @@ export class Game {
 
   private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
-  private coins: Coin[] = [];
+  private waterRings: WaterRing[] = [];
 
   constructor() {
 
@@ -59,8 +59,8 @@ export class Game {
       this.muaddibs.push(new Muaddib(position, GROUND))
     }
 
-    this.coins.push(new Coin(3));
-    this.coins.push(new Coin(3.3))
+    this.waterRings.push(new WaterRing(3));
+    this.waterRings.push(new WaterRing(3.3))
 
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
@@ -81,7 +81,7 @@ export class Game {
     this.pressedKeys.delete(event.key);
   }
 
-  /** Évite qu'une touche reste "coincée" si la fenêtre perd le focus. */
+  /** Évite qu'une touche reste "waterRingcée" si la fenêtre perd le focus. */
   protected onBlur(): void {
     this.pressedKeys.clear();
   }
@@ -117,7 +117,7 @@ export class Game {
 
     this.character.draw(ctx, this.camera);
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
-    this.coins.forEach((coin: Coin) => coin.draw(ctx, this.camera));
+    this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
   }
 }

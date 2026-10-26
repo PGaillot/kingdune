@@ -1,9 +1,9 @@
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 
-export class Coin {
+export class WaterRing {
 
-    color: string = 'gold';
+    color: string = 'silver';
     size: GameMeter = 0.7;
 
     constructor(
