@@ -1,7 +1,7 @@
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 import { Biome } from "./biomes/biome";
-import { ForestBiome } from "./biomes/forest.biome";
+import { RockBiome } from "./biomes/rock.biome";
 import { MeadowBiome } from "./biomes/meadow.biome";
 
 export class Ground {
@@ -15,7 +15,7 @@ export class Ground {
 
     constructor(private leftEnd: GameMeter, cellCount: number) {
         for (let i = 0; i < cellCount; i++) {
-            this.groundGrid.push(new ForestBiome())
+            this.groundGrid.push(new RockBiome())
         }
         this.setZone(0, this.borderWidth, new MeadowBiome());
         this.setZone(cellCount - this.borderWidth, this.borderWidth, new MeadowBiome());
