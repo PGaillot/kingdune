@@ -109,6 +109,20 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi du personnage avec
 décalage vertical), entités converties en mètres et posées sur le sol.
 
+**Entrées et joueur (fait)** : `INPUT_MAPPING` dans `config.ts` (action → touches `event.code` +
+trigger : `tap`, `hold`, `long_hold`, `double_tap_hold`) ; `InputManager` (reçoit les événements
+transmis par `Game`, répond à `isActive(action)`, seul `hold` géré) ; `PlayerController` (cerveau :
+lit les actions dans `update()` et pilote le corps) ; `PlayerCharacter extends Character` (corps du
+joueur, avec une `Purse`) ; `Purse` (capacité optionnelle, `add()` renvoie l'objet qui déborde,
+`contentCount` en getter) ; `Hunter` a aussi une bourse (illimitée). Déplacement flèches + ZQSD OK.
+
+**En cours** : gérer les autres triggers dans `InputManager` pour la course (`double_tap_hold`).
+Piste retenue : une `Map` code de touche → fiche (`KeyRecord`) qui ne stocke que des **faits**
+(enfoncée, `pressedAt`, `releasedAt`, et au moment de l'appui « second appui rapide ? ») ; chaque
+trigger est **calculé** par une fonction (fiche + heure actuelle), choisie dans `isActive` via un
+`switch`. Penser à `event.repeat` et à séparer seuil tap/hold et délai de double tap. Ensuite :
+faire courir le corps (paramètre de `move()` ou état ?), puis ramasser les anneaux (AABB).
+
 **Pistes ouvertes / prochaines étapes possibles** :
 
 - Faire apparaître les muad'dib entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).

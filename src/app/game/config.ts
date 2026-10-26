@@ -1,6 +1,8 @@
 export type GameMeter = number;
 export type Pixel = number;
 
+export type KeyboardKey = KeyboardEvent['code'];
+
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
 export const GROUND = 0;
@@ -26,7 +28,7 @@ export type ActionTrigger =
     | 'hold' // se declanche instantanémant et se stop quand on relache la touche
     | 'long_hold' // se declanche apres une durée deffinit quand on maintient la touche
 
-export const INPUT_MAPPING: Record<KeyActionInGame, { keys: KeyboardEvent['code'][], trigger: ActionTrigger }> = {
+export const INPUT_MAPPING: Record<KeyActionInGame, { keys: KeyboardKey[], trigger: ActionTrigger }> = {
     move_left: { keys: ['ArrowLeft', 'KeyA'], trigger: 'hold' },
     move_right: { keys: ['ArrowRight', 'KeyD'], trigger: 'hold' },
     run_left: { keys: ['ArrowLeft', 'KeyA'], trigger: 'double_tap_hold' },

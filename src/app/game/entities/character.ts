@@ -18,7 +18,14 @@ export class Character {
   move(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
     const next = this.x + direction * this.speed * deltaSeconds;
     this.x = Math.min(Math.max(next, minX), maxX - this.width);
-  }
+  };
+
+  run(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+    const speedFactor: number = 1.3;
+    const runSpeed: number = speedFactor * this.speed;
+    const next = this.x + direction * runSpeed * deltaSeconds;
+    this.x = Math.min(Math.max(next, minX), maxX - this.width);
+  };
 
   draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
     ctx.fillStyle = this.color;

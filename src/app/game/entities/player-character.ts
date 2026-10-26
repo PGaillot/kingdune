@@ -1,7 +1,7 @@
 import { GameMeter } from "../config";
-import { Purse } from "../purse";
 import { Character } from "./character";
 import { Collectible } from "./collectible";
+import { Purse } from "./purse";
 
 export class PlayerCharacter extends Character {
     purse: Purse = new Purse(20);

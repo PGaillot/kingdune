@@ -1,15 +1,33 @@
-import { KeyActionInGame, INPUT_MAPPING } from "./config";
+import { KeyActionInGame, INPUT_MAPPING, ActionTrigger, KeyboardKey } from "./config";
+
+type KeyRecord = {
+    isDown: boolean,
+    releasedAt: number
+}
 
 export class InputManager {
 
-    public readonly keysPressed: Set<KeyboardEvent['code']> = new Set<KeyboardEvent['code']>();;
+    public readonly keysPressed: Set<KeyboardKey> = new Set<KeyboardKey>();
 
+    private holdDelay: number = 200; // c'est sous ce delay qu'on considère une tap, plus c'est du hold.
+
+    private keyRegistry = new Map<KeyboardKey, KeyRecord>()
 
     isActive(action: KeyActionInGame): boolean {
-        const keysFromActionInGame: KeyboardEvent['code'][] = this.getKeysFromActionInGame(action);
-        return keysFromActionInGame.some((key: KeyboardEvent['code']) => this.keysPressed.has(key))
+        const keysAndTriggerFromActionInGame: { keys: KeyboardKey[], trigger: ActionTrigger } = INPUT_MAPPING[action];
+        const keys: KeyboardKey[] = keysAndTriggerFromActionInGame.keys;
+        const trigger: ActionTrigger = keysAndTriggerFromActionInGame.trigger;
+        if (keys.some((key: KeyboardKey) => this.keysPressed.has(key))) {
+            switch (trigger) {
+                case "double_tap_hold": return true
+                case "hold":
+                    return true
+                case "long_hold": return true
+                default: return true
+            }
+        }
+        return false
     }
-
 
     public inputPress(keyPressed: KeyboardEvent): void {
         this.keysPressed.add(keyPressed.code)
@@ -24,7 +42,4 @@ export class InputManager {
         this.keysPressed.clear();
     }
 
-    private getKeysFromActionInGame(actionTriggerInGame: KeyActionInGame): KeyboardEvent['code'][] {
-        return INPUT_MAPPING[actionTriggerInGame].keys;
-    }
 }

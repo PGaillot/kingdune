@@ -1,4 +1,4 @@
-import { Collectible } from "./entities/collectible";
+import { Collectible } from "./collectible";
 
 export class Purse {
 

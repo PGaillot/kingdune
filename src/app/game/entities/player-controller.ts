@@ -7,9 +7,10 @@ export type Direction = -1 | 0 | 1;
 
 export class PlayerController {
 
-    constructor(protected inputManager: InputManager, protected playerCharacter: PlayerCharacter) {
-
-    }
+    constructor(
+        protected inputManager: InputManager,
+        protected playerCharacter: PlayerCharacter
+    ) { }
 
     public update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
         this.playerCharacter.move(this.direction, deltaSeconds, minX, maxX)
