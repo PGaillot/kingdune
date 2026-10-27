@@ -16,4 +16,8 @@ export class PlayerCharacter extends Character {
             // le faire apparaitre au sol
         }
     }
+
+    pay(): void {
+        console.log('pay')
+    }
 }

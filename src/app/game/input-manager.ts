@@ -8,7 +8,7 @@ type KeyRecord = {
 export class InputManager {
     private doubleTapDelay: number = 250; // le laps de temps entre deux taps pour faire un double tap !
     private tapDelay: number = 200;
-    private longHoldDelay: number = 300; // délais a partir du quel on considere un appuis long sur une touche 
+    private longHoldDelay: number = 800; // délais a partir du quel on considere un appuis long sur une touche 
     private keyRegistry = new Map<KeyboardKey, KeyRecord>()
 
     private previousFrameTimestamp: number = 0;

@@ -21,9 +21,17 @@ export class PlayerController {
     public update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
         const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
         if (isRunning) {
-            this.playerCharacter.run(this.direction, deltaSeconds, minX, maxX)
+            this.playerCharacter.run(this.direction, deltaSeconds, minX, maxX);
         } else {
             this.playerCharacter.walk(this.direction, deltaSeconds, minX, maxX);
+        }
+
+        if (this.inputManager.isActive('drop')) {
+            this.playerCharacter.dropCollectible();
+        }
+
+        if (this.inputManager.isActive('pay')) {
+            this.playerCharacter.pay();
         }
     }
 
