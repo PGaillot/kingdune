@@ -4,6 +4,12 @@ import { PlayerCharacter } from "./player-character";
 
 /** -1 = gauche, 0 = immobile, 1 = droite */
 export type Direction = -1 | 0 | 1;
+export type DirectionHorizontalType = 'left' | 'idle' | 'right';
+export const DIRECTION: Record<DirectionHorizontalType, Direction> = {
+    left: -1,
+    idle: 0,
+    right: 1
+}
 
 export class PlayerController {
 
@@ -13,7 +19,12 @@ export class PlayerController {
     ) { }
 
     public update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
-        this.playerCharacter.move(this.direction, deltaSeconds, minX, maxX)
+        const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
+        if (isRunning) {
+            this.playerCharacter.run(this.direction, deltaSeconds, minX, maxX)
+        } else {
+            this.playerCharacter.walk(this.direction, deltaSeconds, minX, maxX);
+        }
     }
 
     private get direction(): Direction {

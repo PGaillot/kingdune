@@ -72,7 +72,9 @@ export class Game {
 
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
-      this.frameId = requestAnimationFrame((timestamp) => this.loop(timestamp));
+      this.frameId = requestAnimationFrame((timestamp) => {
+        this.loop(timestamp)
+      });
     });
 
     inject(DestroyRef).onDestroy(() => cancelAnimationFrame(this.frameId));
@@ -81,7 +83,7 @@ export class Game {
   private loop(timestamp: number): void {
     const deltaSeconds = this.lastTimestamp ? (timestamp - this.lastTimestamp) / 1000 : 0;
     this.lastTimestamp = timestamp;
-
+    this.inputManager.updateClock(timestamp);
     this.playerController.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     this.camera.follow({ x: this.player.x, y: this.player.y })
     this.muaddibs.forEach((muaddib) => {
@@ -105,5 +107,6 @@ export class Game {
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
+
   }
 }

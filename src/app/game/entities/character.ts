@@ -2,34 +2,56 @@ import { Camera } from "../camera";
 import { GameMeter, METER_UNIT, ScreenPoint } from "../config";
 import { Direction } from "./player-controller";
 
+export type CharacterOptions = {
+  readonly width: GameMeter,
+  readonly height: GameMeter,
+  readonly speed: GameMeter,
+  readonly color: string,
+  readonly runFactor: number,
+}
+
+const DEFAULT_CHARACTER: CharacterOptions = {
+  width: 1,
+  height: 2,
+  speed: 3,
+  color: 'red',
+  runFactor: 1.85,
+}
+
 export class Character {
+
+  readonly options: CharacterOptions;
+
   constructor(
     public x: GameMeter,
     public y: GameMeter,
-    readonly width: GameMeter = 1,
-    readonly height: GameMeter = 2,
-    readonly speed: GameMeter = 3,
-    readonly color: string = 'red',
-  ) { }
+    options: Partial<CharacterOptions> = {},
+  ) {
+    this.options = { ...DEFAULT_CHARACTER, ...options }
+  }
 
+  get runSpeed(): GameMeter {
+    return this.options.runFactor * this.options.speed;
+  }
 
 
   /** Déplace le personnage en restant dans les bornes [minX, maxX]. */
-  move(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
-    const next = this.x + direction * this.speed * deltaSeconds;
-    this.x = Math.min(Math.max(next, minX), maxX - this.width);
+  protected move(direction: Direction, speed: number, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+    const next = this.x + direction * speed * deltaSeconds;
+    this.x = Math.min(Math.max(next, minX), maxX - this.options.width);
   };
 
+  walk(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter) {
+    this.move(direction, this.options.speed, deltaSeconds, minX, maxX)
+  }
+
   run(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
-    const speedFactor: number = 1.3;
-    const runSpeed: number = speedFactor * this.speed;
-    const next = this.x + direction * runSpeed * deltaSeconds;
-    this.x = Math.min(Math.max(next, minX), maxX - this.width);
+    this.move(direction, this.runSpeed, deltaSeconds, minX, maxX)
   };
 
   draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = this.options.color;
     const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: this.y })
-    ctx.fillRect(positionInCamera.x, (positionInCamera.y - this.height * METER_UNIT), this.width * METER_UNIT, this.height * METER_UNIT);
+    ctx.fillRect(positionInCamera.x, (positionInCamera.y - this.options.height * METER_UNIT), this.options.width * METER_UNIT, this.options.height * METER_UNIT);
   }
 }

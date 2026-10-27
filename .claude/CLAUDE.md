@@ -110,18 +110,29 @@ ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi
 décalage vertical), entités converties en mètres et posées sur le sol.
 
 **Entrées et joueur (fait)** : `INPUT_MAPPING` dans `config.ts` (action → touches `event.code` +
-trigger : `tap`, `hold`, `long_hold`, `double_tap_hold`) ; `InputManager` (reçoit les événements
-transmis par `Game`, répond à `isActive(action)`, seul `hold` géré) ; `PlayerController` (cerveau :
-lit les actions dans `update()` et pilote le corps) ; `PlayerCharacter extends Character` (corps du
-joueur, avec une `Purse`) ; `Purse` (capacité optionnelle, `add()` renvoie l'objet qui déborde,
+trigger : `tap`, `hold`, `long_hold`, `double_tap_hold`) ; `PlayerController` (cerveau : lit les
+actions dans `update()` et pilote le corps) ; `PlayerCharacter extends Character` (corps du joueur,
+avec une `Purse`) ; `Purse` (capacité optionnelle, `add()` renvoie l'objet qui déborde,
 `contentCount` en getter) ; `Hunter` a aussi une bourse (illimitée). Déplacement flèches + ZQSD OK.
 
-**En cours** : gérer les autres triggers dans `InputManager` pour la course (`double_tap_hold`).
-Piste retenue : une `Map` code de touche → fiche (`KeyRecord`) qui ne stocke que des **faits**
-(enfoncée, `pressedAt`, `releasedAt`, et au moment de l'appui « second appui rapide ? ») ; chaque
-trigger est **calculé** par une fonction (fiche + heure actuelle), choisie dans `isActive` via un
-`switch`. Penser à `event.repeat` et à séparer seuil tap/hold et délai de double tap. Ensuite :
-faire courir le corps (paramètre de `move()` ou état ?), puis ramasser les anneaux (AABB).
+**`InputManager` (fait, les 4 triggers)** : une `Map` code de touche → fiche `KeyRecord`
+(`pressedAt`, `releasedAt`, notés avec `performance.now()` ; `event.repeat` ignoré ; plus de `Set`).
+Chaque trigger est **calculé** depuis la fiche (`isDown`, `isDoubleTap`, `isLongHold`, `isTap`) via
+un `switch` exhaustif sur `ActionTrigger` ; `isActive` = `some` sur les touches de l'action.
+`updateClock(timestamp)` est appelé en haut de `Game.loop()` : il garde l'heure de la frame
+précédente et de la frame actuelle. Les décisions lisent l'heure de la frame ; `tap` est un
+**événement** (relâchée dans la tranche `]précédente, actuelle]` + appui court), vrai une seule
+frame. Seuils : tap < 200 ms, double tap < 250 ms, long hold > 400 ms.
+
+**Personnages (fait)** : `Character` reçoit `x`, `y` et une fiche `Partial<CharacterOptions>`
+(`width`, `height`, `speed`, `color`, `runFactor`) fusionnée avec `DEFAULT_CHARACTER` par spread ;
+chaque sous-classe a sa constante de défauts hors de la classe, `Npc` relaie la fiche à `super`.
+`move()` (protected, vitesse en paramètre) + intentions `walk()` / `run()` (`runSpeed` en getter).
+`PlayerController` : une direction, puis `run()` **ou** `walk()`. Course au double tap OK.
+Gauche + droite en même temps = arrêt : comportement voulu.
+
+**Prochaine étape** : ramasser les anneaux (AABB). `runFactor` (1,1) sera sans doute à régler en
+jouant. `drop` (tap) et `pay` (long hold) sont détectés mais rien ne les utilise encore.
 
 **Pistes ouvertes / prochaines étapes possibles** :
 

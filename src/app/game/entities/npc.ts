@@ -1,18 +1,17 @@
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
-import { Character } from "./character";
+import { Character, CharacterOptions } from "./character";
 import { GameMeter } from "../config";
 import { Direction } from "./player-controller";
 
 export class Npc extends Character {
-
 
     private nextDecisionDuration: number = 0;
 
     private timeUntilNextDecision: number = this.nextDecisionDuration;
     private currentDirection: Direction = 0;
 
-    constructor(x: GameMeter, y: GameMeter, width: GameMeter, height: GameMeter, speed: GameMeter, nextDecisionDurationMin: number, nextDecisionDurationMax: number, color: string) {
-        super(x, y, width, height, speed, color);
+    constructor(x: GameMeter, y: GameMeter, nextDecisionDurationMin: number, nextDecisionDurationMax: number, options: Partial<CharacterOptions>) {
+        super(x, y, options);
         this.nextDecisionDuration = getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
     }
 
@@ -25,6 +24,6 @@ export class Npc extends Character {
             this.timeUntilNextDecision = this.nextDecisionDuration;
         }
 
-        this.move(this.currentDirection, deltaSeconds, minX, maxX)
+        this.walk(this.currentDirection, deltaSeconds, minX, maxX)
     }
 }

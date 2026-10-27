@@ -1,12 +1,15 @@
 import { GameMeter } from "../config";
-import { Purse } from "../purse";
+import { CharacterOptions } from "./character";
 import { Npc } from "./npc";
+import { Purse } from "./purse";
+
+const DEFAULT_OPTIONS: Partial<CharacterOptions> = { color: 'black' }
 
 export class Hunter extends Npc {
 
     purse: Purse = new Purse();
 
-    constructor(x: GameMeter, y: GameMeter) {
-        super(x, y, 1, 2, 2, 2, 4, "black");
+    constructor(x: GameMeter, y: GameMeter, options?: Partial<CharacterOptions>) {
+        super(x, y, 2, 4, { ...DEFAULT_OPTIONS, ...options });
     }
 }
