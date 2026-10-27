@@ -16,6 +16,7 @@ import { WaterRing } from '../../game/entities/water-ring';
 import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
+import { Builder } from '../../game/entities/builder';
 
 @Component({
   selector: 'app-game',
@@ -58,6 +59,7 @@ export class Game {
 
   private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
+  private readonly buider = new Builder(-3, GROUND)
   private waterRings: WaterRing[] = [];
 
 
@@ -89,7 +91,8 @@ export class Game {
     this.muaddibs.forEach((muaddib) => {
       muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     });
-    this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
+    this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
+    this.buider.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
     this.render();
 
     this.frameId = requestAnimationFrame((next) => this.loop(next));
@@ -107,6 +110,6 @@ export class Game {
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
-
+    this.buider.draw(ctx, this.camera);
   }
 }
