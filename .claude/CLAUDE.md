@@ -144,16 +144,52 @@ chaque sous-classe a sa constante de défauts hors de la classe, `Npc` relaie la
 `PlayerController` : une direction, puis `run()` **ou** `walk()`. Course au double tap OK.
 Gauche + droite en même temps = arrêt : comportement voulu.
 
-**Prochaine étape** : ramasser les anneaux (AABB). `runFactor` (1,1) sera sans doute à régler en
-jouant. `drop` (tap) et `pay` (long hold) sont détectés mais rien ne les utilise encore.
+**Ramassage et dépôt (fait)** : `overlaps(a, b)` dans `src/app/hitbox.ts` (AABB écrite à la main,
+X et Y) ; `hitbox` en **getter** sur `Character` et `Collectible` (recalculée à chaque lecture).
+`Collectible` a ses options (`width`, `height`, `color`), `x`/`y`, `draw()` (remonté depuis
+`WaterRing`) et un état `droppedBy`. Les collectibles vivent dans `World.collectibles`
+(`Collectible[]`). `PlayerController.update(deltaSeconds, world)` reçoit le monde entier.
+`dropCollectible(world)` pose **le même objet** sorti de la bourse aux pieds du naib.
+Règle de ramassage : `canBePickedBy(character)` = tout le monde sauf `droppedBy` ; `update()` oublie
+`droppedBy` dès que celui-ci ne touche plus l'anneau. Le délai en secondes a été retiré (à remettre
+peut-être pour le hunter). Type `Second` dans `config.ts`.
+
+**Sprite de la dune (fait, commité le 28/10/2026)** : `Catchbasin` (`world/catchbasin.ts`) = la dune
+« cache d'eau ». Images dans `public/ressources/catchbasin/` (`catchbasin_1.png` 48×32 px,
+`catchbasin_flag_1.png` = le drapeau). Échelle : 16 px de dessin = 1 m. Images chargées **une fois**
+dans des constantes hors de la classe (`IMAGE`, `MARKER`), mises dans `DEFAULT_CATCHBASIN_OPTION`.
+Taille logique (hitbox) **1 m × 2 m**, taille visuelle **3 m × 2 m** (`imageWidth` / `imageHeight`),
+image **centrée sur le tronc** (comme les arbres de Kingdom, les dunes peuvent se chevaucher).
+`draw()` : `ctx.save()` en premier / `ctx.restore()` à la fin (`imageSmoothingEnabled`, `filter`),
+position et taille calculées une fois (`destinationOption`, `dimensionOption`), technique du peintre :
+dune puis drapeau si `marker`. **Survol** : `hoverByPlayer` mis à jour dans `Game.loop()`
+(`catchbasin.hoverByPlayer = overlaps(...)`), la dune s'assombrit (`filter = 'brightness(0.6)'`,
+drapeau compris). `mark()` et `price` (1 anneau) existent mais ne sont pas encore branchés.
+Rappels donnés : `=` vs `===` dans un `if` ; `save()`/`restore()` = pile de réglages, pas de dessins.
+
+**Prochaine étape (après la pause repas du 28/10/2026)** : afficher un **symbole d'anneau**
+au-dessus de la dune survolée (l'utilisateur a une image à montrer), puis **payer** : action `pay`
+(déjà dans `PlayerController`, appelle `playerCharacter.pay()`) → l'anneau sort de la bourse, va
+dans la dune survolée, qui appelle `mark()`. Question ouverte : qui sait **quelle** dune est devant
+le naib (le controller qui cherche dans `world.catchbasins`, ou autre) ? Le drapeau s'utilise aussi
+avec la taille de la dune : à revoir si le PNG du drapeau n'a pas la même taille.
+Toujours en attente : un `METER_UNIT` multiple de 16 (aujourd'hui 40 → agrandissement 2,5).
 
 **Pistes ouvertes / prochaines étapes possibles** :
 
+- **Mode debug des hitbox** (voulu par l'utilisateur) : une fonction générique qui dessine le contour
+  (`strokeRect`) de n'importe quel `hitbox` (tous les objets exposent le même getter), activée par
+  une constante dans `config.ts` ou mieux une touche `tap` dans `INPUT_MAPPING`.
+- Dessiner les collectibles au premier plan (aujourd'hui dans `World.draw()`, donc derrière les
+  personnages) : les dessiner depuis `Game.render()` après les personnages, ou des calques.
+- `WaterRing.draw()` est remonté dans `Collectible` ; `update()` des collectibles prendra
+  `deltaSeconds` quand la gravité arrivera (chute, lancer, rebond : intégration d'Euler).
 - Faire apparaître les muad'dib entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
 - Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
   les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
 - La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
-- `src/app/hitbox.ts` n'est utilisé nulle part : à brancher (collisions AABB) ou à retirer.
+- `speed` est typé `GameMeter` alors que c'est des m/s (à revoir plus tard).
+- `hitbox.ts` est dans `src/app/` alors que c'est de la logique de jeu (`src/app/game/`).
 
 ---
 
