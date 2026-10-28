@@ -17,6 +17,8 @@ import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
 import { Builder } from '../../game/entities/builder';
+import { overlaps } from '../../hitbox';
+import { Collectible } from '../../game/entities/collectible';
 
 @Component({
   selector: 'app-game',
@@ -87,6 +89,17 @@ export class Game {
     this.lastTimestamp = timestamp;
     this.inputManager.updateClock(timestamp);
     this.playerController.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
+
+    this.waterRings.forEach((ring: WaterRing) => {
+      if (overlaps(this.player.hitbox, ring.hitbox)) {
+        const ringOverflow: Collectible | undefined = this.player.purse.add(ring);
+        if (ringOverflow === undefined) {
+          this.waterRings = this.waterRings.filter((other: WaterRing) => other !== ring)
+        }
+      }
+    })
+
+
     this.camera.follow({ x: this.player.x, y: this.player.y })
     this.muaddibs.forEach((muaddib) => {
       muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
