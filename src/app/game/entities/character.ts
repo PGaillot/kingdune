@@ -1,5 +1,6 @@
+import { Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, METER_UNIT, ScreenPoint } from "../config";
+import { GameMeter, METER_UNIT, ScreenPoint, Second } from "../config";
 import { Direction } from "./player-controller";
 
 export type CharacterOptions = {
@@ -8,6 +9,7 @@ export type CharacterOptions = {
   readonly speed: GameMeter,
   readonly color: string,
   readonly runFactor: number,
+  readonly delayCollectiblePicking: Second, // le delai avant qu'un personnage puis ramasser un collectible qu'il à laché lui même.
 }
 
 const DEFAULT_CHARACTER: CharacterOptions = {
@@ -16,6 +18,7 @@ const DEFAULT_CHARACTER: CharacterOptions = {
   speed: 1.75,
   color: 'red',
   runFactor: 1.85,
+  delayCollectiblePicking: 5,
 }
 
 export class Character {
@@ -25,27 +28,35 @@ export class Character {
   constructor(
     public x: GameMeter,
     public y: GameMeter,
-    options: Partial<CharacterOptions> = {},
+    options?: Partial<CharacterOptions>,
   ) {
-    this.options = { ...DEFAULT_CHARACTER, ...options }
+    this.options = { ...DEFAULT_CHARACTER, ...options };
   }
 
   get runSpeed(): GameMeter {
     return this.options.runFactor * this.options.speed;
   }
 
+  get hitbox(): Hitbox {
+    return {
+      height: this.options.height,
+      width: this.options.width,
+      x: this.x,
+      y: this.y
+    }
+  }
 
   /** Déplace le personnage en restant dans les bornes [minX, maxX]. */
-  protected move(direction: Direction, speed: number, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+  protected move(direction: Direction, speed: number, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
     const next = this.x + direction * speed * deltaSeconds;
     this.x = Math.min(Math.max(next, minX), maxX - this.options.width);
   };
 
-  walk(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter) {
+  walk(direction: Direction, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter) {
     this.move(direction, this.options.speed, deltaSeconds, minX, maxX)
   }
 
-  run(direction: Direction, deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+  run(direction: Direction, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
     this.move(direction, this.runSpeed, deltaSeconds, minX, maxX)
   };
 

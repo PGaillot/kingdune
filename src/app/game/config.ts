@@ -1,5 +1,6 @@
 export type GameMeter = number;
 export type Pixel = number;
+export type Second = number
 
 export type KeyboardKey = KeyboardEvent['code'];
 

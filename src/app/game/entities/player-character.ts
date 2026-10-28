@@ -3,12 +3,13 @@ import { Character, CharacterOptions } from "./character";
 import { Collectible } from "./collectible";
 import { Purse } from "./purse";
 
-const DEFAULT_OPTIONS: CharacterOptions = {
+const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
     width: 1,
     height: 2,
     speed: 2.4,
     color: 'purple',
     runFactor: 1.9,
+    delayCollectiblePicking: 0.5
 }
 
 export class PlayerCharacter extends Character {

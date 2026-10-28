@@ -1,6 +1,6 @@
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Character, CharacterOptions } from "./character";
-import { GameMeter } from "../config";
+import { GameMeter, Second } from "../config";
 import { Direction } from "./player-controller";
 
 export class Npc extends Character {
@@ -15,7 +15,7 @@ export class Npc extends Character {
         this.nextDecisionDuration = getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
     }
 
-    update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+    update(deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
         this.timeUntilNextDecision -= deltaSeconds;
 
         if (this.timeUntilNextDecision <= 0) {

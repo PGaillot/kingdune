@@ -59,7 +59,7 @@ export class Game {
 
   private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
-  private readonly buider = new Builder(-3, GROUND)
+  private readonly builder = new Builder(-3, GROUND)
   private waterRings: WaterRing[] = [];
 
 
@@ -69,8 +69,8 @@ export class Game {
       this.muaddibs.push(new Muaddib(position, GROUND))
     }
 
-    this.waterRings.push(new WaterRing(3));
-    this.waterRings.push(new WaterRing(3.3))
+    this.waterRings.push(new WaterRing(3, GROUND));
+    this.waterRings.push(new WaterRing(3.3, GROUND))
 
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
@@ -92,7 +92,7 @@ export class Game {
       muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
     });
     this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
-    this.buider.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
+    this.builder.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
     this.render();
 
     this.frameId = requestAnimationFrame((next) => this.loop(next));
@@ -110,6 +110,6 @@ export class Game {
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
-    this.buider.draw(ctx, this.camera);
+    this.builder.draw(ctx, this.camera);
   }
 }

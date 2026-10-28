@@ -1,4 +1,4 @@
-import { GameMeter } from "../config";
+import { GameMeter, Second } from "../config";
 import { InputManager } from "../input-manager";
 import { PlayerCharacter } from "./player-character";
 
@@ -18,7 +18,7 @@ export class PlayerController {
         protected playerCharacter: PlayerCharacter
     ) { }
 
-    public update(deltaSeconds: number, minX: GameMeter, maxX: GameMeter): void {
+    public update(deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
         const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
         if (isRunning) {
             this.playerCharacter.run(this.direction, deltaSeconds, minX, maxX);
