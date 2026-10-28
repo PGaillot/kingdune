@@ -57,3 +57,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Ressources graphiques
+
+- [The Spriters Resource : Kingdom Two Crowns](https://www.spriters-resource.com/pc_computer/kingdomtwocrowns/) : les planches de sprites extraites du jeu, pour mesurer la taille des personnages et étudier les animations. Le site couvre aussi beaucoup d'autres jeux.

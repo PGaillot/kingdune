@@ -39,11 +39,24 @@ reste simple : peu de touches et **une seule ressource**.
   - coffres → **caches d'eau abandonnées**.
 - **Ennemis** : Harkonnen et/ou Sardaukar. Comme les Greed, ils **ne donnent aucune eau** quand on les
   tue (ils se replient, ou les leurs emportent leurs morts).
+- **Côtés du monde** : comme dans Kingdom, les deux bords diffèrent : d'un côté un « portail » ennemi
+  à détruire, de l'autre un côté bouché. Croquis : dunes d'un côté, ruines de l'autre.
+
+**Décidé à partir des croquis** (`recherches/recherches_1.png`, pas encore codé) :
+
+- **Buissons secs** (l'équivalent des terriers/buissons à lapins) : les muad'dib en sortent et restent
+  dans une zone autour. Ils n'apparaissent que sur certains biomes (le biome rock).
+- **Dunes à aplanir** (l'équivalent de l'arbre à couper) : on marque la dune avec un **petit drapeau**
+  en payant un anneau, puis un builder l'aplanit. Il rend alors au hasard **1 anneau** (on récupère la
+  mise) ou **2 anneaux** (gain net d'un anneau). Probabilités à définir.
+  Bonus : si la dune est au **bord d'un biome rock**, l'aplanir **fait grandir la roche**, où peuvent
+  ensuite pousser des buissons secs et vivre des muad'dib (et où les vers ne vont pas).
+- **Emplacements de construction signalés par des cairns** : un socle carré + 2-3 cailloux empilés =
+  futur **mur** ; des pierres plates empilées = futur **tour**. L'anneau dessiné au-dessus indique où
+  payer.
 
 **Pistes ouvertes (rien de décidé) :**
 
-- Équivalent de l'arbre (obstacle à dégager qui rapporte de l'eau) : **caches d'eau dans la roche**,
-  creusées par les bâtisseurs.
 - Grosse proie rare (le sanglier de Kingdom) : la **truite des sables**.
 - Niveaux du siètch : distille-tente → entrée scellée → siètch avec réservoir.
 - Monture : **chevaucher un ver** appelé avec un marteleur (thumper), sur le sable uniquement.
