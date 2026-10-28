@@ -83,7 +83,7 @@ export class Game {
     const deltaSeconds = this.lastTimestamp ? (timestamp - this.lastTimestamp) / 1000 : 0;
     this.lastTimestamp = timestamp;
     this.inputManager.updateClock(timestamp);
-    this.playerController.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
+    this.playerController.update(deltaSeconds, this.world);
 
     this.world.waterRings.forEach((ring: WaterRing) => {
       if (overlaps(this.player.hitbox, ring.hitbox)) {

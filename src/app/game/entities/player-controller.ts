@@ -1,5 +1,6 @@
-import { GameMeter, Second } from "../config";
+import { Second } from "../config";
 import { InputManager } from "../input-manager";
+import { World } from "../world/world";
 import { PlayerCharacter } from "./player-character";
 
 /** -1 = gauche, 0 = immobile, 1 = droite */
@@ -18,12 +19,12 @@ export class PlayerController {
         protected playerCharacter: PlayerCharacter
     ) { }
 
-    public update(deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
+    public update(deltaSeconds: Second, world: World): void {
         const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
         if (isRunning) {
-            this.playerCharacter.run(this.direction, deltaSeconds, minX, maxX);
+            this.playerCharacter.run(this.direction, deltaSeconds, world.leftEnd, world.rightEnd);
         } else {
-            this.playerCharacter.walk(this.direction, deltaSeconds, minX, maxX);
+            this.playerCharacter.walk(this.direction, deltaSeconds, world.leftEnd, world.rightEnd);
         }
 
         if (this.inputManager.isActive('drop')) {
