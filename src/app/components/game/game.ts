@@ -62,17 +62,12 @@ export class Game {
   private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
   private readonly builder = new Builder(-3, GROUND)
-  private waterRings: WaterRing[] = [];
-
 
   constructor() {
     for (let index = 0; index < 5; index++) {
       const position: number = Math.round((Math.random()) * this.world.width)
       this.muaddibs.push(new Muaddib(position, GROUND))
     }
-
-    this.waterRings.push(new WaterRing(3, GROUND));
-    this.waterRings.push(new WaterRing(3.3, GROUND))
 
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
@@ -90,15 +85,14 @@ export class Game {
     this.inputManager.updateClock(timestamp);
     this.playerController.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
 
-    this.waterRings.forEach((ring: WaterRing) => {
+    this.world.waterRings.forEach((ring: WaterRing) => {
       if (overlaps(this.player.hitbox, ring.hitbox)) {
         const ringOverflow: Collectible | undefined = this.player.purse.add(ring);
         if (ringOverflow === undefined) {
-          this.waterRings = this.waterRings.filter((other: WaterRing) => other !== ring)
+          this.world.waterRings = this.world.waterRings.filter((other: WaterRing) => other !== ring)
         }
       }
     })
-
 
     this.camera.follow({ x: this.player.x, y: this.player.y })
     this.muaddibs.forEach((muaddib) => {
@@ -121,7 +115,6 @@ export class Game {
 
     this.player.draw(ctx, this.camera);
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
-    this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
     this.builder.draw(ctx, this.camera);
   }

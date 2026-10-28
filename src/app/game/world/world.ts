@@ -1,9 +1,10 @@
 import { Camera } from "../camera";
-import { SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { GROUND, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
 import { RockBiome } from "./biomes/rock.biome";
+import { WaterRing } from "../entities/water-ring";
 
 export class World {
 
@@ -11,6 +12,7 @@ export class World {
     ground: Ground;
     catchbasins: Catchbasin[] = [];
     sietch: Sietch;
+    waterRings: WaterRing[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
@@ -23,6 +25,12 @@ export class World {
         this.sietch = new Sietch(this.center);
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
         this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome())
+
+        this.waterRings.push(new WaterRing(3, GROUND));
+        this.waterRings.push(new WaterRing(-3.3, GROUND))
+        this.waterRings.push(new WaterRing(-6, GROUND));
+        this.waterRings.push(new WaterRing(13.3, GROUND))
+        this.waterRings.push(new WaterRing(-8, GROUND));
     }
 
     public readonly center: GameMeter = 0;
@@ -65,6 +73,6 @@ export class World {
         this.ground.draw(ctx, camera);
         this.catchbasins.forEach((catchbasin: Catchbasin) => catchbasin.draw(ctx, camera))
         this.sietch.draw(ctx, camera)
-
+        this.waterRings.forEach((waterRing: WaterRing) => waterRing.draw(ctx, camera));
     }
 }
