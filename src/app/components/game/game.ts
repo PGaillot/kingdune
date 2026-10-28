@@ -12,7 +12,6 @@ import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
 import { GROUND, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
-import { WaterRing } from '../../game/entities/water-ring';
 import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
@@ -85,11 +84,12 @@ export class Game {
     this.inputManager.updateClock(timestamp);
     this.playerController.update(deltaSeconds, this.world);
 
-    this.world.waterRings.forEach((ring: WaterRing) => {
-      if (overlaps(this.player.hitbox, ring.hitbox)) {
-        const ringOverflow: Collectible | undefined = this.player.purse.add(ring);
-        if (ringOverflow === undefined) {
-          this.world.waterRings = this.world.waterRings.filter((other: WaterRing) => other !== ring)
+    this.world.collectibles.forEach((collectible: Collectible) => {
+      collectible.update();
+      if (overlaps(this.player.hitbox, collectible.hitbox) && collectible.canBePickedBy(this.player)) {
+        const collectibleOverflow: Collectible | undefined = this.player.purse.add(collectible);
+        if (collectibleOverflow === undefined) {
+          this.world.collectibles = this.world.collectibles.filter((other: Collectible) => other !== collectible)
         }
       }
     })
@@ -112,7 +112,6 @@ export class Game {
 
     const ctx = this.ctx;
     this.world.draw(ctx, this.camera);
-
     this.player.draw(ctx, this.camera);
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);

@@ -1,4 +1,5 @@
 import { GameMeter } from "../config";
+import { World } from "../world/world";
 import { Character, CharacterOptions } from "./character";
 import { Collectible } from "./collectible";
 import { Purse } from "./purse";
@@ -9,7 +10,6 @@ const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
     speed: 2.4,
     color: 'purple',
     runFactor: 1.9,
-    delayCollectiblePicking: 0.5
 }
 
 export class PlayerCharacter extends Character {
@@ -20,10 +20,13 @@ export class PlayerCharacter extends Character {
         super(x, y, { ...DEFAULT_OPTIONS, ...options });
     }
 
-    dropCollectible(): void {
+    dropCollectible(world: World): void {
         const collectible: Collectible | undefined = this.purse.remove();
         if (collectible) {
-            // le faire apparaitre au sol
+            collectible.x = this.x;
+            collectible.y = this.y;
+            collectible.droppedBy = this;
+            world.collectibles.push(collectible)
         }
     }
 

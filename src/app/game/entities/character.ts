@@ -9,7 +9,6 @@ export type CharacterOptions = {
   readonly speed: GameMeter,
   readonly color: string,
   readonly runFactor: number,
-  readonly delayCollectiblePicking: Second, // le delai avant qu'un personnage puis ramasser un collectible qu'il à laché lui même.
 }
 
 const DEFAULT_CHARACTER: CharacterOptions = {
@@ -18,7 +17,6 @@ const DEFAULT_CHARACTER: CharacterOptions = {
   speed: 1.75,
   color: 'red',
   runFactor: 1.85,
-  delayCollectiblePicking: 5,
 }
 
 export class Character {

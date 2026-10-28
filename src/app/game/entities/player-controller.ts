@@ -28,7 +28,7 @@ export class PlayerController {
         }
 
         if (this.inputManager.isActive('drop')) {
-            this.playerCharacter.dropCollectible();
+            this.playerCharacter.dropCollectible(world);
         }
 
         if (this.inputManager.isActive('pay')) {
