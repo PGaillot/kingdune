@@ -49,7 +49,7 @@ export class Game {
   private lastTimestamp = 0;
 
   // Monde
-  public readonly world: World = new World(15); // rayon de 15 cases autour de la case centrale, soit 31 cases
+  public readonly world: World = new World(40); // rayon de 40 cases autour de la case centrale, soit 81 cases
 
   // player
   private readonly player = new PlayerCharacter(this.world.center - 0.5, GROUND);

@@ -22,7 +22,7 @@ export class World {
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, catchbasinCount: number = 6) {
+    constructor(public readonly radius: GameMeter, catchbasinCount: number = 25) {
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch(this.center);

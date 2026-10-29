@@ -1,18 +1,19 @@
 import { Hitbox, overlaps } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, METER_UNIT, ScreenPoint } from "../config";
+import { GameMeter, METER_UNIT, Pixel, ScreenPoint } from "../config";
 import { Character } from "./character";
+
 
 export type CollectibleOptions = {
     height: GameMeter,
     width: GameMeter,
-    color: string,
+    image?: HTMLImageElement,
 }
+
 
 const DEFAULT_OPTIONS: CollectibleOptions = {
     height: 1,
     width: 1,
-    color: 'white',
 }
 
 export class Collectible {
@@ -48,13 +49,29 @@ export class Collectible {
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {
-        ctx.fillStyle = this.options.color;
+        ctx.save();
         const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: this.y })
-        ctx.fillRect(
-            positionInCamera.x,
-            (positionInCamera.y - (this.options.height * METER_UNIT)),
-            this.options.width * METER_UNIT,
-            this.options.height * METER_UNIT)
+        const postionOptions: { dX: Pixel, dY: Pixel } = { dX: positionInCamera.x, dY: positionInCamera.y - (this.options.height * METER_UNIT) }
+        const dimentionOptions: { dW: Pixel, dH: Pixel } = { dW: this.options.width * METER_UNIT, dH: this.options.height * METER_UNIT }
+        ctx.imageSmoothingEnabled = false;
+        if (this.options.image) {
+            ctx.drawImage(
+                this.options.image,
+                postionOptions.dX,
+                postionOptions.dY,
+                dimentionOptions.dW,
+                dimentionOptions.dH)
+        } else {
+            ctx.fillStyle = "silver"
+            ctx.fillRect(
+                postionOptions.dX,
+                postionOptions.dY,
+                dimentionOptions.dW,
+                dimentionOptions.dH
+            )
+
+        }
+        ctx.restore();
     }
 
 }

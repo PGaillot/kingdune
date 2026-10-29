@@ -201,6 +201,16 @@ encore des pixels en dur (`METER_UNIT + 20`) ; le demi-décalage est fait en pix
 `src/app/game/` ; collectibles dessinés après les achetables ; JSDoc dans `Purchasable` ;
 `onOverlappingCheck` et branche `length === 1` retirée de `findTarget`.
 
+**Images des anneaux (29/10/2026)** : `public/ressources/waterring/` (`waterring_1.png` et
+`waterring_placeholder_1.png`, 16×16 px = 1 m). `CollectibleOptions.image?: HTMLImageElement`
+(plus de `color`) : chaque sorte de collectible charge son image **une fois** dans une constante
+hors de la classe (`WATERRING_IMAGE`), comme `Catchbasin` ; `Collectible.draw()` fait le narrowing
+(`if (this.options.image)`), sinon carré argenté, entre `save()`/`restore()`. Le placeholder des
+pièces est une constante dans `target-highlight.ts`, dessinée en `opacity(0.35)`. Décidé : le
+`Purchasable` dirait *avec quelle monnaie* il se paie, l'image du placeholder appartient à la monnaie ;
+pas utile tant qu'il n'y a qu'une ressource (YAGNI). Monde agrandi exprès : `new World(40)` et
+25 dunes (le commentaire de `game.ts` parle encore de 15).
+
 **Points signalés, pas encore corrigés :**
 
 1. Dans `targetHighlight` : dessiner les pièces **après** `restore()` (technique du peintre : là,
@@ -209,7 +219,10 @@ encore des pixels en dur (`METER_UNIT + 20`) ; le demi-décalage est fait en pix
 2. `Sietch` : `canPay()` n'est plus dans le contrat (le cooldown voulu ira dans `currentPrice`).
    Éventuellement un alias `type Price` dans l'interface.
 3. Ensuite : **payer** (`pay()` lit `target.currentPrice`, vérifie la bourse, l'anneau sort, appelle
-   `onPaid()`).
+   `onPaid()`), d'abord pour les dunes, puis pour le siètch.
+4. Plan de l'utilisateur après le paiement du siètch : faire apparaître **deux bâtiments** de part et
+   d'autre du siètch, un pour les **builders**, un pour les **archers**. Les biomes viendront
+   plus tard (une chose à la fois).
 
 Rappels donnés : une interface = contrat sans valeur ni code ; `find`/`reduce` sans `return` dans
 des accolades renvoient `undefined` (c'était le bug du premier essai avec `find`) ; `Math.min`
