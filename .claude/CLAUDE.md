@@ -135,7 +135,11 @@ un `switch` exhaustif sur `ActionTrigger` ; `isActive` = `some` sur les touches 
 `updateClock(timestamp)` est appelé en haut de `Game.loop()` : il garde l'heure de la frame
 précédente et de la frame actuelle. Les décisions lisent l'heure de la frame ; `tap` est un
 **événement** (relâchée dans la tranche `]précédente, actuelle]` + appui court), vrai une seule
-frame. Seuils : tap < 200 ms, double tap < 250 ms, long hold > 400 ms.
+frame. `long_hold` est aussi un **événement** (corrigé le 29/10/2026) : l'instant du seuil
+(`pressedAt + longHoldDelay`) tombe dans la tranche de la frame **et** la touche est encore
+enfoncée (`isDown`). Avant, c'était un état vrai à chaque frame : un appui long payait une dune
+par frame (la cible passait à la dune voisine). Concept : détection de front (edge detection).
+Seuils : tap < 200 ms, double tap < 250 ms, long hold 800 ms.
 
 **Personnages (fait)** : `Character` reçoit `x`, `y` et une fiche `Partial<CharacterOptions>`
 (`width`, `height`, `speed`, `color`, `runFactor`) fusionnée avec `DEFAULT_CHARACTER` par spread ;
@@ -218,8 +222,11 @@ pas utile tant qu'il n'y a qu'une ressource (YAGNI). Monde agrandi exprès : `ne
    fonction, plus par la dune.
 2. `Sietch` : `canPay()` n'est plus dans le contrat (le cooldown voulu ira dans `currentPrice`).
    Éventuellement un alias `type Price` dans l'interface.
-3. Ensuite : **payer** (`pay()` lit `target.currentPrice`, vérifie la bourse, l'anneau sort, appelle
-   `onPaid()`), d'abord pour les dunes, puis pour le siètch.
+3. **Paiement, première version (fait, 29/10/2026)** : `pay()` lit `target.currentPrice`, vérifie
+   la bourse, retire les anneaux (ils disparaissent, pas encore lâchés ni comptés quelque part),
+   appelle `onPaid()` ; dunes marquées, `Sietch.onPaid()` fait `level += 1`. Signalé : le test
+   `currentPrice &&` traite un prix de 0 comme absent (`!== undefined` serait plus juste) ;
+   `pressedAt + longHoldDelay` écrit deux fois dans `isLongHold` (une constante `longHoldAt`).
 4. Plan de l'utilisateur après le paiement du siètch : faire apparaître **deux bâtiments** de part et
    d'autre du siètch, un pour les **builders**, un pour les **archers**. Les biomes viendront
    plus tard (une chose à la fois).

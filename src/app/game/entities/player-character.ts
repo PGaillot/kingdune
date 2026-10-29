@@ -45,6 +45,12 @@ export class PlayerCharacter extends Character {
     }
 
     pay(): void {
-        console.log('pay')
+        if (!this.target) return;
+        if (this.target.currentPrice !== undefined && this.purse.contentCount >= this.target.currentPrice) {
+            for (let i = 0; i < this.target.currentPrice; i++) {
+                this.purse.remove()
+            }
+            this.target.onPaid();
+        }
     }
 }

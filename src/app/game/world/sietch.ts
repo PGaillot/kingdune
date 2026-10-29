@@ -35,7 +35,7 @@ export class Sietch implements Purchasable {
     }
 
     onPaid(): void {
-        console.log("Method not implemented.");
+        this.level += 1;
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {

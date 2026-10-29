@@ -61,7 +61,9 @@ export class InputManager {
     }
 
     private isLongHold(keyRecord: KeyRecord): boolean {
-        return keyRecord.pressedAt + this.longHoldDelay < this.currentFrameTimestamp && this.isDown(keyRecord);
+        const longHoldAt: number = keyRecord.pressedAt + this.longHoldDelay;
+        const inRange: boolean = longHoldAt > this.previousFrameTimestamp && longHoldAt <= this.currentFrameTimestamp;
+        return inRange && this.isDown(keyRecord);
     }
 
     public inputPress(keyPressed: KeyboardEvent): void {
