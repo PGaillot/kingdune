@@ -263,8 +263,8 @@ hitbox)` dans `hitbox.ts` (`strokeRect`, sans `save()`/`restore()`), appelé à 
 `Game.render()` ; pas de touche, voulu comme ça.
 
 **Convention du point d'origine (décidé)** : **centre en bas** (pivot) pour tous les objets, une
-seule règle ; seul le getter `hitbox` passe du centre au bord gauche. Fait : `Sietch`, `Wall`. Encore
-au bord gauche : `Character`, `Catchbasin`, `Collectible` (à convertir un par un, vérifier avec le
+seule règle ; seul le getter `hitbox` passe du centre au bord gauche. Fait : `Sietch`, `Wall`,
+`Catchbasin` (image de 3 m centrée sur `x`). Encore au bord gauche : `Character`, `Collectible` (à convertir un par un, vérifier avec le
 debug des hitbox).
 
 **Anneaux de test** : anneaux dupliqués à la main dans le constructeur du `World` (voulu, pour avoir
@@ -313,6 +313,11 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
 - Faire apparaître les muad'dib entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
 - Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
   les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
+- **Parallaxe (prévue, pas prioritaire : d'abord une petite boucle de gameplay)** : découverte par
+  accident le 29/10/2026 (position écran comptée deux fois dans `Catchbasin.draw()` → la dune
+  défilait 2× plus vite). À faire proprement : des couches de **décor sans hitbox**, chacune avec un
+  **facteur de profondeur** (< 1 au loin, 1 = sol, > 1 premier plan) appliqué au **point regardé**,
+  sans toucher à la formule de `convert()`.
 - La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
 - `speed` est typé `GameMeter` alors que c'est des m/s (à revoir plus tard).
 - `hitbox.ts` est dans `src/app/` alors que c'est de la logique de jeu (`src/app/game/`).

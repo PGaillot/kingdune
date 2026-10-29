@@ -44,7 +44,7 @@ export class Catchbasin implements Purchasable {
         return {
             height: this.height,
             width: this.width,
-            x: this.x,
+            x: this.x - (this.width / 2),
             y: GROUND
         }
     };
@@ -55,10 +55,9 @@ export class Catchbasin implements Purchasable {
 
     public draw(ctx: CanvasRenderingContext2D, camera: Camera) {
 
-
         const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: GROUND });
         const destinationOption: { dx: Pixel, dy: Pixel } = {
-            dx: positionInCamera.x - ((this.options.imageWidth * METER_UNIT - this.width * METER_UNIT) / 2),
+            dx: positionInCamera.x - ((this.options.imageWidth * METER_UNIT) / 2),
             dy: (positionInCamera.y - (this.height * METER_UNIT))
         }
         const dimensionOption: { dw: Pixel, dh: Pixel } = {

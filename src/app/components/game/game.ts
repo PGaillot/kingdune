@@ -66,7 +66,7 @@ export class Game {
   hitboxDebug: boolean = true;
 
   private get hitboxObjects(): HitboxObject[] {
-    return [...this.world.walls]
+    return [...this.world.walls, ...this.world.catchbasins]
   }
 
   constructor() {
