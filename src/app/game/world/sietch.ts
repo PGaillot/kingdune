@@ -1,6 +1,6 @@
 import { Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
+import { CENTER, GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 import { Purchasable } from "../interfaces/purchasable";
 
 export class Sietch implements Purchasable {
@@ -8,7 +8,7 @@ export class Sietch implements Purchasable {
     width: GameMeter = 3;
     color: string = 'orange';
 
-    constructor(public position: GameMeter) { }
+    constructor() { }
 
     level: number = 0;
     sietchLevel: Record<number, { price: number }> = {
@@ -22,9 +22,14 @@ export class Sietch implements Purchasable {
         return {
             height: this.height,
             width: this.width,
-            x: this.position - (this.width / 2),
-            y: GROUND
+            x: CENTER - (this.width / 2),
+            y: GROUND,
         }
+    }
+
+
+    get position(): GameMeter {
+        return this.hitbox.x
     }
 
     get currentPrice(): number | undefined { return this.nextSietchLevelPrice };

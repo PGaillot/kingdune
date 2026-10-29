@@ -1,10 +1,8 @@
-import { Second } from "../config";
+import { Direction, Second } from "../config";
 import { InputManager } from "../input-manager";
 import { World } from "../world/world";
 import { PlayerCharacter } from "./player-character";
 
-/** -1 = gauche, 0 = immobile, 1 = droite */
-export type Direction = -1 | 0 | 1;
 export type DirectionHorizontalType = 'left' | 'idle' | 'right';
 export const DIRECTION: Record<DirectionHorizontalType, Direction> = {
     left: -1,

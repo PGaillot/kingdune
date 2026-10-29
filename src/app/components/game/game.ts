@@ -16,8 +16,10 @@ import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
 import { Builder } from '../../game/entities/builder';
-import { overlaps } from '../../hitbox';
+import { drawHitbox, Hitbox, overlaps } from '../../hitbox';
 import { Collectible } from '../../game/entities/collectible';
+
+type HitboxObject = { hitbox: Hitbox };
 
 @Component({
   selector: 'app-game',
@@ -60,7 +62,12 @@ export class Game {
 
   private readonly muaddibs: Muaddib[] = [];
   private readonly hunter = new Hunter(this.world.center, GROUND)
-  private readonly builder = new Builder(-3, GROUND)
+  private readonly builder = new Builder(-3, GROUND);
+  hitboxDebug: boolean = true;
+
+  private get hitboxObjects(): HitboxObject[] {
+    return [...this.world.walls]
+  }
 
   constructor() {
     for (let index = 0; index < 5; index++) {
@@ -116,6 +123,13 @@ export class Game {
     this.player.draw(ctx, this.camera);
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);
+
+    // DEBUG
     this.builder.draw(ctx, this.camera);
+
+    if (this.hitboxDebug)
+      this.hitboxObjects.forEach((object: HitboxObject) => {
+        drawHitbox(ctx, this.camera, object.hitbox)
+      })
   }
 }

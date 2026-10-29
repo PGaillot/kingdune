@@ -19,13 +19,19 @@
 ## Univers : on joue les Fremen
 
 Principe : **garder les mécaniques de Kingdom et ne changer que leur sens.** Comme Kingdom, le jeu
-reste simple : peu de touches et **une seule ressource**.
+reste simple : peu de touches et **une monnaie principale** (d'autres monnaies viendront plus tard,
+voir ci-dessous).
 
 **Décidé :**
 
 - **Camp** : on joue une tribu **Fremen**, menée par un naib (le monarque de Kingdom).
-- **Ressource unique : l'eau.** Les pièces sont représentées par des **anneaux d'eau** (les anneaux
-  qui comptent l'eau d'un Fremen). Pas d'épice comme monnaie.
+- **Monnaie principale : l'eau.** Les pièces sont représentées par des **anneaux d'eau** (les
+  anneaux qui comptent l'eau d'un Fremen). Pas d'épice comme monnaie.
+- **Plusieurs monnaies plus tard (changement d'avis du 29/10/2026)** : l'utilisateur ne veut plus
+  une ressource unique. Il y aura sûrement d'autres monnaies, comme l'équivalent des **gemmes** de
+  Kingdom, ou des **trophées / objets** de Kingdom Eighties. Pas encore codé. Conséquence déjà
+  discutée : un `Purchasable` dira **avec quelle monnaie** il se paie, et l'image du placeholder
+  appartiendra à la monnaie.
 - **Cœur du royaume : le siètch**, qui remplace le feu de camp et en garde tous les rôles : point
   de départ, centre améliorable, refuge, lumière (des brilleurs au lieu de flammes). Il est creusé
   dans une **île rocheuse** au centre du monde. Plus on va vers `leftEnd`/`rightEnd`, plus le sable
@@ -63,6 +69,14 @@ reste simple : peu de touches et **une seule ressource**.
 - Inverser le danger jour/nuit (les Fremen se déplacent la nuit) : plus original, moins intuitif.
 - Naib anonyme avec Paul Atreides en toile de fond, ou incarner Paul (plus scénarisé).
 - L'épice : simple élément de décor ou de lore, peut-être échangée aux contrebandiers plus tard.
+- **Paliers de matériaux** (dans Kingdom : bois au départ, puis pierre, puis fer, débloqués en
+  payant une mine) : ce ne sont pas des monnaies, on paie toujours en anneaux. Le palier
+  débloqué ferait évoluer les murs (même emplacement, autre matériau) et bloquerait la montée du
+  siètch à partir d'un certain niveau. Peut-être porté par le siètch. **Pas codé (YAGNI)**.
+  Version Dune voulue par l'utilisateur (sur Arrakis, il n'y a que de la pierre et du sable) :
+  1. une **pierre orangée** au départ (nom à trouver) ;
+  2. une **pierre plus blanche**, type granit ;
+  3. une **pierre noire**, type basalte.
 
 ## Rôle de Claude : mentor, pas développeur
 
@@ -212,24 +226,73 @@ hors de la classe (`WATERRING_IMAGE`), comme `Catchbasin` ; `Collectible.draw()`
 (`if (this.options.image)`), sinon carré argenté, entre `save()`/`restore()`. Le placeholder des
 pièces est une constante dans `target-highlight.ts`, dessinée en `opacity(0.35)`. Décidé : le
 `Purchasable` dirait *avec quelle monnaie* il se paie, l'image du placeholder appartient à la monnaie ;
-pas utile tant qu'il n'y a qu'une ressource (YAGNI). Monde agrandi exprès : `new World(40)` et
-25 dunes (le commentaire de `game.ts` parle encore de 15).
+pas codé tant qu'il n'y a qu'une monnaie (YAGNI), mais d'autres monnaies viendront. Monde agrandi exprès : `new World(40)` et
+25 dunes.
 
-**Points signalés, pas encore corrigés :**
+**Paiement, première version (fait, commité le 29/10/2026)** : `pay()` lit `target.currentPrice`
+(`!== undefined`), vérifie la bourse, retire les anneaux (ils disparaissent, pas encore lâchés ni
+comptés quelque part), appelle `onPaid()` ; dunes marquées, `Sietch.onPaid()` fait `level += 1`.
+`isLongHold` utilise une constante `longHoldAt`.
 
-1. Dans `targetHighlight` : dessiner les pièces **après** `restore()` (technique du peintre : là,
-   elles sont dessinées avant l'objet). `imageSmoothingEnabled` est maintenant réglé par la
-   fonction, plus par la dune.
-2. `Sietch` : `canPay()` n'est plus dans le contrat (le cooldown voulu ira dans `currentPrice`).
-   Éventuellement un alias `type Price` dans l'interface.
-3. **Paiement, première version (fait, 29/10/2026)** : `pay()` lit `target.currentPrice`, vérifie
-   la bourse, retire les anneaux (ils disparaissent, pas encore lâchés ni comptés quelque part),
-   appelle `onPaid()` ; dunes marquées, `Sietch.onPaid()` fait `level += 1`. Signalé : le test
-   `currentPrice &&` traite un prix de 0 comme absent (`!== undefined` serait plus juste) ;
-   `pressedAt + longHoldDelay` écrit deux fois dans `isLongHold` (une constante `longHoldAt`).
-4. Plan de l'utilisateur après le paiement du siètch : faire apparaître **deux bâtiments** de part et
-   d'autre du siètch, un pour les **builders**, un pour les **archers**. Les biomes viendront
-   plus tard (une chose à la fois).
+**Prochaine étape (plan de l'utilisateur)** : après le paiement du siètch, faire apparaître **deux
+bâtiments** de part et d'autre du siètch, un pour les **builders**, un pour les **archers**. Les
+biomes viendront plus tard (une chose à la fois). Piste retenue (discutée, pas codée) :
+
+- **Quand ? Un Observer écrit à la main** (pas RxJS, même s'il est livré avec Angular : logique de
+  jeu en TS pur, et `Subject.next()` est synchrone, donc ça ne règle rien). Le siètch prévient le
+  `World` quand il change de niveau. Attention au **milieu de frame** : le paiement a lieu dans
+  `PlayerController.update()` ; modifier les tableaux du `World` à ce moment-là est risqué (file
+  d'événements traitée à un moment précis de la boucle). L'utilisateur est dev web : Observer et
+  `subscribe` lui sont familiers.
+- **Quoi et où ? Un plan fixe du camp (data-driven design)** : comme dans Kingdom, le centre est
+  toujours le même : siètch, petit espace, bâtiments (builders, archers), tours, murs, un espace
+  (fermes…), tour, mur, puis l'aléatoire. Décrire des **emplacements** (distance au centre, type,
+  niveau requis) sur **un seul côté**, reflétés à gauche et à droite (× -1 / × 1). La zone du camp
+  pourrait être l'**île rocheuse** (déjà posée avec `setZone` sous le siètch), et les emplacements
+  correspondent aux **cairns** des croquis.
+
+**Mur (fait, 29/10/2026)** : `Wall` (`entities/wall.ts`, `Purchasable`), niveaux dans un `Record`
+`WALL_LEVEL` (prix, vie, image ; `public/ressources/wall/`), `currentPrice` = prix du niveau
+**suivant** via `?.`. `positionX` = **centre** du mur, `width`/`height` en champs, le getter
+`hitbox` calcule le bord gauche. Murs créés par `mirrored` dans `World.buildSietchZone()` (±6 et
+±20 m). `orientation` : getter `Direction` (1 si `positionX >= CENTER`, sinon -1) ; le mur de droite
+est dessiné retourné (`translate` sur le bord droit en pixels, `scale(-1, 1)`, `drawImage` en
+coordonnées relatives). `CENTER` dans `config.ts` (`World.center` le lit), `Direction` déplacé de
+`player-controller.ts` vers `config.ts`. **Debug des hitbox fait** : `drawHitbox(ctx, camera,
+hitbox)` dans `hitbox.ts` (`strokeRect`, sans `save()`/`restore()`), appelé à la fin de
+`Game.render()` ; pas de touche, voulu comme ça.
+
+**Convention du point d'origine (décidé)** : **centre en bas** (pivot) pour tous les objets, une
+seule règle ; seul le getter `hitbox` passe du centre au bord gauche. Fait : `Sietch`, `Wall`. Encore
+au bord gauche : `Character`, `Catchbasin`, `Collectible` (à convertir un par un, vérifier avec le
+debug des hitbox).
+
+**Anneaux de test** : anneaux dupliqués à la main dans le constructeur du `World` (voulu, pour avoir
+de quoi acheter en testant). Idée de l'utilisateur : une fonction qui fait apparaître N anneaux
+entre un point A et un point B (ex. 17 anneaux de -7 à 14), utile au début de chaque partie ; plus
+tard, sur la zone du siètch.
+
+**Symétrie, décidé** :
+- **Orientation déduite, pas passée** (philosophie du projet : déduire plutôt que stocker) : un
+  bâtiment calcule son côté avec un **getter** (à gauche ou à droite du centre). Le centre devient
+  une **constante** dans `config.ts` (le siètch est toujours au centre), lue par le `World` et par
+  le getter, au lieu du `x > 0` implicite. Décider le cas « pile au centre ».
+- Exception : les **personnages** gardent leur orientation en **état** (le dernier sens de marche
+  est un souvenir, il ne se déduit pas de la position).
+- Une **fonction de dessin partagée** qui retourne le dessin selon une `Direction` (comme
+  `targetHighlight` enveloppe le dessin), utilisée par murs, tours, portails, personnages.
+- Une **fonction de paires** : crée deux objets à ± distance du centre, avec une **fabrique**
+  (fonction qui crée l'objet à partir d'une position) plutôt qu'un objet à copier. Moteur du futur
+  plan du camp. Objets concernés : murs, tours ; les portails sont orientés mais pas forcément par
+  paires (un côté bouché).
+- **Fait** : `mirrored(distance, create)` dans `src/app/utils/mirrored.ts` : `CENTER ± distance`,
+  sans connaître la largeur des objets (chaque objet gère la sienne). La fonction de dessin
+  partagée n'est pas encore faite (le retournement est dans `Wall.draw()`).
+
+Idée en réserve : un alias `type Price` dans l'interface `Purchasable` ; le cooldown du siètch ira
+dans `currentPrice`.
+
+**Avant de citer un point « en attente » de ces notes, vérifier dans le code qu'il l'est encore.**
 
 Rappels donnés : une interface = contrat sans valeur ni code ; `find`/`reduce` sans `return` dans
 des accolades renvoient `undefined` (c'était le bug du premier essai avec `find`) ; `Math.min`

@@ -1,7 +1,7 @@
 import { Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
 import { GameMeter, METER_UNIT, ScreenPoint, Second } from "../config";
-import { Direction } from "./player-controller";
+import { Direction } from "../config";
 
 export type CharacterOptions = {
   readonly width: GameMeter,

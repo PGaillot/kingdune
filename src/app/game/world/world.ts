@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { GROUND, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, GROUND, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -8,6 +8,8 @@ import { WaterRing } from "../entities/water-ring";
 import { Collectible } from "../entities/collectible";
 import { Purchasable } from "../interfaces/purchasable";
 import { targetHighlight } from "../target-highlight";
+import { Wall } from "../entities/wall";
+import { mirrored } from "../../utils/mirrored";
 
 export class World {
 
@@ -16,6 +18,7 @@ export class World {
     catchbasins: Catchbasin[] = [];
     sietch: Sietch;
     collectibles: Collectible[] = [];
+    walls: Wall[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
@@ -25,10 +28,15 @@ export class World {
     constructor(public readonly radius: GameMeter, catchbasinCount: number = 25) {
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
-        this.sietch = new Sietch(this.center);
-        const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
-        this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome())
+        this.sietch = new Sietch();
 
+        this.buildSietchZone();
+
+        this.collectibles.push(new WaterRing(3.1, GROUND));
+        this.collectibles.push(new WaterRing(-3.4, GROUND))
+        this.collectibles.push(new WaterRing(-6.1, GROUND));
+        this.collectibles.push(new WaterRing(13.4, GROUND))
+        this.collectibles.push(new WaterRing(-8.1, GROUND));
         this.collectibles.push(new WaterRing(3, GROUND));
         this.collectibles.push(new WaterRing(-3.3, GROUND))
         this.collectibles.push(new WaterRing(-6, GROUND));
@@ -36,10 +44,16 @@ export class World {
         this.collectibles.push(new WaterRing(-8, GROUND));
     }
 
-    public readonly center: GameMeter = 0;
+
+    private buildSietchZone(): void {
+        const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
+        this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome());
+        this.walls = [...mirrored(6, (x: GameMeter) => new Wall(x)), ...mirrored(20, (x: GameMeter) => new Wall(x))];
+    }
+
 
     get purchasables(): Purchasable[] {
-        return [...this.catchbasins, this.sietch]
+        return [...this.catchbasins, this.sietch, ...this.walls]
     }
 
     getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
@@ -59,7 +73,11 @@ export class World {
             positions.push(position);
         }
         return positions;
+
     }
+    public get center(): GameMeter {
+        return CENTER
+    };
 
     public get width(): GameMeter {
         return (this.radius * 2) + 1;
@@ -79,5 +97,6 @@ export class World {
         this.ground.draw(ctx, camera);
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, target === purchasable))
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
+
     }
 }

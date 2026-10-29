@@ -4,9 +4,13 @@ export type Second = number
 
 export type KeyboardKey = KeyboardEvent['code'];
 
+/** -1 = gauche, 0 = immobile, 1 = droite */
+export type Direction = -1 | 0 | 1;
+
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
 export const GROUND = 0;
+export const CENTER = 0;
 
 /** Un point dans le monde du jeu, en mètres. Le sol est à y = 0 et la hauteur monte. */
 export type WorldPoint = { x: GameMeter, y: GameMeter }
