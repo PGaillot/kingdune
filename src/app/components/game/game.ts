@@ -54,7 +54,7 @@ export class Game {
   public readonly world: World = new World(40); // rayon de 40 cases autour de la case centrale, soit 81 cases
 
   // player
-  private readonly player = new PlayerCharacter(this.world.center - 0.5, GROUND);
+  private readonly player = new PlayerCharacter(this.world.center, GROUND);
   protected inputManager: InputManager = new InputManager();
   protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
 
@@ -66,7 +66,9 @@ export class Game {
   hitboxDebug: boolean = true;
 
   private get hitboxObjects(): HitboxObject[] {
-    return [...this.world.walls, ...this.world.catchbasins]
+    return [
+      ...this.world.collectibles, this.player
+    ]
   }
 
   constructor() {

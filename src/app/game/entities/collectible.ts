@@ -33,7 +33,7 @@ export class Collectible {
         return {
             height: this.options.height,
             width: this.options.width,
-            x: this.x,
+            x: this.x - (this.options.width / 2),
             y: this.y
         }
     };
@@ -50,7 +50,7 @@ export class Collectible {
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {
         ctx.save();
-        const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: this.y })
+        const positionInCamera: ScreenPoint = camera.convert({ x: this.hitbox.x, y: this.hitbox.y })
         const postionOptions: { dX: Pixel, dY: Pixel } = { dX: positionInCamera.x, dY: positionInCamera.y - (this.options.height * METER_UNIT) }
         const dimentionOptions: { dW: Pixel, dH: Pixel } = { dW: this.options.width * METER_UNIT, dH: this.options.height * METER_UNIT }
         ctx.imageSmoothingEnabled = false;

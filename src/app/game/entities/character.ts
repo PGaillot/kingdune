@@ -39,7 +39,7 @@ export class Character {
     return {
       height: this.options.height,
       width: this.options.width,
-      x: this.x,
+      x: this.x - (this.options.width / 2),
       y: this.y
     }
   }
@@ -47,7 +47,8 @@ export class Character {
   /** Déplace le personnage en restant dans les bornes [minX, maxX]. */
   protected move(direction: Direction, speed: number, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
     const next = this.x + direction * speed * deltaSeconds;
-    this.x = Math.min(Math.max(next, minX), maxX - this.options.width);
+    const haflCharacter: GameMeter = this.hitbox.width / 2;
+    this.x = Math.min(Math.max(next, minX + haflCharacter), maxX - haflCharacter);
   };
 
   walk(direction: Direction, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter) {
@@ -60,7 +61,7 @@ export class Character {
 
   draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
     ctx.fillStyle = this.options.color;
-    const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: this.y })
+    const positionInCamera: ScreenPoint = camera.convert({ x: this.hitbox.x, y: this.hitbox.y })
     ctx.fillRect(positionInCamera.x, (positionInCamera.y - this.options.height * METER_UNIT), this.options.width * METER_UNIT, this.options.height * METER_UNIT);
   }
 }

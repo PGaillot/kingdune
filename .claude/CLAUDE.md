@@ -263,9 +263,17 @@ hitbox)` dans `hitbox.ts` (`strokeRect`, sans `save()`/`restore()`), appelé à 
 `Game.render()` ; pas de touche, voulu comme ça.
 
 **Convention du point d'origine (décidé)** : **centre en bas** (pivot) pour tous les objets, une
-seule règle ; seul le getter `hitbox` passe du centre au bord gauche. Fait : `Sietch`, `Wall`,
-`Catchbasin` (image de 3 m centrée sur `x`). Encore au bord gauche : `Character`, `Collectible` (à convertir un par un, vérifier avec le
-debug des hitbox).
+seule règle ; seul le getter `hitbox` passe du centre au bord gauche, les `draw()` lisent
+`this.hitbox`. **Tous convertis** (29/10/2026) : `Sietch`, `Wall`, `Catchbasin` (image de 3 m
+centrée sur `x`), `Character` (et ses sous-classes), `Collectible`. Le joueur part de
+`world.center` (plus de `- 0.5`) ; `Character.move()` borne le centre à une demi-largeur des bords ;
+au dépôt, l'anneau est posé au centre du naib.
+
+**Prochaine tâche (en cours)** : fonction qui fait apparaître N anneaux entre deux bornes
+(`src/app/utils/spaw-waterrings.ts`, ébauche). Pistes données : renvoyer un tableau (fonction pure)
+plutôt que remplir le `World` ; réguliers (attention à `count = 1`) ou au hasard ; trois besoins
+identiques (anneaux, dunes avec `getRandomCatchbasinPositions`, muad'dib dans `game.ts`) → version
+générique avec fabrique, comme `mirrored`.
 
 **Anneaux de test** : anneaux dupliqués à la main dans le constructeur du `World` (voulu, pour avoir
 de quoi acheter en testant). Idée de l'utilisateur : une fonction qui fait apparaître N anneaux
