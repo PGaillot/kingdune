@@ -1,4 +1,5 @@
 import { Hitbox } from "../../hitbox";
+import { Purchasable } from "../interfaces/purchasable";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 
@@ -22,20 +23,24 @@ const DEFAULT_CATCHBASIN_OPTION: CatchbasinOptions = {
     imageWidth: 3
 }
 
-export class Catchbasin {
+export class Catchbasin implements Purchasable {
+
     readonly options: CatchbasinOptions;
 
     private width: GameMeter = 1;
     private height: GameMeter = 2;
-    private marker: boolean = false; // Marqué pour etre fouillé, il est toujours initialisé à faux.
+    private marked: boolean = false; // Marqué pour etre fouillé, il est toujours initialisé à faux.
     public readonly price: number = 1; // le prix qu'il en coute en WaterRing pour la fouiller et la faire disparaitre.
-    public hoverByPlayer: boolean = false; // est ce que le joueur est devant le catchbasin.
 
     constructor(readonly x: GameMeter, option?: Partial<CatchbasinOptions>) {
         this.options = { ...DEFAULT_CATCHBASIN_OPTION, ...option }
     }
 
-    get hitbox(): Hitbox {
+    get currentPrice(): number | undefined {
+        return this.marked ? undefined : this.price;
+    }
+
+    public get hitbox(): Hitbox {
         return {
             height: this.height,
             width: this.width,
@@ -44,13 +49,13 @@ export class Catchbasin {
         }
     };
 
-    mark(): void {
-        this.marker = true;
+    public onPaid(): void {
+        this.mark()
     }
 
-    draw(ctx: CanvasRenderingContext2D, camera: Camera) {
-        ctx.save()
-        ctx.imageSmoothingEnabled = false;
+    public draw(ctx: CanvasRenderingContext2D, camera: Camera) {
+
+
         const positionInCamera: ScreenPoint = camera.convert({ x: this.x, y: GROUND });
         const destinationOption: { dx: Pixel, dy: Pixel } = {
             dx: positionInCamera.x - ((this.options.imageWidth * METER_UNIT - this.width * METER_UNIT) / 2),
@@ -61,15 +66,15 @@ export class Catchbasin {
             dh: this.options.imageHeight * METER_UNIT
         }
 
-        if (this.hoverByPlayer) {
-            ctx.filter = 'brightness(0.6)';
-        }
         ctx.drawImage(this.options.image, destinationOption.dx, destinationOption.dy, dimensionOption.dw, dimensionOption.dh)
-        if (this.marker) {
+
+        if (this.marked) {
             ctx.drawImage(this.options.marker, destinationOption.dx, destinationOption.dy, dimensionOption.dw, dimensionOption.dh)
         }
+    }
 
-        ctx.restore();
+    private mark(): void {
+        this.marked = true;
     }
 
 }

@@ -6,6 +6,8 @@ import { Catchbasin } from "./catchbasin";
 import { RockBiome } from "./biomes/rock.biome";
 import { WaterRing } from "../entities/water-ring";
 import { Collectible } from "../entities/collectible";
+import { Purchasable } from "../interfaces/purchasable";
+import { targetHighlight } from "../target-highlight";
 
 export class World {
 
@@ -20,7 +22,7 @@ export class World {
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, catchbasinCount: number = 4) {
+    constructor(public readonly radius: GameMeter, catchbasinCount: number = 6) {
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch(this.center);
@@ -36,6 +38,9 @@ export class World {
 
     public readonly center: GameMeter = 0;
 
+    get purchasables(): Purchasable[] {
+        return [...this.catchbasins, this.sietch]
+    }
 
     getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
         const available: GameMeter[] = [];
@@ -68,12 +73,11 @@ export class World {
         return -this.rightEnd;
     }
 
-    public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
+    public draw(ctx: CanvasRenderingContext2D, camera: Camera, target: Purchasable | undefined): void {
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         this.ground.draw(ctx, camera);
-        this.catchbasins.forEach((catchbasin: Catchbasin) => catchbasin.draw(ctx, camera))
-        this.sietch.draw(ctx, camera)
+        this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, target === purchasable))
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
     }
 }

@@ -18,7 +18,6 @@ import { PlayerController } from '../../game/entities/player-controller';
 import { Builder } from '../../game/entities/builder';
 import { overlaps } from '../../hitbox';
 import { Collectible } from '../../game/entities/collectible';
-import { Catchbasin } from '../../game/world/catchbasin';
 
 @Component({
   selector: 'app-game',
@@ -95,10 +94,6 @@ export class Game {
       }
     })
 
-    this.world.catchbasins.forEach((catchbasin: Catchbasin) => {
-      catchbasin.hoverByPlayer = overlaps(this.player.hitbox, catchbasin.hitbox)
-    })
-
     this.camera.follow({ x: this.player.x, y: this.player.y })
     this.muaddibs.forEach((muaddib) => {
       muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
@@ -117,7 +112,7 @@ export class Game {
     }
 
     const ctx = this.ctx;
-    this.world.draw(ctx, this.camera);
+    this.world.draw(ctx, this.camera, this.player.target);
     this.player.draw(ctx, this.camera);
     this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
     this.hunter.draw(ctx, this.camera);

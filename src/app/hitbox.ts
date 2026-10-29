@@ -26,3 +26,7 @@ export function overlaps(a: Hitbox, b: Hitbox): boolean {
 
     return !(aIsLeftOfB || aIsRightOfB) && !(aIsTopOfB || aIsBottomOfB)
 }
+
+export function centerX(hitbox: Hitbox): GameMeter {
+    return hitbox.x + (hitbox.width / 2)
+}

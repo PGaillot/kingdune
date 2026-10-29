@@ -21,6 +21,7 @@ export class PlayerController {
 
     public update(deltaSeconds: Second, world: World): void {
         const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
+        this.playerCharacter.findTarget(world.purchasables)
         if (isRunning) {
             this.playerCharacter.run(this.direction, deltaSeconds, world.leftEnd, world.rightEnd);
         } else {

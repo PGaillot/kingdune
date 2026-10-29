@@ -162,18 +162,61 @@ Taille logique (hitbox) **1 m × 2 m**, taille visuelle **3 m × 2 m** (`imageWi
 image **centrée sur le tronc** (comme les arbres de Kingdom, les dunes peuvent se chevaucher).
 `draw()` : `ctx.save()` en premier / `ctx.restore()` à la fin (`imageSmoothingEnabled`, `filter`),
 position et taille calculées une fois (`destinationOption`, `dimensionOption`), technique du peintre :
-dune puis drapeau si `marker`. **Survol** : `hoverByPlayer` mis à jour dans `Game.loop()`
-(`catchbasin.hoverByPlayer = overlaps(...)`), la dune s'assombrit (`filter = 'brightness(0.6)'`,
-drapeau compris). `mark()` et `price` (1 anneau) existent mais ne sont pas encore branchés.
+dune puis drapeau si `marker`. **Survol** : la dune s'assombrit (`filter = 'brightness(0.6)'`,
+drapeau compris). Le mécanisme `hoverByPlayer` de ce commit a été remplacé depuis (voir
+« Cible et objets achetables » ci-dessous).
 Rappels donnés : `=` vs `===` dans un `if` ; `save()`/`restore()` = pile de réglages, pas de dessins.
 
-**Prochaine étape (après la pause repas du 28/10/2026)** : afficher un **symbole d'anneau**
-au-dessus de la dune survolée (l'utilisateur a une image à montrer), puis **payer** : action `pay`
-(déjà dans `PlayerController`, appelle `playerCharacter.pay()`) → l'anneau sort de la bourse, va
-dans la dune survolée, qui appelle `mark()`. Question ouverte : qui sait **quelle** dune est devant
-le naib (le controller qui cherche dans `world.catchbasins`, ou autre) ? Le drapeau s'utilise aussi
-avec la taille de la dune : à revoir si le PNG du drapeau n'a pas la même taille.
-Toujours en attente : un `METER_UNIT` multiple de 16 (aujourd'hui 40 → agrandissement 2,5).
+**Cible et objets achetables (en cours, pas commité, 28/10/2026 au soir)** : le bug de départ :
+deux dunes qui se chevauchent étaient survolées et payables en même temps (un booléen
+`hoverByPlayer` par dune). Décisions prises ensemble :
+
+- **Source unique de vérité** : plus de `hoverByPlayer`. Le `PlayerCharacter` a une seule case
+  `target: Purchasable | undefined` (sur le joueur et pas `Character` : seul le naib paie ; pas
+  dans le `World` : c'est une info du joueur).
+- **Interface `Purchasable`** (`src/app/game/interfaces/purchasable.ts`) plutôt qu'une classe mère
+  `Building` (un mendiant/recrue serait payable mais hérite déjà de `Npc` ; héritage simple ;
+  règle de trois). Contrat : `hitbox`, `currentPrice`, `onPaid()` (renommé depuis `paid()` : une méthode = un verbe, `on…` = réaction à un événement), `draw(ctx, camera)`.
+- **`currentPrice: number | undefined`** remplace `price` + `canPay()` : `undefined` = pas
+  achetable en ce moment (dune marquée, siètch au niveau max, cooldown…). Une seule question,
+  narrowing TypeScript possible. Le prix sert aussi à afficher N pièces (préparation du paiement
+  pièce par pièce comme Kingdom).
+- `Catchbasin` : `onPaid()` appelle `mark()` (devenu `private`), `currentPrice` lit `price`.
+- `Sietch` implémente `Purchasable` : `sietchLevel` (prix 3/8/12), `currentPrice` via `?.`.
+- `World.purchasables` (getter, dunes + siètch). `PlayerCharacter.findTarget(purchasables)` :
+  un seul `filter` (overlaps **et** prix défini) puis `reduce` sur la distance
+  `Math.abs(centerX(objet) - centerX(naib))`, `undefined` si liste vide. Appelée dans
+  `PlayerController.update()`. `centerX(hitbox)` ajouté dans `hitbox.ts`. **Ça marche.**
+- **Effet de survol factorisé** : `targetHighlight(ctx, camera, object, isTarget)`
+  (`src/app/utils/target-highlight.ts`) enveloppe le dessin : `save`, `filter`, `object.draw()`,
+  `restore`, puis les pièces. `World.draw()` appelle ça pour chaque achetable ; les objets ne
+  savent plus qu'ils sont ciblés.
+
+**Fait le 29/10/2026 (commité)** : pièces passées par `camera.convert()`, empilées à la verticale
+et centrées sur `centerX(hitbox)` (on recule d'une demi-pièce : `fillRect` part du coin
+haut-gauche) ; `Sietch` : hitbox et dessin alignés (`position` = centre, `draw()` lit
+`this.hitbox`), `onPaid()` ne plante plus (simple `console.log`). Reste : l'écart vertical mélange
+encore des pixels en dur (`METER_UNIT + 20`) ; le demi-décalage est fait en pixels après
+`convert()` (marche tant qu'il n'y a pas de zoom). Aussi réglé : `target-highlight.ts` déplacé dans
+`src/app/game/` ; collectibles dessinés après les achetables ; JSDoc dans `Purchasable` ;
+`onOverlappingCheck` et branche `length === 1` retirée de `findTarget`.
+
+**Points signalés, pas encore corrigés :**
+
+1. Dans `targetHighlight` : dessiner les pièces **après** `restore()` (technique du peintre : là,
+   elles sont dessinées avant l'objet). `imageSmoothingEnabled` est maintenant réglé par la
+   fonction, plus par la dune.
+2. `Sietch` : `canPay()` n'est plus dans le contrat (le cooldown voulu ira dans `currentPrice`).
+   Éventuellement un alias `type Price` dans l'interface.
+3. Ensuite : **payer** (`pay()` lit `target.currentPrice`, vérifie la bourse, l'anneau sort, appelle
+   `onPaid()`).
+
+Rappels donnés : une interface = contrat sans valeur ni code ; `find`/`reduce` sans `return` dans
+des accolades renvoient `undefined` (c'était le bug du premier essai avec `find`) ; `Math.min`
+donne la distance, pas l'objet ; `Math.abs` = valeur absolue ; positions via `camera.convert()`,
+tailles via `METER_UNIT` ; champs initialisés dans l'ordre d'écriture, getter = recalculé.
+Toujours en attente : un `METER_UNIT` multiple de 16 (aujourd'hui 40 → agrandissement 2,5) ; le
+drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même taille).
 
 **Pistes ouvertes / prochaines étapes possibles** :
 
