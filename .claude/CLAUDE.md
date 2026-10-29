@@ -269,16 +269,15 @@ centrée sur `x`), `Character` (et ses sous-classes), `Collectible`. Le joueur p
 `world.center` (plus de `- 0.5`) ; `Character.move()` borne le centre à une demi-largeur des bords ;
 au dépôt, l'anneau est posé au centre du naib.
 
-**Prochaine tâche (en cours)** : fonction qui fait apparaître N anneaux entre deux bornes
-(`src/app/utils/spaw-waterrings.ts`, ébauche). Pistes données : renvoyer un tableau (fonction pure)
-plutôt que remplir le `World` ; réguliers (attention à `count = 1`) ou au hasard ; trois besoins
-identiques (anneaux, dunes avec `getRandomCatchbasinPositions`, muad'dib dans `game.ts`) → version
-générique avec fabrique, comme `mirrored`.
-
-**Anneaux de test** : anneaux dupliqués à la main dans le constructeur du `World` (voulu, pour avoir
-de quoi acheter en testant). Idée de l'utilisateur : une fonction qui fait apparaître N anneaux
-entre un point A et un point B (ex. 17 anneaux de -7 à 14), utile au début de chaque partie ; plus
-tard, sur la zone du siètch.
+**`disperse` (fait, 29/10/2026)** : `disperse<T>(count, begin, end, create)` dans
+`src/app/utils/disperse.ts` : fonction pure et générique avec fabrique (comme `mirrored`), positions
+au hasard entre les bornes (`getRandomBetweenMinMax`). Le `World` s'en sert pour les anneaux de
+départ (remplace les anneaux dupliqués à la main ; plus tard, sur la zone du siètch). Pourra servir
+aux dunes (`getRandomCatchbasinPositions`) et aux muad'dib (`game.ts`). Bugs rencontrés et
+expliqués : `fill(valeur)` met **le même objet** dans toutes les cases (une seule pièce visible) ;
+`fill(() => …)` range **la fonction**, sans l'appeler (`update is not a function`), et
+`new Array(n)` est un `any[]` qui cache l'erreur à TypeScript → `Array.from({ length }, fabrique)`.
+`Array.from` renvoie directement les objets créés (l'emballage `{ t: T }` + `map` a été retiré).
 
 **Symétrie, décidé** :
 - **Orientation déduite, pas passée** (philosophie du projet : déduire plutôt que stocker) : un

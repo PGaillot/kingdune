@@ -10,6 +10,7 @@ import { Purchasable } from "../interfaces/purchasable";
 import { targetHighlight } from "../target-highlight";
 import { Wall } from "../entities/wall";
 import { mirrored } from "../../utils/mirrored";
+import { disperse } from "../../utils/disperse";
 
 export class World {
 
@@ -29,19 +30,8 @@ export class World {
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch();
-
         this.buildSietchZone();
-
-        this.collectibles.push(new WaterRing(3.1, GROUND));
-        this.collectibles.push(new WaterRing(-3.4, GROUND))
-        this.collectibles.push(new WaterRing(-6.1, GROUND));
-        this.collectibles.push(new WaterRing(13.4, GROUND))
-        this.collectibles.push(new WaterRing(-8.1, GROUND));
-        this.collectibles.push(new WaterRing(3, GROUND));
-        this.collectibles.push(new WaterRing(-3.3, GROUND))
-        this.collectibles.push(new WaterRing(-6, GROUND));
-        this.collectibles.push(new WaterRing(13.3, GROUND))
-        this.collectibles.push(new WaterRing(-8, GROUND));
+        this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
     }
 
 
