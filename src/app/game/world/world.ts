@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, GROUND, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -17,12 +17,12 @@ import { centerX, overlaps } from "../../hitbox";
 import { Muaddib } from "../entities/muaddib";
 import { Hunter } from "../entities/hunter";
 import { PlayerCharacter } from "../entities/player-character";
+import { Clock } from "../clock";
 
 export class World {
-
-    backgroundColor: string = 'blue';
+    clock: Clock;
     readonly player: PlayerCharacter;
-    ground: Ground;
+    readonly ground: Ground;
     catchbasins: Catchbasin[] = [];
     sietch: Sietch;
     collectibles: Collectible[] = [];
@@ -31,13 +31,13 @@ export class World {
     muaddibs: Muaddib[] = [];
     hunter = new Hunter(this.center, GROUND)
 
-
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
     constructor(public readonly radius: GameMeter, catchbasinCount: number = 25) {
+        this.clock = new Clock(0)
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch();
@@ -45,7 +45,6 @@ export class World {
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
         this.workers.push(new Worker(1, GROUND))
         this.player = new PlayerCharacter(this.center, GROUND);
-
         for (let index = 0; index < 5; index++) {
             const position: number = Math.round((Math.random()) * this.width)
             this.muaddibs.push(new Muaddib(position, GROUND))
@@ -136,7 +135,8 @@ export class World {
         return -this.rightEnd;
     }
 
-    update(deltaSeconds: number) {
+    public update(deltaSeconds: number) {
+        this.clock.updateClock(deltaSeconds)
         this.workers.forEach((worker: Worker) => worker.update(deltaSeconds, this.leftEnd, this.rightEnd))
         this.catchbasins = this.catchbasins.filter((catchbasin: Catchbasin) => {
             const completeCatchbasin: boolean = catchbasin.workChargeLeft <= 0;
@@ -162,7 +162,11 @@ export class World {
     }
 
     public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
-        ctx.fillStyle = this.backgroundColor;
+        const gradient: CanvasGradient = ctx.createLinearGradient(0, 0, 0, camera.convert({ x: 0, y: GROUND }).y)
+        const gradientColors: string[] = this.clock.timeOfDay === 'day' ? DAY_LIGHT_GRADIENT : NIGHT_GRADIENT;
+        gradientColors.forEach((color: string, index: number) => gradient.addColorStop(index / (gradientColors.length - 1), color))
+
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         this.ground.draw(ctx, camera);
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))

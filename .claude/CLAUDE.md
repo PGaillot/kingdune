@@ -67,9 +67,18 @@ voir ci-dessous).
 - Niveaux du siètch : distille-tente → entrée scellée → siètch avec réservoir.
 - Monture : **chevaucher un ver** appelé avec un marteleur (thumper), sur le sable uniquement.
 - Inverser le danger jour/nuit (les Fremen se déplacent la nuit) : plus original, moins intuitif.
-- **Cycle jour/nuit (voulu, pas encore codé, 30/10/2026)** : une horloge qui cumule `deltaSeconds`
-  (modulo la durée d'une journée), la phase (jour/nuit) et la couleur du ciel **déduites** par
-  getter. Les machines à états des PNJ liront la phase (ex. les workers rentrent au siètch la
+- **Cycle jour/nuit (horloge et ciel faits, 31/10/2026)** : `Clock` (`src/app/game/clock.ts`),
+  possédée par le `World` (temps **de jeu**, s'arrête en pause ; le temps **réel** reste dans
+  `Game` et l'`InputManager`). Stocke seulement `time` (secondes, part de 0), `updateClock()`
+  cumule `deltaSeconds` (appelée dans `World.update()`). Getters : `days` (division +
+  `Math.floor`), `timeInDay` (modulo), `timeOfDay` (`'day' | 'night'`, moitié de journée chacun).
+  `DAY_LENGTH` = 5 min et les dégradés `DAY_LIGHT_GRADIENT` / `NIGHT_GRADIENT` sont dans
+  `config.ts`. Ciel : dégradé vertical
+  (`createLinearGradient` de `y = 0` jusqu'à l'horizon `camera.convert({ y: GROUND }).y`,
+  `addColorStop(index / (length - 1))`), bascule nette jour/nuit (transition douce par lerp :
+  plus tard). `backgroundColor` retiré du `World`. **Prochaine étape** : la machine à états du
+  worker (rentrer au siètch la nuit). Questions ouvertes : comment le worker connaît la phase
+  (paramètre de plus ou objet « contexte ») ; garde-t-il sa tâche la nuit. Les machines à états des PNJ liront la phase (ex. les workers rentrent au siètch la
   nuit). La tombée de la nuit serait le **deuxième déclencheur** d'événements (après la montée de
   niveau du siètch) : argument pour l'Observer fait main.
 - Naib anonyme avec Paul Atreides en toile de fond, ou incarner Paul (plus scénarisé).
@@ -137,7 +146,7 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 
 ## État d'avancement (à mettre à jour)
 
-**Fait** : `World` (largeur, bornes `leftEnd`/`rightEnd`, contient un `Ground` et la couleur du
+**Fait** : `World` (largeur, bornes `leftEnd`/`rightEnd`, contient un `Ground` et une `Clock` qui donne la couleur du
 ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi du personnage avec
 décalage vertical), entités converties en mètres et posées sur le sol.
 
