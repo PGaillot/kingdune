@@ -67,6 +67,11 @@ voir ci-dessous).
 - Niveaux du siètch : distille-tente → entrée scellée → siètch avec réservoir.
 - Monture : **chevaucher un ver** appelé avec un marteleur (thumper), sur le sable uniquement.
 - Inverser le danger jour/nuit (les Fremen se déplacent la nuit) : plus original, moins intuitif.
+- **Cycle jour/nuit (voulu, pas encore codé, 30/10/2026)** : une horloge qui cumule `deltaSeconds`
+  (modulo la durée d'une journée), la phase (jour/nuit) et la couleur du ciel **déduites** par
+  getter. Les machines à états des PNJ liront la phase (ex. les workers rentrent au siètch la
+  nuit). La tombée de la nuit serait le **deuxième déclencheur** d'événements (après la montée de
+  niveau du siètch) : argument pour l'Observer fait main.
 - Naib anonyme avec Paul Atreides en toile de fond, ou incarner Paul (plus scénarisé).
 - L'épice : simple élément de décor ou de lore, peut-être échangée aux contrebandiers plus tard.
 - **Paliers de matériaux** (dans Kingdom : bois au départ, puis pierre, puis fer, débloqués en
@@ -234,6 +239,87 @@ pas codé tant qu'il n'y a qu'une monnaie (YAGNI), mais d'autres monnaies viendr
 comptés quelque part), appelle `onPaid()` ; dunes marquées, `Sietch.onPaid()` fait `level += 1`.
 `isLongHold` utilise une constante `longHoldAt`.
 
+**Workers et tâches (en cours, 30/10/2026, pas commité)** : **le worker va jusqu'à la dune et la
+creuse, ça marche.** Points 1 et 2 ci-dessous réglés et commités le 31/10/2026 ; le point 3
+(`state`) fera l'objet d'un commit à part. L'utilisateur ne veut pas commiter du code qui ne
+sert à rien.
+
+- **Fait** : image du siètch niveau 0 (commité : `sietch_level_0.png`, 240×112 px = 15 m × 7 m,
+  centrée sur `CENTER`, `save()`/`imageSmoothingEnabled = false`/`restore()`). `Worker extends
+  Npc` (`workForce`, `task: Workable | undefined`, `work()` vide). Interface `Workable` :
+  `workChargeLeft`, `workerRequired`, `requestedAt: number | undefined`, `complete()`, `hitbox`.
+  Le type `Task` a été **retiré** (copie de la charge = deux sources de vérité ; le `Workable`
+  **est** la tâche). `Catchbasin` : plus de booléen `marked`, remplacé par `requestedAt`
+  (`performance.now()` dans `mark()`) et un getter privé `marked` qui le lit (« make impossible
+  states unrepresentable »). Vocabulaire : l'interface reste générique (`requestedAt` = demande
+  **en cours**), chaque classe garde ses mots (`marked` pour la dune, `isUnderConstruction` pour
+  un futur mur, qui remettrait `requestedAt` à `undefined` dans `complete()`).
+  `World.workersTasks` (getter) : `filter` sur `workerRequired > 0` puis `sort` sur
+  `requestedAt` (FIFO). `World.workers: Worker[]` (un worker créé dans le constructeur), dessinés
+  depuis `Game.render()`.
+- **Règles décidées (comme Kingdom)** : c'est **la tâche qui choisit son worker** (répartiteur) ;
+  les tâches sont servies dans l'ordre de la demande, chacune prend le **worker libre le plus
+  proche** (même `filter` + `reduce` que `findTarget()`, distance à la tâche) ; une tâche pleine
+  n'attire plus personne ; plus de worker libre → on arrête. Tout se **déduit** de
+  `worker.task` : libre = `undefined`, workers sur une tâche = ceux qui la ciblent, pleine =
+  ce nombre atteint `workerRequired`. Répartiteur dans le `World` pour commencer.
+- **Fait le 30/10/2026 au soir (pas commité)** : `Npc<AdditionalState extends string = never>`
+  avec `state: NpcState | AdditionalState = 'idle'` ; `Worker extends Npc<'build' | 'repair' |
+  'dig'>`, `Hunter extends Npc<'hunt' | 'protect_sietch'>` (plus de redéclaration de `state`).
+  Concept expliqué : `extends` dans `< >` = **contrainte**, pas héritage ; `'lave'` est un type.
+- **Fait le 30/10/2026, fin de soirée (pas commité)** :
+  - `Npc.runTo(hitbox, …)` : un seul pas par frame (le `while` a été retiré : la game loop **est**
+    la boucle, et `!==` sur des décimales ne devient jamais faux). `distance` = écart des
+    `centerX`, direction = son signe, arrivé si `Math.abs(distance) <= 0.1` m (en mètres, pas
+    `METER_UNIT`). Renvoie `true` une fois arrivé.
+  - `Worker.update()` : `if (task) runTo… puis work() une fois arrivé, else super.update()`.
+  - `Worker.work(deltaSeconds)` : `workChargeLeft -= workForce * deltaSeconds`, puis
+    `task = undefined` quand la charge passe à 0. La dune est retirée par le `filter` dans
+    `Game.loop()`.
+  - Répartiteur `World.taskDistributor()` : bug corrigé, il relit maintenant le getter
+    `availableWorkers` **à chaque tâche**. Avant, il lisait une « photo » prise une seule fois,
+    et un même worker recevait plusieurs tâches dans la frame. Expliqué : complexité O(tâches ×
+    workers), négligeable même à 50 workers, et le vrai levier serait de ne lancer le
+    répartiteur que sur un événement.
+  - **Refacto du 31/10/2026 (pas commité)** : tout le contenu du jeu est passé de `Game` au
+    `World` : `World.update(deltaSeconds)` (workers, retrait des dunes finies, ramassage des
+    anneaux, muad'dib, hunter, répartiteur) et `World.draw(ctx, camera)` (sol, achetables, PNJ,
+    anneaux, joueur en dernier). Le joueur vit dans le `World` (`readonly player`) ; `Game` le lit
+    par un getter `player` (caméra, contrôleur). `draw()` ne reçoit plus `target`, il lit
+    `this.player.target`. `Game` = boucle, horloge, caméra, debug des hitbox.
+- **À faire à la reprise (les 3 points, dans l'ordre que l'utilisateur voudra)** :
+  1. **Fait le 31/10/2026** : plus de `-= 1`. `Workable.workerRequired` est `readonly` ;
+     `Catchbasin` le déduit par getter (`marked ? 1 : 0`) ; `World.workersOnTask(task)` (privée)
+     compte les workers dont `task` est cette tâche ; `workersTasks` filtre sur
+     `workersOnTask(w) < w.workerRequired` (« il manque du monde »). Bug rencontré en route :
+     `workerRequired = 1` en champ fixe → les 25 dunes demandaient un worker, et le `sort` sur
+     `requestedAt!` comparait des `undefined` (`NaN`, ordre au hasard).
+  2. **Récompense de la dune (fait le 31/10/2026)** : c'est le `World` qui **remarque** la fin
+     (dans le `filter` de `update()`, `workChargeLeft <= 0`), appelle `complete()` une seule fois
+     et pose les anneaux renvoyés (`createCollectible`). `complete()` **renvoie**
+     `WaterRing[]` (1 ou 2, `Math.floor(Math.random() + 1.5)`, `Array.from` + fabrique, centrés
+     sur `centerX(hitbox)`). `Workable.complete(): Collectible[] | undefined` : `undefined`
+     voulu par l'utilisateur (= « ce genre de tâche ne rapporte rien », ex. un mur ; `[]` =
+     « rien cette fois »). La détection de front dans `Worker.work()` a été retirée (code mort).
+     Bugs rencontrés : condition inversée (`> 0`), `new Array().fill()` sur un tableau vide,
+     `Array().from` (méthode **statique** appelée sur une instance). Le worker ne ramasse rien :
+     seul le joueur ramasse.
+  3. **`state` ne sert pas** (toujours `'idle'`, le worker décide avec `task`). L'utilisateur
+     veut s'en servir (d'autres états viendront) et aime le générique `Npc<AdditionalState>`.
+     Piste : `state` = **ce qu'il fait**, `task` = **sur quoi** ; `switch` sur `state` dans
+     `update()` (machine à états) ; le répartiteur cherche les `idle` et change tâche **et**
+     état. Pour que les deux champs ne se contredisent jamais (invariant), les changer
+     uniquement via deux méthodes du worker (donner une tâche / libérer), encapsulation.
+- **Réglé le 31/10/2026** : `initialWorkCharge`, `hasArrived`, `availableWorkers` lu une fois
+  par tâche (constante **dans** le `forEach`).
+- **Points signalés, pas réglés** : le nom `runTo` ne dit pas qu'il renvoie « arrivé » ;
+  `runTo` prend `deltaSeconds: number` au lieu de `Second` ; marge de 0,1 m : OK à 60 fps
+  (environ 5 cm par frame en courant) mais un gros `deltaSeconds` peut la sauter (piste : ne
+  jamais avancer plus que la distance restante) ; s'il y a plusieurs workers sur une dune, seul
+  celui qui passe la charge sous 0 se libère tout de suite ; les `!` dans le `sort` de
+  `workersTasks` (piste : un **type predicate** `(w): w is Workable & { requestedAt: number }`) ;
+  `performance.now()` avance même en pause (l'horloge de jeu du jour/nuit sera la bonne source).
+
 **Prochaine étape (plan de l'utilisateur)** : après le paiement du siètch, faire apparaître **deux
 bâtiments** de part et d'autre du siètch, un pour les **builders**, un pour les **archers**. Les
 biomes viendront plus tard (une chose à la fois). Piste retenue (discutée, pas codée) :
@@ -315,8 +401,12 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
   une constante dans `config.ts` ou mieux une touche `tap` dans `INPUT_MAPPING`.
 - Dessiner les collectibles au premier plan (aujourd'hui dans `World.draw()`, donc derrière les
   personnages) : les dessiner depuis `Game.render()` après les personnages, ou des calques.
-- `WaterRing.draw()` est remonté dans `Collectible` ; `update()` des collectibles prendra
-  `deltaSeconds` quand la gravité arrivera (chute, lancer, rebond : intégration d'Euler).
+- **Physique 2D (voulue)** : `update()` des collectibles prendra `deltaSeconds` quand la gravité
+  arrivera (chute, lancer, rebond : intégration d'Euler, vitesse + gravité à chaque frame). Servira
+  aussi aux **flèches des archers** (trajectoire en cloche).
+- **Bourse visuelle (voulue)** : l'utilisateur ne sait jamais combien il a d'anneaux. Afficher le
+  contenu de la `Purse` du naib (comme la bourse de Kingdom, les anneaux visibles dedans), pourra
+  utiliser la même physique.
 - Faire apparaître les muad'dib entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
 - Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
   les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
@@ -325,6 +415,22 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
   défilait 2× plus vite). À faire proprement : des couches de **décor sans hitbox**, chacune avec un
   **facteur de profondeur** (< 1 au loin, 1 = sol, > 1 premier plan) appliqué au **point regardé**,
   sans toucher à la formule de `convert()`.
+- **Animations (voulues plus tard, quelques images/seconde, ex. le drapeau de la dune)** : une
+  **planche de sprites** (images côte à côte dans un PNG), `drawImage` à **9 arguments** (morceau
+  source `sx, sy, sw, sh` puis destination), numéro d'image **déduit du temps** :
+  `Math.floor(time * fps) % frameCount` (même horloge que le jour/nuit). Décalage aléatoire par
+  objet pour éviter que tout bouge en même temps. L'animation jouée dépend de l'**état** du PNJ.
+  Une petite fonction/classe réutilisable (composition), comme `targetHighlight`.
+- **Zone du siètch / zone protégée (à attaquer bientôt : beaucoup d'états en dépendent)** : comme
+  Kingdom, au départ le siètch seul, puis deux murs qui délimitent une zone où les personnages se
+  cachent ou ne s'éloignent pas trop ; elle **s'agrandit** quand on construit un mur plus loin.
+  Piste : la zone **se déduit des murs construits** (le mur construit le plus éloigné de chaque
+  côté ; zone minimale autour du siètch s'il n'y en a pas), getter sur le `World`, rien à stocker.
+  Servira à : savoir si un personnage est dehors (le personnage ne connaît pas le `World`, donc
+  plutôt une fonction qui prend la zone et une hitbox), et choisir le mur à défendre la nuit (le
+  mur frontière du côté du personnage, côté donné par rapport à `CENTER`). **Décidé** : un mur au
+  niveau 0 (cairn) **ne compte pas**, c'est juste un marqueur « on pourra construire ici » (sinon la
+  zone serait immense dès le départ). Distincte de l'île rocheuse (terrain fixe).
 - La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
 - `speed` est typé `GameMeter` alors que c'est des m/s (à revoir plus tard).
 - `hitbox.ts` est dans `src/app/` alors que c'est de la logique de jeu (`src/app/game/`).

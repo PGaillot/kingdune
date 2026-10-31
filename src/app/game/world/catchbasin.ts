@@ -1,7 +1,9 @@
-import { Hitbox } from "../../hitbox";
+import { centerX, Hitbox } from "../../hitbox";
 import { Purchasable } from "../interfaces/purchasable";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
+import { Workable } from "../interfaces/workable";
+import { WaterRing } from "../entities/water-ring";
 
 export type CatchbasinOptions = {
     image: HTMLImageElement,
@@ -23,17 +25,36 @@ const DEFAULT_CATCHBASIN_OPTION: CatchbasinOptions = {
     imageWidth: 3
 }
 
-export class Catchbasin implements Purchasable {
+export class Catchbasin implements Purchasable, Workable {
 
     readonly options: CatchbasinOptions;
 
     private width: GameMeter = 1;
     private height: GameMeter = 2;
-    private marked: boolean = false; // Marqué pour etre fouillé, il est toujours initialisé à faux.
+    get workerRequired(): number {
+        return this.marked ? 1 : 0;
+    };
+
     public readonly price: number = 1; // le prix qu'il en coute en WaterRing pour la fouiller et la faire disparaitre.
 
     constructor(readonly x: GameMeter, option?: Partial<CatchbasinOptions>) {
         this.options = { ...DEFAULT_CATCHBASIN_OPTION, ...option }
+    }
+
+    private initialWorkCharge: number = 2.5;
+
+    workChargeLeft: number = this.initialWorkCharge;
+    public requestedAt: number | undefined = undefined;
+
+
+    private get marked(): boolean {
+        return this.requestedAt !== undefined
+    };
+
+
+    complete(): WaterRing[] {
+        const randomWaterringNumber: number = Math.floor(Math.random() + 1.5);
+        return Array.from({ length: randomWaterringNumber }, () => (new WaterRing(centerX(this.hitbox), GROUND)))
     }
 
     get currentPrice(): number | undefined {
@@ -73,7 +94,7 @@ export class Catchbasin implements Purchasable {
     }
 
     private mark(): void {
-        this.marked = true;
+        this.requestedAt = performance.now();
     }
 
 }

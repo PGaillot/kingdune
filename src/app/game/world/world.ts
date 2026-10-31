@@ -11,15 +11,26 @@ import { targetHighlight } from "../target-highlight";
 import { Wall } from "../entities/wall";
 import { mirrored } from "../../utils/mirrored";
 import { disperse } from "../../utils/disperse";
+import { Workable } from "../interfaces/workable";
+import { Worker } from "../entities/worker";
+import { centerX, overlaps } from "../../hitbox";
+import { Muaddib } from "../entities/muaddib";
+import { Hunter } from "../entities/hunter";
+import { PlayerCharacter } from "../entities/player-character";
 
 export class World {
 
     backgroundColor: string = 'blue';
+    readonly player: PlayerCharacter;
     ground: Ground;
     catchbasins: Catchbasin[] = [];
     sietch: Sietch;
     collectibles: Collectible[] = [];
+    workers: Worker[] = []
     walls: Wall[] = [];
+    muaddibs: Muaddib[] = [];
+    hunter = new Hunter(this.center, GROUND)
+
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
@@ -32,8 +43,28 @@ export class World {
         this.sietch = new Sietch();
         this.buildSietchZone();
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
+        this.workers.push(new Worker(1, GROUND))
+        this.player = new PlayerCharacter(this.center, GROUND);
+
+        for (let index = 0; index < 5; index++) {
+            const position: number = Math.round((Math.random()) * this.width)
+            this.muaddibs.push(new Muaddib(position, GROUND))
+        }
     }
 
+    /** Distribue les taches entre les workers */
+    taskDistributor(): void {
+        // qui quel worker est le plus proche et est dispoinible de chaque taches ?
+        this.workersTasks.forEach((task: Workable) => {
+            const availableWorkers: Worker[] = this.availableWorkers;
+            if (availableWorkers.length >= 1) {
+                const workerReady: Worker = availableWorkers.reduce((a: Worker, b: Worker) =>
+                    Math.abs(centerX(a.hitbox) - centerX(task.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(task.hitbox)) ? a : b
+                )
+                workerReady.task = task;
+            }
+        })
+    };
 
     private buildSietchZone(): void {
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
@@ -41,9 +72,28 @@ export class World {
         this.walls = [...mirrored(6, (x: GameMeter) => new Wall(x)), ...mirrored(20, (x: GameMeter) => new Wall(x))];
     }
 
-
     get purchasables(): Purchasable[] {
         return [...this.catchbasins, this.sietch, ...this.walls]
+    }
+
+    get workersTasks(): Workable[] {
+        const workablesInPending: Workable[] = this.workables.filter((workable: Workable) => this.workersOnTask(workable) < workable.workerRequired)
+        workablesInPending.sort((a: Workable, b: Workable) => a.requestedAt! - b.requestedAt!)
+        return workablesInPending;
+    }
+
+    /** Pour connaitre le nombre de Worker sur une tache */
+    private workersOnTask(task: Workable): number {
+        return this.workers.filter((worker: Worker) => worker.task === task).length;
+    }
+
+    // les workers qui attendent du taffs.
+    get availableWorkers(): Worker[] {
+        return this.workers.filter((worker: Worker) => worker.task === undefined)
+    }
+
+    get workables(): Workable[] {
+        return [...this.catchbasins]
     }
 
     getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
@@ -65,6 +115,11 @@ export class World {
         return positions;
 
     }
+
+    createCollectible(collectibles: Collectible[]) {
+        this.collectibles = [...this.collectibles, ...collectibles]
+    }
+
     public get center(): GameMeter {
         return CENTER
     };
@@ -81,12 +136,40 @@ export class World {
         return -this.rightEnd;
     }
 
-    public draw(ctx: CanvasRenderingContext2D, camera: Camera, target: Purchasable | undefined): void {
+    update(deltaSeconds: number) {
+        this.workers.forEach((worker: Worker) => worker.update(deltaSeconds, this.leftEnd, this.rightEnd))
+        this.catchbasins = this.catchbasins.filter((catchbasin: Catchbasin) => {
+            const completeCatchbasin: boolean = catchbasin.workChargeLeft <= 0;
+            if (completeCatchbasin) {
+                const reward: WaterRing[] = catchbasin.complete();
+                this.createCollectible(reward)
+            }
+            return !completeCatchbasin
+        })
+
+        this.collectibles.forEach((collectible: Collectible) => {
+            collectible.update();
+            if (overlaps(this.player.hitbox, collectible.hitbox) && collectible.canBePickedBy(this.player)) {
+                const collectibleOverflow: Collectible | undefined = this.player.purse.add(collectible);
+                if (collectibleOverflow === undefined) {
+                    this.collectibles = this.collectibles.filter((other: Collectible) => other !== collectible)
+                }
+            }
+        })
+        this.muaddibs.forEach((muaddib) => muaddib.update(deltaSeconds, this.leftEnd, this.rightEnd));
+        this.hunter.update(deltaSeconds, this.leftEnd, this.rightEnd);
+        this.taskDistributor();
+    }
+
+    public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         this.ground.draw(ctx, camera);
-        this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, target === purchasable))
+        this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))
+        this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, camera));
+        this.workers.forEach((worker: Worker) => worker.draw(ctx, camera))
+        this.hunter.draw(ctx, camera);
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
-
+        this.player.draw(ctx, camera);
     }
 }

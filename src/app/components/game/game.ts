@@ -7,17 +7,13 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import { Muaddib } from '../../game/entities/muaddib';
-import { Hunter } from '../../game/entities/hunter';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
-import { GROUND, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
+import { Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
 import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
-import { Builder } from '../../game/entities/builder';
-import { drawHitbox, Hitbox, overlaps } from '../../hitbox';
-import { Collectible } from '../../game/entities/collectible';
+import { drawHitbox, Hitbox } from '../../hitbox';
 
 type HitboxObject = { hitbox: Hitbox };
 
@@ -54,36 +50,30 @@ export class Game {
   public readonly world: World = new World(40); // rayon de 40 cases autour de la case centrale, soit 81 cases
 
   // player
-  private readonly player = new PlayerCharacter(this.world.center, GROUND);
+  get player(): PlayerCharacter {
+    return this.world.player;
+  }
   protected inputManager: InputManager = new InputManager();
   protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
 
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
-  private readonly muaddibs: Muaddib[] = [];
-  private readonly hunter = new Hunter(this.world.center, GROUND)
-  private readonly builder = new Builder(-3, GROUND);
+
   hitboxDebug: boolean = true;
 
   private get hitboxObjects(): HitboxObject[] {
     return [
-      ...this.world.collectibles, this.player
+      this.world.sietch
     ]
   }
 
   constructor() {
-    for (let index = 0; index < 5; index++) {
-      const position: number = Math.round((Math.random()) * this.world.width)
-      this.muaddibs.push(new Muaddib(position, GROUND))
-    }
-
     afterNextRender(() => {
       this.ctx = this.canvasRef().nativeElement.getContext('2d');
       this.frameId = requestAnimationFrame((timestamp) => {
         this.loop(timestamp)
       });
     });
-
     inject(DestroyRef).onDestroy(() => cancelAnimationFrame(this.frameId));
   }
 
@@ -92,43 +82,20 @@ export class Game {
     this.lastTimestamp = timestamp;
     this.inputManager.updateClock(timestamp);
     this.playerController.update(deltaSeconds, this.world);
-
-    this.world.collectibles.forEach((collectible: Collectible) => {
-      collectible.update();
-      if (overlaps(this.player.hitbox, collectible.hitbox) && collectible.canBePickedBy(this.player)) {
-        const collectibleOverflow: Collectible | undefined = this.player.purse.add(collectible);
-        if (collectibleOverflow === undefined) {
-          this.world.collectibles = this.world.collectibles.filter((other: Collectible) => other !== collectible)
-        }
-      }
-    })
-
+    this.world.update(deltaSeconds)
     this.camera.follow({ x: this.player.x, y: this.player.y })
-    this.muaddibs.forEach((muaddib) => {
-      muaddib.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
-    });
-
-    this.hunter.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd);
-    this.builder.update(deltaSeconds, this.world.leftEnd, this.world.rightEnd)
     this.render();
-
     this.frameId = requestAnimationFrame((next) => this.loop(next));
   }
 
   private render(): void {
-    if (!this.ctx) {
-      return;
-    }
-
+    if (!this.ctx) return;
     const ctx = this.ctx;
-    this.world.draw(ctx, this.camera, this.player.target);
-    this.player.draw(ctx, this.camera);
-    this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, this.camera));
-    this.hunter.draw(ctx, this.camera);
+
+
+    this.world.draw(ctx, this.camera);
 
     // DEBUG
-    this.builder.draw(ctx, this.camera);
-
     if (this.hitboxDebug)
       this.hitboxObjects.forEach((object: HitboxObject) => {
         drawHitbox(ctx, this.camera, object.hitbox)

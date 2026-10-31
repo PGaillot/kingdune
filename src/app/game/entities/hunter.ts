@@ -5,7 +5,7 @@ import { Purse } from "./purse";
 
 const DEFAULT_OPTIONS: Partial<CharacterOptions> = { color: 'black' }
 
-export class Hunter extends Npc {
+export class Hunter extends Npc<'hunt' | 'protect_sietch'> {
 
     purse: Purse = new Purse();
 
