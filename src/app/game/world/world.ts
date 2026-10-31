@@ -60,7 +60,8 @@ export class World {
             height: 2,
             width: x1 - x0,
             x: x0,
-            y: GROUND
+            y: GROUND,
+            strokeDebugColor: 'aqua'
         }
     }
 
@@ -69,11 +70,11 @@ export class World {
         const builtWalls: Wall[] = walls.filter((wall: Wall) => wall.currentLevel > 0);
         if (builtWalls.length >= 1) {
             return builtWalls.reduce((a: Wall, b: Wall) =>
-                Math.abs((a.positionX - this.center)) > Math.abs(b.positionX - this.center) ? a : b
+                Math.abs((centerX(a.hitbox) - this.center)) > Math.abs(centerX(b.hitbox) - this.center) ? a : b
             )
         }
         return walls.reduce((a: Wall, b: Wall) =>
-            Math.abs((a.positionX - this.center)) < Math.abs(b.positionX - this.center) ? a : b
+            Math.abs((centerX(a.hitbox) - this.center)) < Math.abs(centerX(b.hitbox) - this.center) ? a : b
         )
     }
 

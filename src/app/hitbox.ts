@@ -6,6 +6,7 @@ export interface Hitbox {
     width: GameMeter,
     x: GameMeter,
     y: GameMeter,
+    strokeDebugColor?: string;
 }
 
 export function overlaps(a: Hitbox, b: Hitbox): boolean {
@@ -33,7 +34,7 @@ export function centerX(hitbox: Hitbox): GameMeter {
 }
 
 export function drawHitbox(ctx: CanvasRenderingContext2D, camera: Camera, hitbox: Hitbox) {
-    ctx.strokeStyle = "greenyellow";
+    ctx.strokeStyle = hitbox.strokeDebugColor ?? "greenyellow";
     const cameraPosition: ScreenPoint = camera.convert({ x: hitbox.x, y: hitbox.y })
     ctx.strokeRect(cameraPosition.x, (cameraPosition.y - (hitbox.height * METER_UNIT)), hitbox.width * METER_UNIT, hitbox.height * METER_UNIT);
 }
