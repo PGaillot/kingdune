@@ -63,7 +63,9 @@ export class Game {
 
   private get hitboxObjects(): HitboxObject[] {
     return [
-      this.world.sietch
+      this.world.sietch,
+      { hitbox: this.world.sietchZone },
+      // ...this.world.walls
     ]
   }
 

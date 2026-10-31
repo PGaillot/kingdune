@@ -430,16 +430,20 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
   `Math.floor(time * fps) % frameCount` (même horloge que le jour/nuit). Décalage aléatoire par
   objet pour éviter que tout bouge en même temps. L'animation jouée dépend de l'**état** du PNJ.
   Une petite fonction/classe réutilisable (composition), comme `targetHighlight`.
-- **Zone du siètch / zone protégée (à attaquer bientôt : beaucoup d'états en dépendent)** : comme
-  Kingdom, au départ le siètch seul, puis deux murs qui délimitent une zone où les personnages se
-  cachent ou ne s'éloignent pas trop ; elle **s'agrandit** quand on construit un mur plus loin.
-  Piste : la zone **se déduit des murs construits** (le mur construit le plus éloigné de chaque
-  côté ; zone minimale autour du siètch s'il n'y en a pas), getter sur le `World`, rien à stocker.
-  Servira à : savoir si un personnage est dehors (le personnage ne connaît pas le `World`, donc
+- **Zone du siètch / zone protégée (faite et commitée le 31/10/2026)** : comme Kingdom, deux murs
+  délimitent une zone où les personnages se cachent ; elle **s'agrandit** quand on construit un
+  mur plus loin. Codé : getter `World.sietchZone` (une `Hitbox` de hauteur 2, du bord intérieur du
+  mur gauche au bord intérieur du mur droit, rien de stocké) et `getLastSietchWall(direction)` :
+  murs du côté, puis le **construit** (`currentLevel > 0`) le plus **éloigné** du centre, sinon
+  l'emplacement (cairn) le plus **proche** (décision de l'utilisateur : sans mur construit, la zone
+  est celle des premiers emplacements). Comparaison par `Math.abs(positionX - CENTER)` (plus de
+  code par côté). Debug : la zone est dessinée par `drawHitbox` dans `Game.render()`. Reste : le
+  filtre de côté compare `hitbox.x` à 0 (piste : `wall.orientation === direction`) ; un côté sans
+  mur ferait planter le `reduce` (tableau vide, côté bouché). Servira à : savoir si un personnage est dehors (le personnage ne connaît pas le `World`, donc
   plutôt une fonction qui prend la zone et une hitbox), et choisir le mur à défendre la nuit (le
-  mur frontière du côté du personnage, côté donné par rapport à `CENTER`). **Décidé** : un mur au
-  niveau 0 (cairn) **ne compte pas**, c'est juste un marqueur « on pourra construire ici » (sinon la
-  zone serait immense dès le départ). Distincte de l'île rocheuse (terrain fixe).
+  mur frontière du côté du personnage, côté donné par rapport à `CENTER`). Un mur au niveau 0
+  (cairn) ne compte comme frontière que s'il n'y a aucun mur construit de ce côté, et seulement le
+  plus proche (sinon la zone serait immense dès le départ). Distincte de l'île rocheuse (terrain fixe).
 - La convention « centré sur 0 » est écrite à deux endroits (`World.leftEnd` et `Ground.draw()`).
 - `speed` est typé `GameMeter` alors que c'est des m/s (à revoir plus tard).
 - `hitbox.ts` est dans `src/app/` alors que c'est de la logique de jeu (`src/app/game/`).

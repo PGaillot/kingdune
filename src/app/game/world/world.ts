@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -13,7 +13,7 @@ import { mirrored } from "../../utils/mirrored";
 import { disperse } from "../../utils/disperse";
 import { Workable } from "../interfaces/workable";
 import { Worker } from "../entities/worker";
-import { centerX, overlaps } from "../../hitbox";
+import { centerX, Hitbox, overlaps } from "../../hitbox";
 import { Muaddib } from "../entities/muaddib";
 import { Hunter } from "../entities/hunter";
 import { PlayerCharacter } from "../entities/player-character";
@@ -49,6 +49,32 @@ export class World {
             const position: number = Math.round((Math.random()) * this.width)
             this.muaddibs.push(new Muaddib(position, GROUND))
         }
+    }
+
+    get sietchZone(): Hitbox {
+        const lastSietchWallLeft: Wall = this.getLastSietchWall(-1);
+        const lastSietchWallRight: Wall = this.getLastSietchWall(1);
+        const x0: number = lastSietchWallLeft.hitbox.x + lastSietchWallLeft.hitbox.width;
+        const x1: number = lastSietchWallRight.hitbox.x;
+        return {
+            height: 2,
+            width: x1 - x0,
+            x: x0,
+            y: GROUND
+        }
+    }
+
+    getLastSietchWall(direction: Direction): Wall {
+        const walls: Wall[] = this.walls.filter((wall: Wall) => wall.orientation === direction)
+        const builtWalls: Wall[] = walls.filter((wall: Wall) => wall.currentLevel > 0);
+        if (builtWalls.length >= 1) {
+            return builtWalls.reduce((a: Wall, b: Wall) =>
+                Math.abs((a.positionX - this.center)) > Math.abs(b.positionX - this.center) ? a : b
+            )
+        }
+        return walls.reduce((a: Wall, b: Wall) =>
+            Math.abs((a.positionX - this.center)) < Math.abs(b.positionX - this.center) ? a : b
+        )
     }
 
     /** Distribue les taches entre les workers */
