@@ -189,7 +189,7 @@ export class World {
         })
 
         this.collectibles.forEach((collectible: Collectible) => {
-            collectible.update();
+            collectible.update(deltaSeconds);
             if (overlaps(this.player.hitbox, collectible.hitbox) && collectible.canBePickedBy(this.player)) {
                 const collectibleOverflow: Collectible | undefined = this.player.purse.add(collectible);
                 if (collectibleOverflow === undefined) {

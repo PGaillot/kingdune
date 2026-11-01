@@ -21,6 +21,7 @@ export class Purse {
     /** pour ajouter un collectible a la bourse */
     public add(collectible: Collectible): undefined | Collectible {
         if (this.maxSize === undefined || this.content.length < this.maxSize) {
+            collectible.resetSpeed();
             this.content.push(collectible)
             return
         }

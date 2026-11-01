@@ -1,6 +1,6 @@
 import { Hitbox, overlaps } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, METER_UNIT, Pixel, ScreenPoint } from "../config";
+import { REBOUND_FRICTION, GameMeter, GRAVITY, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
 import { Character } from "./character";
 
 
@@ -19,7 +19,11 @@ const DEFAULT_OPTIONS: CollectibleOptions = {
 export class Collectible {
 
     readonly options: CollectibleOptions;
-    droppedBy: Character | undefined = undefined
+    droppedBy: Character | undefined = undefined;
+    /** la vitesse sur X pour la physique tout ca tout ça ! */
+    vX: number = 0;
+    /** la vitesse sur Y pour la physique, faut bien que ça tombe. */
+    vY: number = 0;
 
     constructor(
         public x: GameMeter,
@@ -38,7 +42,27 @@ export class Collectible {
         }
     };
 
-    update(): void {
+
+    update(deltaSeconds: Second): void {
+
+        this.vY -= GRAVITY * deltaSeconds;
+
+        this.y += (this.vY * deltaSeconds);
+
+        if (this.y < GROUND) {
+            this.y = GROUND;
+
+            if (this.vY < 0 && this.vY > -0.3) {
+                this.vY = 0;
+                this.vX = 0;
+            } else {
+                this.vY = -this.vY * REBOUND_FRICTION;
+                this.vX = this.vX * REBOUND_FRICTION;
+            }
+
+        }
+        this.x += (this.vX * deltaSeconds);
+
         if (this.droppedBy === undefined) return
         const isOverlap: boolean = overlaps(this.hitbox, this.droppedBy.hitbox);
         if (!isOverlap) this.droppedBy = undefined;
@@ -46,6 +70,11 @@ export class Collectible {
 
     canBePickedBy(character: Character): boolean {
         return character !== this.droppedBy
+    }
+
+    resetSpeed(): void {
+        this.vX = 0;
+        this.vY = 0;
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {

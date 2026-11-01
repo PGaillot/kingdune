@@ -4,6 +4,7 @@ import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
 import { Workable } from "../interfaces/workable";
 import { WaterRing } from "../entities/water-ring";
+import { getRandomBetweenMinMax } from "../../utils/random.utils";
 
 export type CatchbasinOptions = {
     image: HTMLImageElement,
@@ -54,7 +55,11 @@ export class Catchbasin implements Purchasable, Workable {
 
     complete(): WaterRing[] {
         const randomWaterringNumber: number = Math.floor(Math.random() + 1.5);
-        return Array.from({ length: randomWaterringNumber }, () => (new WaterRing(centerX(this.hitbox), GROUND)))
+        return Array.from({ length: randomWaterringNumber }, () => (new WaterRing(centerX(this.hitbox), 1))).map((waterring: WaterRing) => {
+            waterring.vY = getRandomBetweenMinMax(1, 2);
+            waterring.vX = getRandomBetweenMinMax(-2, 2);
+            return waterring
+        })
     }
 
     get currentPrice(): number | undefined {

@@ -458,9 +458,19 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
   une constante dans `config.ts` ou mieux une touche `tap` dans `INPUT_MAPPING`.
 - Dessiner les collectibles au premier plan (aujourd'hui dans `World.draw()`, donc derrière les
   personnages) : les dessiner depuis `Game.render()` après les personnages, ou des calques.
-- **Physique 2D (voulue)** : `update()` des collectibles prendra `deltaSeconds` quand la gravité
-  arrivera (chute, lancer, rebond : intégration d'Euler, vitesse + gravité à chaque frame). Servira
-  aussi aux **flèches des archers** (trajectoire en cloche).
+- **Physique 2D des anneaux (faite le 01/11/2026)** : `Collectible` a `vX`/`vY` (champs d'état,
+  0 par défaut, pas des options) ; `update(deltaSeconds)` : gravité (`GRAVITY` dans `config.ts`)
+  → vitesse → position (Euler) ; au sol : repos si `vY` entre -0,3 et 0 (les deux vitesses à 0),
+  sinon rebond (`REBOUND_FRICTION` = 0,4). `Catchbasin.complete()` crée chaque anneau **dans** la
+  fabrique d'`Array.from`, à 1 m, avec une vitesse au hasard. `resetSpeed()` appelé par
+  `Purse.add()` seulement si l'anneau est rangé. Bugs rencontrés : position calculée dans des
+  getters (vitesse jamais remise à 0 → anneau dans l'espace) ; test du sol sur `x` au lieu de
+  `y` ; même objet dans `Array.from` (deux `update()` par frame = temps en accéléré) ;
+  `forEach` sur `this.collectibles` au lieu du paramètre ; seuil de repos collé à la gravité
+  d'une frame (dépend des fps). Restent : nombres magiques (`0.3`, hauteur `1`), pas de bornes
+  pour les anneaux, ramassage en plein vol autorisé (à décider). Servira aussi aux **flèches
+  des archers** (trajectoire en cloche, angle par `Math.atan2(vY, vX)`) et au paiement pièce
+  par pièce (les pièces retombent si l'achat échoue).
 - **Bourse visuelle (voulue)** : l'utilisateur ne sait jamais combien il a d'anneaux. Afficher le
   contenu de la `Purse` du naib (comme la bourse de Kingdom, les anneaux visibles dedans), pourra
   utiliser la même physique.

@@ -9,8 +9,11 @@ export type Direction = -1 | 0 | 1;
 
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
-export const GROUND = 0;
-export const CENTER = 0;
+export const GROUND: GameMeter = 0;
+export const CENTER: GameMeter = 0;
+
+export const GRAVITY: number = 9.81 // m/s²
+export const REBOUND_FRICTION: number = 0.4;
 
 /** Un point dans le monde du jeu, en mètres. Le sol est à y = 0 et la hauteur monte. */
 export type WorldPoint = { x: GameMeter, y: GameMeter }
