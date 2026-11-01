@@ -28,7 +28,6 @@ type HitboxObject = { hitbox: Hitbox };
       role="img"
       aria-label="Zone de jeu : utilisez les flèches gauche et droite pour déplacer le personnage."
     ></canvas>
-    <p class="instructions">Flèches ← et → pour déplacer le personnage.</p>
   `,
   styleUrl: './game.scss',
   host: {

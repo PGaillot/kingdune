@@ -19,6 +19,8 @@ import { Hunter } from "../entities/hunter";
 import { PlayerCharacter } from "../entities/player-character";
 import { Clock } from "../clock";
 import { WorldContext } from "../entities/npc";
+import { PyonsCamp } from "../entities/pyons-camp";
+import { Pyon } from "../entities/pyon";
 
 export class World {
     clock: Clock;
@@ -31,13 +33,15 @@ export class World {
     walls: Wall[] = [];
     muaddibs: Muaddib[] = [];
     hunters: Hunter[] = [];
+    pyonsCamps: PyonsCamp[] = [];
+    pyons: Pyon[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, catchbasinCount: number = 10) {
+    constructor(public readonly radius: GameMeter, catchbasinCount: number = 20) {
         this.clock = new Clock(0)
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
@@ -52,6 +56,10 @@ export class World {
             const position: number = Math.round((Math.random()) * this.width)
             this.muaddibs.push(new Muaddib(position, GROUND, this.worldContext))
         }
+
+        this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext))
+        this.pyonsCamps.push(new PyonsCamp(34, this.worldContext))
+
     }
 
     get worldContext(): WorldContext {
@@ -77,6 +85,46 @@ export class World {
             y: GROUND,
             strokeDebugColor: 'aqua'
         }
+    }
+
+    public get center(): GameMeter {
+        return CENTER
+    };
+
+    public get width(): GameMeter {
+        return (this.radius * 2) + 1;
+    }
+
+    public get rightEnd(): GameMeter {
+        return this.radius + 0.5;
+    }
+
+    public get leftEnd(): GameMeter {
+        return -this.rightEnd;
+    }
+
+    get purchasables(): Purchasable[] {
+        return [...this.catchbasins, this.sietch, ...this.walls]
+    }
+
+    get workersTasks(): Workable[] {
+        const workablesInPending: Workable[] = this.workables.filter((workable: Workable) => this.workersOnTask(workable) < workable.workerRequired)
+        workablesInPending.sort((a: Workable, b: Workable) => a.requestedAt! - b.requestedAt!)
+        return workablesInPending;
+    }
+
+    /** Pour connaitre le nombre de Worker sur une tache */
+    private workersOnTask(task: Workable): number {
+        return this.workers.filter((worker: Worker) => worker.task === task).length;
+    }
+
+    // les workers qui attendent du taffs.
+    get availableWorkers(): Worker[] {
+        return this.workers.filter((worker: Worker) => worker.task === undefined)
+    }
+
+    get workables(): Workable[] {
+        return [...this.catchbasins]
     }
 
     private getLastSietchWall(direction: Direction): Wall {
@@ -109,31 +157,7 @@ export class World {
     private buildSietchZone(): void {
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
         this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome());
-        this.walls = [...mirrored(6, (x: GameMeter) => new Wall(x)), ...mirrored(20, (x: GameMeter) => new Wall(x))];
-    }
-
-    get purchasables(): Purchasable[] {
-        return [...this.catchbasins, this.sietch, ...this.walls]
-    }
-
-    get workersTasks(): Workable[] {
-        const workablesInPending: Workable[] = this.workables.filter((workable: Workable) => this.workersOnTask(workable) < workable.workerRequired)
-        workablesInPending.sort((a: Workable, b: Workable) => a.requestedAt! - b.requestedAt!)
-        return workablesInPending;
-    }
-
-    /** Pour connaitre le nombre de Worker sur une tache */
-    private workersOnTask(task: Workable): number {
-        return this.workers.filter((worker: Worker) => worker.task === task).length;
-    }
-
-    // les workers qui attendent du taffs.
-    get availableWorkers(): Worker[] {
-        return this.workers.filter((worker: Worker) => worker.task === undefined)
-    }
-
-    get workables(): Workable[] {
-        return [...this.catchbasins]
+        this.walls = [...mirrored(14, (x: GameMeter) => new Wall(x)), ...mirrored(26, (x: GameMeter) => new Wall(x))];
     }
 
     getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
@@ -158,22 +182,6 @@ export class World {
 
     createCollectible(collectibles: Collectible[]) {
         this.collectibles = [...this.collectibles, ...collectibles]
-    }
-
-    public get center(): GameMeter {
-        return CENTER
-    };
-
-    public get width(): GameMeter {
-        return (this.radius * 2) + 1;
-    }
-
-    public get rightEnd(): GameMeter {
-        return this.radius + 0.5;
-    }
-
-    public get leftEnd(): GameMeter {
-        return -this.rightEnd;
     }
 
     public update(deltaSeconds: number) {
@@ -208,6 +216,17 @@ export class World {
             hunter.update(deltaSeconds)
         })
 
+        this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => {
+            pyonsCamp.updateWorldContext(this.worldContext)
+            pyonsCamp.pyonsCreated = this.pyons.filter((pyon: Pyon) => pyon.createdBy === pyonsCamp)
+            const pyon: Pyon | undefined = pyonsCamp.update(deltaSeconds);
+            if (pyon) this.pyons.push(pyon);
+        })
+
+        this.pyons.forEach((pyon: Pyon) => {
+            pyon.update(deltaSeconds)
+        })
+
         this.muaddibs.forEach((muaddib) => {
             muaddib.updateWorldContexte(this.worldContext);
             muaddib.update(deltaSeconds)
@@ -228,6 +247,9 @@ export class World {
         this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, camera));
         this.workers.forEach((worker: Worker) => worker.draw(ctx, camera))
         this.hunters.forEach((hunter: Hunter) => hunter.draw(ctx, camera));
+        this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => pyonsCamp.draw(ctx, camera));
+        this.pyons.forEach((pyon: Pyon) => pyon.draw(ctx, camera));
+
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
         this.player.draw(ctx, camera);
     }

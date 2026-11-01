@@ -48,6 +48,11 @@ voir ci-dessous).
 - **Côtés du monde** : comme dans Kingdom, les deux bords diffèrent : d'un côté un « portail » ennemi
   à détruire, de l'autre un côté bouché. Croquis : dunes d'un côté, ruines de l'autre.
 
+**Principe de design (décidé le 01/11/2026)** : comme dans les premiers Kingdom (ce que
+l'utilisateur préfère aux derniers), **aucun texte, aucun tuto** : tout se comprend par le
+**level design** et les réactions du monde. Les noms des choses (pyons, etc.) ne servent qu'à
+nous, dans le code ; le joueur ne les voit jamais.
+
 **Décidé à partir des croquis** (`recherches/recherches_1.png`, pas encore codé) :
 
 - **Buissons secs** (l'équivalent des terriers/buissons à lapins) : les muad'dib en sortent et restent
@@ -377,6 +382,23 @@ sert à rien.
   `workersTasks` (piste : un **type predicate** `(w): w is Workable & { requestedAt: number }`) ;
   `performance.now()` avance même en pause (l'horloge de jeu du jour/nuit sera la bonne source).
 
+**Pyons et camps (fait, commité le 01/11/2026)** : `Pyon extends Npc` (`createdBy: PyonsCamp`,
+`entities/pyon.ts`) et `PyonsCamp` (`entities/pyons-camp.ts`, deux camps à -32 et 34 m, carré rose, `MAX_PYONS` = 2, un
+pyon toutes les 60 s via `createPyonTimer: number | undefined`). Même principe que
+`Catchbasin.complete()` : **le camp fabrique, le monde range** (`update()` renvoie
+`Pyon | undefined`, le `World` le pousse dans `pyons`, les met à jour et les dessine). Le `World`
+réécrit `pyonsCreated` à chaque frame (photo dans un champ ; piste : passer le nombre en
+paramètre d'`update()`). Bug rencontré : `0` est falsy (`if (timer)` ne démarrait jamais).
+
+**À la reprise (02/11/2026) : zones d'errance des PNJ** (piste discutée, pas codée) :
+- la **machine à états choisit la zone** et la passe en paramètre à chaque frame, rien de
+  stocké (pyon `idle` → hitbox de son camp ; hunter/worker la nuit → `sietchZone`) ;
+- une fonction pure « hitbox dans la zone » dans `hitbox.ts` (centre ou corps entier : à
+  décider ; seul l'axe X compte) : **par là que l'utilisateur commencera** ;
+- une méthode « errer dans la zone » : dehors → court vers la zone (« arrivé » = dedans, plus
+  au centre, ce qui règle l'entassement au centre) ; dedans → balade de `Npc.update()` avec
+  demi-tour si le prochain pas sort. Piège : zone plus petite que le PNJ.
+
 **Prochaine étape (plan de l'utilisateur)** : après le paiement du siètch, faire apparaître **deux
 bâtiments** de part et d'autre du siètch, un pour les **builders**, un pour les **archers**. Les
 biomes viendront plus tard (une chose à la fois). Piste retenue (discutée, pas codée) :
@@ -397,8 +419,8 @@ biomes viendront plus tard (une chose à la fois). Piste retenue (discutée, pas
 **Mur (fait, 29/10/2026)** : `Wall` (`entities/wall.ts`, `Purchasable`), niveaux dans un `Record`
 `WALL_LEVEL` (prix, vie, image ; `public/ressources/wall/`), `currentPrice` = prix du niveau
 **suivant** via `?.`. `positionX` = **centre** du mur, `width`/`height` en champs, le getter
-`hitbox` calcule le bord gauche. Murs créés par `mirrored` dans `World.buildSietchZone()` (±6 et
-±20 m). `orientation` : getter `Direction` (1 si `positionX >= CENTER`, sinon -1) ; le mur de droite
+`hitbox` calcule le bord gauche. Murs créés par `mirrored` dans `World.buildSietchZone()` (±14 et
+±26 m). `orientation` : getter `Direction` (1 si `positionX >= CENTER`, sinon -1) ; le mur de droite
 est dessiné retourné (`translate` sur le bord droit en pixels, `scale(-1, 1)`, `drawImage` en
 coordonnées relatives). `CENTER` dans `config.ts` (`World.center` le lit), `Direction` déplacé de
 `player-controller.ts` vers `config.ts`. **Debug des hitbox fait** : `drawHitbox(ctx, camera,
