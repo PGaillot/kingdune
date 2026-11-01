@@ -16,7 +16,7 @@ export function targetHighlight(ctx: CanvasRenderingContext2D, camera: Camera, o
         ctx.filter = 'opacity(0.35)';
         for (let i = 0; i < object.currentPrice; i++) {
             const positionInCamera: ScreenPoint = camera.convert({ x: centerX(object.hitbox), y: object.hitbox.y });
-            ctx.drawImage(PLACEHOLDER, positionInCamera.x - (placeHolderWateringSize * METER_UNIT) / 2, positionInCamera.y - (4 * METER_UNIT) - (i * (METER_UNIT + 20)), placeHolderWateringSize * METER_UNIT, placeHolderWateringSize * METER_UNIT)
+            ctx.drawImage(PLACEHOLDER, positionInCamera.x - (placeHolderWateringSize * METER_UNIT) / 2, positionInCamera.y - (4 * METER_UNIT) - (i * (METER_UNIT + 10)), placeHolderWateringSize * METER_UNIT, placeHolderWateringSize * METER_UNIT)
         }
         ctx.filter = 'brightness(0.6)';
     }

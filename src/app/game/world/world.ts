@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LENGTH, DAY_LIGHT_GRADIENT, Direction, GROUND, METER_UNIT, NIGHT_GRADIENT, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -242,6 +242,16 @@ export class World {
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        // Bouger ca dans une class Sun, qui herite de Celestial,
+        // comme ca on peux mettre la lune et pleins d'autres trucs (lune rouge, eclipse ...)
+        const sunSize: Pixel = 3 * METER_UNIT;
+        ctx.fillStyle = 'yellow';
+        const sunAngle: number = (this.clock.timeInDay / DAY_LENGTH) * 2 * Math.PI;
+        const sunX: number = (SCREEN_WIDTH / 2) - Math.cos(sunAngle) * SCREEN_HEIGHT / 2;
+        const suny: number = (SCREEN_HEIGHT / 2) - Math.sin(sunAngle) * SCREEN_HEIGHT / 2;
+        ctx.fillRect(sunX, suny, sunSize, sunSize)
+
         this.ground.draw(ctx, camera);
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))
         this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, camera));
