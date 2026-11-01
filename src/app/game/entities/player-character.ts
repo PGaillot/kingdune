@@ -33,7 +33,7 @@ export class PlayerCharacter extends Character {
         const collectible: Collectible | undefined = this.purse.remove();
         if (collectible) {
             collectible.x = this.x;
-            collectible.y = this.y;
+            collectible.y = this.y + 1; // pour qu'ils tombent un peu
             collectible.droppedBy = this;
             world.collectibles.push(collectible)
         }
