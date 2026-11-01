@@ -81,6 +81,12 @@ voir ci-dessous).
   (paramètre de plus ou objet « contexte ») ; garde-t-il sa tâche la nuit. Les machines à états des PNJ liront la phase (ex. les workers rentrent au siètch la
   nuit). La tombée de la nuit serait le **deuxième déclencheur** d'événements (après la montée de
   niveau du siètch) : argument pour l'Observer fait main.
+- **Bornes et zones (discuté le 01/11/2026, pas codé)** : l'utilisateur retire `minX`/`maxX`.
+  Piste : séparer la **contrainte dure** (personne ne sort du monde, appliquée par le `World`
+  après les `update()`) de la **zone d'errance** (comportement : le PNJ erre dans une `Hitbox`
+  qui peut changer : autour de son camp, `sietchZone` la nuit ; s'il en sort, il y revient).
+  Besoin à venir : les vagabonds de Kingdom (en attente d'être recrutés) errent autour de leur
+  camp. Nom à trouver (pistes : pyons, errants, réfugiés).
 - Naib anonyme avec Paul Atreides en toile de fond, ou incarner Paul (plus scénarisé).
 - L'épice : simple élément de décor ou de lore, peut-être échangée aux contrebandiers plus tard.
 - **Paliers de matériaux** (dans Kingdom : bois au départ, puis pierre, puis fer, débloqués en
@@ -319,6 +325,48 @@ sert à rien.
      `update()` (machine à états) ; le répartiteur cherche les `idle` et change tâche **et**
      état. Pour que les deux champs ne se contredisent jamais (invariant), les changer
      uniquement via deux méthodes du worker (donner une tâche / libérer), encapsulation.
+- **Machine à états, mise à jour du 01/11/2026 (pas commité, ça marche)** : le plantage est
+  réglé (hunter créé dans le constructeur du `World`, `hunters: Hunter[]`) ; le contexte est
+  rafraîchi à chaque frame (`updateWorldContexte(this.worldContext)` avant chaque `update()`,
+  `WorldContext` contient aussi `world: { leftEnd, rightEnd }`) ; `case "dig"` ne repasse en
+  `idle` que sans tâche. Le hunter rentre au siètch la nuit (`protect_sietch` + `runTo` vers la
+  zone) et repart en `idle` le jour. Bugs rencontrés : `moveTo` sans `this.` = `window.moveTo`
+  (global du DOM, compile sans rien faire) ; `GROUND` (= 0) passé à la place de `deltaSeconds`
+  (pas nul, un alias `Second = number` ne protège pas : piste des branded types). Restent : tous
+  vont au **centre** de la zone (point au hasard tiré une fois à la transition) ; le worker ne
+  rentre pas encore la nuit ; le `return` de `case "dig"` sans tâche le bloquerait en `dig`.
+  **`minX`/`maxX` retirés (01/11/2026)** : `Character` reçoit `worldStart`/`worldEnd` (`readonly`)
+  au constructeur (fixes pendant la partie, donc pas de problème de photo) ; `Npc` les tire de
+  `worldContext.world.start/end` ; `walk`/`run`/`move`/`runTo`/`update` n'ont plus de bornes.
+  Bug rencontré : arguments de `super()` dans le désordre (`y` = -20, PNJ sous le sol) ;
+  TypeScript ne voit rien car tout est `number` : argument pour un **parameter object**
+  (le constructeur de `Npc` a 6 paramètres positionnels).
+- **Machine à états, historique (31/10/2026 au soir)** :
+  - Objectif : à la nuit, tout le monde (workers, hunter ; pas les muad'dib) rentre se cacher dans
+    `World.sietchZone`. Plan conseillé en 2 étapes : (1) refaire l'existant du worker avec un
+    `switch` (`idle` = balade via `super.update()`, `dig` = `runTo` + `work`), transitions :
+    tâche reçue → `dig`, plus de tâche → `idle`, le jeu doit marcher **comme avant** → commit ;
+    (2) ajouter l'état « se cacher » (pas encore dans `NpcState` ; `escape` existe déjà) avec
+    les transitions nuit / jour. Idées : point au hasard dans la zone tiré **une fois** à la
+    transition (sinon tous empilés) ; le worker peut **garder** sa tâche la nuit.
+  - Fait par l'utilisateur : `switch` dans `Worker.update()` et `Hunter.update()` ; type
+    `WorldContext` (`sietchZone`, `clock`) dans `npc.ts` ; getter `World.worldContext` ;
+    contexte passé au **constructeur** de `Npc`, `Worker`, `Hunter`, `Muaddib` (choisi pour ne
+    pas tester `undefined`).
+  - **Problèmes signalés, pas réglés** :
+    1. **Plantage au démarrage** : `hunter = new Hunter(..., this.worldContext)` est un
+       **champ**, initialisé **avant** le constructeur : `walls` encore vide → `reduce` sur
+       tableau vide dans `getLastSietchWall`, et `clock` vaut `undefined`.
+    2. Le contexte au constructeur : OK pour `clock` (référence), mais `sietchZone` est
+       recalculée par le getter → le PNJ garderait une **photo** de la zone. Et `Npc` ne range
+       même pas `worldContext`. Conseil : passer le contexte (**parameter object**) à
+       `update()` à chaque frame. Options discutées : tout le `World` (couplage), contexte
+       (conseillé), `World` au constructeur (dépendance cachée).
+    3. `case "dig"` : `this.state = 'idle'` exécuté à chaque frame sans condition (alterne
+       dig/idle) ; la transition vers `idle` doit dépendre de « plus de tâche ».
+  - L'utilisateur veut revoir la signature de `update()` : `minX`/`maxX` ne lui semblent plus
+    utiles, « c'est plus subtil » (à réfléchir de son côté ; ils pourraient entrer dans le
+    contexte).
 - **Réglé le 31/10/2026** : `initialWorkCharge`, `hasArrived`, `availableWorkers` lu une fois
   par tâche (constante **dans** le `forEach`).
 - **Points signalés, pas réglés** : le nom `runTo` ne dit pas qu'il renvoie « arrivé » ;

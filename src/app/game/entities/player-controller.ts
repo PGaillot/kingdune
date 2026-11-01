@@ -21,9 +21,9 @@ export class PlayerController {
         const isRunning: boolean = this.inputManager.isActive('run_left') || this.inputManager.isActive('run_right')
         this.playerCharacter.findTarget(world.purchasables)
         if (isRunning) {
-            this.playerCharacter.run(this.direction, deltaSeconds, world.leftEnd, world.rightEnd);
+            this.playerCharacter.run(this.direction, deltaSeconds);
         } else {
-            this.playerCharacter.walk(this.direction, deltaSeconds, world.leftEnd, world.rightEnd);
+            this.playerCharacter.walk(this.direction, deltaSeconds);
         }
 
         if (this.inputManager.isActive('drop')) {

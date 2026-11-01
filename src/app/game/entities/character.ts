@@ -26,6 +26,8 @@ export class Character {
   constructor(
     public x: GameMeter,
     public y: GameMeter,
+    public readonly worldStart: GameMeter,
+    public readonly worldEnd: GameMeter,
     options?: Partial<CharacterOptions>,
   ) {
     this.options = { ...DEFAULT_CHARACTER, ...options };
@@ -44,19 +46,19 @@ export class Character {
     }
   }
 
-  /** Déplace le personnage en restant dans les bornes [minX, maxX]. */
-  protected move(direction: Direction, speed: number, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
+  /** Déplace le personnage en restant dans les bornes [worldStart, worldEnd]. */
+  protected move(direction: Direction, speed: number, deltaSeconds: Second): void {
     const next = this.x + direction * speed * deltaSeconds;
     const haflCharacter: GameMeter = this.hitbox.width / 2;
-    this.x = Math.min(Math.max(next, minX + haflCharacter), maxX - haflCharacter);
+    this.x = Math.min(Math.max(next, this.worldStart + haflCharacter), this.worldEnd - haflCharacter);
   };
 
-  walk(direction: Direction, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter) {
-    this.move(direction, this.options.speed, deltaSeconds, minX, maxX)
+  walk(direction: Direction, deltaSeconds: Second) {
+    this.move(direction, this.options.speed, deltaSeconds)
   }
 
-  run(direction: Direction, deltaSeconds: Second, minX: GameMeter, maxX: GameMeter): void {
-    this.move(direction, this.runSpeed, deltaSeconds, minX, maxX)
+  run(direction: Direction, deltaSeconds: Second): void {
+    this.move(direction, this.runSpeed, deltaSeconds)
   };
 
   draw(ctx: CanvasRenderingContext2D, camera: Camera): void {

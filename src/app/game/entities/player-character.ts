@@ -19,8 +19,14 @@ export class PlayerCharacter extends Character {
     purse: Purse = new Purse(20);
     public target: Purchasable | undefined;
 
-    constructor(x: GameMeter, y: GameMeter, options?: Partial<CharacterOptions>) {
-        super(x, y, { ...DEFAULT_OPTIONS, ...options });
+    constructor(
+        x: GameMeter,
+        y: GameMeter,
+        worldStart: GameMeter,
+        worldEnd: GameMeter,
+        options?: Partial<CharacterOptions>
+    ) {
+        super(x, y, worldStart, worldEnd, { ...DEFAULT_OPTIONS, ...options });
     }
 
     dropCollectible(world: World): void {

@@ -18,6 +18,7 @@ import { Muaddib } from "../entities/muaddib";
 import { Hunter } from "../entities/hunter";
 import { PlayerCharacter } from "../entities/player-character";
 import { Clock } from "../clock";
+import { WorldContext } from "../entities/npc";
 
 export class World {
     clock: Clock;
@@ -29,25 +30,38 @@ export class World {
     workers: Worker[] = []
     walls: Wall[] = [];
     muaddibs: Muaddib[] = [];
-    hunter = new Hunter(this.center, GROUND)
+    hunters: Hunter[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, catchbasinCount: number = 25) {
+    constructor(public readonly radius: GameMeter, catchbasinCount: number = 10) {
         this.clock = new Clock(0)
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch();
         this.buildSietchZone();
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
-        this.workers.push(new Worker(1, GROUND))
-        this.player = new PlayerCharacter(this.center, GROUND);
+        this.hunters.push(new Hunter(this.center, GROUND, this.worldContext));
+
+        this.workers.push(new Worker(1, GROUND, this.worldContext))
+        this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
         for (let index = 0; index < 5; index++) {
             const position: number = Math.round((Math.random()) * this.width)
-            this.muaddibs.push(new Muaddib(position, GROUND))
+            this.muaddibs.push(new Muaddib(position, GROUND, this.worldContext))
+        }
+    }
+
+    get worldContext(): WorldContext {
+        return {
+            sietchZone: this.sietchZone,
+            clock: this.clock,
+            world: {
+                start: this.leftEnd,
+                end: this.rightEnd
+            }
         }
     }
 
@@ -65,7 +79,7 @@ export class World {
         }
     }
 
-    getLastSietchWall(direction: Direction): Wall {
+    private getLastSietchWall(direction: Direction): Wall {
         const walls: Wall[] = this.walls.filter((wall: Wall) => wall.orientation === direction)
         const builtWalls: Wall[] = walls.filter((wall: Wall) => wall.currentLevel > 0);
         if (builtWalls.length >= 1) {
@@ -163,8 +177,8 @@ export class World {
     }
 
     public update(deltaSeconds: number) {
-        this.clock.updateClock(deltaSeconds)
-        this.workers.forEach((worker: Worker) => worker.update(deltaSeconds, this.leftEnd, this.rightEnd))
+        this.clock.updateClock(deltaSeconds);
+
         this.catchbasins = this.catchbasins.filter((catchbasin: Catchbasin) => {
             const completeCatchbasin: boolean = catchbasin.workChargeLeft <= 0;
             if (completeCatchbasin) {
@@ -183,8 +197,22 @@ export class World {
                 }
             }
         })
-        this.muaddibs.forEach((muaddib) => muaddib.update(deltaSeconds, this.leftEnd, this.rightEnd));
-        this.hunter.update(deltaSeconds, this.leftEnd, this.rightEnd);
+
+        this.workers.forEach((worker: Worker) => {
+            worker.updateWorldContexte(this.worldContext)
+            worker.update(deltaSeconds)
+        })
+
+        this.hunters.forEach((hunter: Hunter) => {
+            hunter.updateWorldContexte(this.worldContext);
+            hunter.update(deltaSeconds)
+        })
+
+        this.muaddibs.forEach((muaddib) => {
+            muaddib.updateWorldContexte(this.worldContext);
+            muaddib.update(deltaSeconds)
+        });
+
         this.taskDistributor();
     }
 
@@ -199,7 +227,7 @@ export class World {
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))
         this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, camera));
         this.workers.forEach((worker: Worker) => worker.draw(ctx, camera))
-        this.hunter.draw(ctx, camera);
+        this.hunters.forEach((hunter: Hunter) => hunter.draw(ctx, camera));
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
         this.player.draw(ctx, camera);
     }
