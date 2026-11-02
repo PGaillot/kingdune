@@ -5,7 +5,7 @@ export class Purse {
     constructor(private maxSize?: number) { }
 
     /** contenu de la bouse */
-    protected content: Collectible[] = [];
+    public readonly content: Collectible[] = [];
 
     /** nombre de collectible dans la bourse */
     public get contentCount(): number {

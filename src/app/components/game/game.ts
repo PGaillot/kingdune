@@ -92,7 +92,6 @@ export class Game {
   private render(): void {
     if (!this.ctx) return;
     const ctx = this.ctx;
-
     this.world.draw(ctx, this.camera);
 
     // DEBUG

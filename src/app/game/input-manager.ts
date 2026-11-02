@@ -80,7 +80,6 @@ export class InputManager {
             pressedAt: performance.now()
         }
         this.keyRegistry.set(keyPressed.code, input)
-
     }
 
     public inputRelease(keyPressed: KeyboardEvent): void {

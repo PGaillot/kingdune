@@ -5,13 +5,20 @@ import { DAY_LENGTH, GameMeter, GROUND, METER_UNIT, Pixel, SCREEN_HEIGHT, SCREEN
 export class Celestial {
 
     /**
-     * 
+     * La class des Objets céléste, permet de faire des trucs dans le ciels, et de les faires tourner.
+     * trop classe.
      * @param size 
      * @param image 
      * @param clock 
      * @param offset le decalage en ° de l'objet céléste (par rapport au soleil)
      */
-    constructor(public size: GameMeter, public image: HTMLImageElement, public clock: Clock, public offset: number) { }
+    constructor(
+        public size: GameMeter,
+        public image: HTMLImageElement,
+        public clock: Clock,
+        public offset: number,
+        public radius: Pixel = SCREEN_HEIGHT / 1.5
+    ) { }
 
     get celestialSize(): Pixel {
         return this.size * METER_UNIT;
@@ -22,11 +29,11 @@ export class Celestial {
     }
 
     positionX(camera: Camera): number {
-        return (SCREEN_WIDTH / 2 - SCREEN_HEIGHT / 1.5 * Math.cos(this.celestialAngle)) - (this.size / 2) * METER_UNIT;
+        return (SCREEN_WIDTH / 2 - this.radius * Math.cos(this.celestialAngle)) - (this.size / 2) * METER_UNIT;
     }
 
     positionY(camera: Camera): number {
-        return (camera.convert({ x: 0, y: GROUND }).y - SCREEN_HEIGHT / 1.5 * Math.sin(this.celestialAngle)) - (this.size / 2) * METER_UNIT;;
+        return (camera.convert({ x: 0, y: GROUND }).y - this.radius * Math.sin(this.celestialAngle)) - (this.size / 2) * METER_UNIT;;
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera) {

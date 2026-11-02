@@ -217,6 +217,8 @@ export class World {
             }
         })
 
+        this.player.update(deltaSeconds)
+
         this.workers.forEach((worker: Worker) => {
             worker.updateWorldContexte(this.worldContext)
             worker.update(deltaSeconds)

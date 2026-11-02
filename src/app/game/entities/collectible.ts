@@ -8,12 +8,16 @@ export type CollectibleOptions = {
     height: GameMeter,
     width: GameMeter,
     image?: HTMLImageElement,
+    purseImage?: HTMLImageElement,
+    purseImageHeight: GameMeter,
+    purseImageWidth: GameMeter,
 }
-
 
 const DEFAULT_OPTIONS: CollectibleOptions = {
     height: 1,
     width: 1,
+    purseImageHeight: 0.2,
+    purseImageWidth: 0.5,
 }
 
 export class Collectible {
@@ -44,11 +48,8 @@ export class Collectible {
 
 
     update(deltaSeconds: Second): void {
-
         this.vY -= GRAVITY * deltaSeconds;
-
         this.y += (this.vY * deltaSeconds);
-
         if (this.y < GROUND) {
             this.y = GROUND;
 
@@ -59,7 +60,6 @@ export class Collectible {
                 this.vY = -this.vY * REBOUND_FRICTION;
                 this.vX = this.vX * REBOUND_FRICTION;
             }
-
         }
         this.x += (this.vX * deltaSeconds);
 

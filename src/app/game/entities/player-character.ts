@@ -1,10 +1,12 @@
 import { centerX, overlaps } from "../../hitbox";
+import { Camera } from "../camera";
 import { GameMeter } from "../config";
 import { Purchasable } from "../interfaces/purchasable";
 import { World } from "../world/world";
 import { Character, CharacterOptions } from "./character";
 import { Collectible } from "./collectible";
 import { Purse } from "./purse";
+import { PurseHUD } from "./purse-hud";
 
 const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
     width: 1,
@@ -18,6 +20,7 @@ export class PlayerCharacter extends Character {
 
     purse: Purse = new Purse(20);
     public target: Purchasable | undefined;
+    private purseHUD: PurseHUD;
 
     constructor(
         x: GameMeter,
@@ -27,6 +30,7 @@ export class PlayerCharacter extends Character {
         options?: Partial<CharacterOptions>
     ) {
         super(x, y, worldStart, worldEnd, { ...DEFAULT_OPTIONS, ...options });
+        this.purseHUD = new PurseHUD(this.purse);
     }
 
     dropCollectible(world: World): void {
@@ -58,5 +62,14 @@ export class PlayerCharacter extends Character {
             }
             this.target.onPaid();
         }
+    }
+
+    override draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
+        super.draw(ctx, camera);
+        this.purseHUD.draw(ctx);
+    }
+
+    update(deltaSeconds: number): void {
+        this.purseHUD.updatePurse(deltaSeconds);
     }
 }

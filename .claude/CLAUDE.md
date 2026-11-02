@@ -493,9 +493,51 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
   pour les anneaux, ramassage en plein vol autorisé (à décider). Servira aussi aux **flèches
   des archers** (trajectoire en cloche, angle par `Math.atan2(vY, vX)`) et au paiement pièce
   par pièce (les pièces retombent si l'achat échoue).
-- **Bourse visuelle (voulue)** : l'utilisateur ne sait jamais combien il a d'anneaux. Afficher le
-  contenu de la `Purse` du naib (comme la bourse de Kingdom, les anneaux visibles dedans), pourra
-  utiliser la même physique.
+- **Bourse visuelle (en cours, 02/11/2026, pas commité)** : `PurseHUD`
+  (`entities/purse-hud.ts`), une **vue** qui **lit** la `Purse` (séparation modèle / vue,
+  composition ; pas dans `Purse` car le `Hunter` en a une aussi). Possédée par `PlayerCharacter`
+  (`update()` appelé par `World.update()`, dessinée dans `PlayerCharacter.draw()`). Garde sa
+  propre liste `items: PurseItem[]` (référence au `Collectible`, `x`/`y`, `vX`/`vY`, `rotation`
+  tirée **une fois** à la création, en radians) ; `updatePurse()` ajoute les anneaux sans item
+  (`!some(=== )`). Pièce dessinée avec `translate` → `rotate` → `fillRect(-w/2, -h/2, …)`
+  (pivot = centre). Taille lue dans `collectible.options.purseImageWidth/Height`. Pour l'instant
+  une boîte rouge en haut à droite. Bugs rencontrés : référence prise pour une photo (diff
+  toujours vide), dessin dans `update()`, `some` sur tableau vide, `update()` jamais appelé,
+  position et taille converties deux fois après `translate`, `Math.random()` dans `draw()`,
+  degrés passés à `rotate()`. Restent : retirer les items des anneaux sortis de la bourse
+  (compteur `items.length` faux après un paiement) ; position de la bourse calculée deux fois
+  (dessin / point d'apparition) ; noms `purse…`/`bourse…` mélangés ; `vX`/`vY` et
+  `deltaSeconds` pas encore utilisés ; `Purse.content` en `public readonly` (le tableau reste
+  modifiable : piste `readonly Collectible[]`) ; `fillText` du compteur = debug (aucun texte en
+  jeu). **Prochaine étape voulue** : la bourse se cache après quelques secondes sans gain
+  d'anneau (délai dans `config.ts`) et réapparaît dès qu'on en gagne.
+- **Physique de la bourse (plan validé, à faire plus tard)** : dans Kingdom, les pièces tombent,
+  s'empilent, glissent les unes sur les autres (effet **pousse-pièce**) et **débordent** du sac
+  quand il y en a trop : c'est du gameplay, donc pas de « places d'arrivée » trichées.
+  1. Extraire la physique de `Collectible.update()` dans une **fonction pure** (`physics.ts`
+     dans `src/app/game/`) sur un petit type `{ x, y, vX, vY }` + `deltaSeconds` + hauteur du
+     sol (typage structurel : `Collectible` et `PurseItem` collent sans changement). Le
+     `droppedBy` reste dans `Collectible`. Le HUD travaille en **mètres, y vers le haut**, dans
+     un repère local (0 = fond de la bourse), conversion en pixels seulement dans `draw()`.
+  2. Collision : chaque pièce = **un cercle** invisible (la rotation reste visuelle). Par frame :
+     gravité → vitesse → position ; puis, répété 4 à 8 fois : écarter les paires de pièces qui
+     se chevauchent (moitié chacune, le long de la ligne des centres) et repousser dans les bords.
+     20 pièces max → ~200 paires, négligeable. Mots-clés : **Verlet**, **position-based
+     dynamics**, **sleeping**.
+  3. Si ça fait trop « billes » : **deux petits cercles reliés** par une contrainte de distance
+     (la rotation se déduit alors de l'angle entre eux), ou une capsule. Pas d'ovales (collision
+     sans formule simple).
+  4. Forme du sac : forme **visuelle** (PNG) ≠ forme de **collision** (simple). Commencer par la
+     boîte ; ensuite sol en fonction de x et/ou segments (distance point-segment). `Path2D`
+     accepte un chemin SVG (`fill`, `clip`, `isPointInPath`) mais ne donne pas le rebond.
+  5. **Décidé (03/11/2026) : c'est la physique qui décide du débordement.** `maxSize` disparaîtra
+     (pas avant que la physique existe, sinon bourse infinie en attendant). Le nombre d'anneaux
+     ne baisse que si le joueur en retire (paiement, dépôt) ou si un anneau **tombe du sac**. Le
+     sac doit alors en informer la `Purse`. Piste conseillée : `PurseHUD.update()` **renvoie**
+     les anneaux tombés (même principe que `Catchbasin.complete()` et `PyonsCamp.update()` :
+     la vue signale, le propriétaire range) ; `PlayerCharacter`/`World` les retire de la
+     `Purse` (il faudra un `remove(collectible)` ciblé, aujourd'hui `remove()` fait un `pop`)
+     et les pose dans le monde près du naib (comme `dropCollectible`, sans `droppedBy` ?).
 - Faire apparaître les muad'dib entre `leftEnd` et `rightEnd` (aujourd'hui entre 0 et `width`).
 - Caméra : glissement horizontal selon la direction (`offset.x`), tremblement, zoom. Pour le zoom,
   les tailles devront aussi passer par la caméra (pas directement par `METER_UNIT`).
