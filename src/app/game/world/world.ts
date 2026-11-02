@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LENGTH, DAY_LIGHT_GRADIENT, Direction, GROUND, METER_UNIT, NIGHT_GRADIENT, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -21,6 +21,12 @@ import { Clock } from "../clock";
 import { WorldContext } from "../entities/npc";
 import { PyonsCamp } from "../entities/pyons-camp";
 import { Pyon } from "../entities/pyon";
+import { Celestial } from "../entities/celestial";
+
+const MOON_IMAGE: HTMLImageElement = new Image();
+const SUN_IMAGE: HTMLImageElement = new Image();
+MOON_IMAGE.src = '/ressources/celestial/moon.png';
+SUN_IMAGE.src = '/ressources/celestial/sun.png';
 
 export class World {
     clock: Clock;
@@ -36,6 +42,8 @@ export class World {
     pyonsCamps: PyonsCamp[] = [];
     pyons: Pyon[] = [];
 
+    moon: Celestial;
+    sun: Celestial;
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
@@ -43,6 +51,10 @@ export class World {
      */
     constructor(public readonly radius: GameMeter, catchbasinCount: number = 20) {
         this.clock = new Clock(0)
+
+        this.sun = new Celestial(3, SUN_IMAGE, this.clock, 0)
+        this.moon = new Celestial(3, MOON_IMAGE, this.clock, 180)
+
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch();
@@ -59,7 +71,6 @@ export class World {
 
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext))
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext))
-
     }
 
     get worldContext(): WorldContext {
@@ -243,14 +254,8 @@ export class World {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        // Bouger ca dans une class Sun, qui herite de Celestial,
-        // comme ca on peux mettre la lune et pleins d'autres trucs (lune rouge, eclipse ...)
-        const sunSize: Pixel = 3 * METER_UNIT;
-        ctx.fillStyle = 'yellow';
-        const sunAngle: number = (this.clock.timeInDay / DAY_LENGTH) * 2 * Math.PI;
-        const sunX: number = (SCREEN_WIDTH / 2) - Math.cos(sunAngle) * SCREEN_HEIGHT / 2;
-        const suny: number = (SCREEN_HEIGHT / 2) - Math.sin(sunAngle) * SCREEN_HEIGHT / 2;
-        ctx.fillRect(sunX, suny, sunSize, sunSize)
+        this.moon.draw(ctx, camera);
+        this.sun.draw(ctx, camera);
 
         this.ground.draw(ctx, camera);
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))

@@ -26,7 +26,6 @@ type HitboxObject = { hitbox: Hitbox };
       [width]="SCREEN_WIDTH"
       [height]="SCREEN_HEIGHT"
       role="img"
-      aria-label="Zone de jeu : utilisez les flèches gauche et droite pour déplacer le personnage."
     ></canvas>
   `,
   styleUrl: './game.scss',
@@ -52,6 +51,7 @@ export class Game {
   get player(): PlayerCharacter {
     return this.world.player;
   }
+
   protected inputManager: InputManager = new InputManager();
   protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
 
@@ -92,7 +92,6 @@ export class Game {
   private render(): void {
     if (!this.ctx) return;
     const ctx = this.ctx;
-
 
     this.world.draw(ctx, this.camera);
 
