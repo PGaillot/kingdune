@@ -22,7 +22,7 @@ export class Hunter extends Npc<'hunt' | 'protect_sietch'> {
                 break
             case 'protect_sietch':
                 if (this.worldContext.clock.timeOfDay === 'day') this.state = 'idle';
-                this.runTo(this.worldContext.sietchZone, deltaSeconds)
+                this.goToHitbox(this.worldContext.sietchZone, deltaSeconds, 'run')
                 break;
         }
     }

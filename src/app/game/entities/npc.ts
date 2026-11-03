@@ -40,18 +40,25 @@ export class Npc<AdditionalState extends string = never> extends Character {
         this.worldContext = context;
     }
 
-    // (POUR LE MOMENT) pour faire aller le Worker jusqua son prochain taff
-    runTo(hitbox: Hitbox, deltaSeconds: number): boolean {
+    goToHitbox(hitbox: Hitbox, deltaSeconds: Second, method: 'run' | 'walk' = 'walk'): boolean {
         const distance: number = centerX(hitbox) - centerX(this.hitbox);
         const direction: Direction = distance < 0 ? -1 : 1;
         if (Math.abs(distance) > 0.1) {
-            this.run(direction, deltaSeconds);
+            this.navToDirection(deltaSeconds, direction, method)
             return false;
         };
         return true;
     }
 
-    update(deltaSeconds: Second): void {
+    navToDirection(deltaSeconds: Second, direction: Direction, method: 'run' | 'walk' = 'walk'): void {
+        if (method === "run") {
+            this.run(direction, deltaSeconds);
+        } else {
+            this.walk(direction, deltaSeconds);
+        }
+    }
+
+    idle(deltaSeconds: Second): void {
         this.timeUntilNextDecision -= deltaSeconds;
         if (this.timeUntilNextDecision <= 0) {
             const randomDirection: Direction = Math.round((Math.random() * 2) - 1) as Direction;
@@ -59,5 +66,29 @@ export class Npc<AdditionalState extends string = never> extends Character {
             this.timeUntilNextDecision = this.nextDecisionDuration;
         }
         this.walk(this.currentDirection, deltaSeconds)
+    }
+
+    update(deltaSeconds: Second): void {
+        this.idle(deltaSeconds);
+    }
+
+    idleInArea(deltaSeconds: Second, hitbox: Hitbox, method: 'run' | 'walk' = 'walk', margin: GameMeter = 0): void {
+        // tant que le centre du NPC est pas entre le start et le end, alors on va dans cette direction;
+        // si le start et plus grand que le end ? ou que c'est trop petit on fait quoi ? on plante ?
+
+        const start: GameMeter = hitbox.x - margin;
+        const end: GameMeter = hitbox.x + hitbox.width + margin
+
+        const distance: number = centerX(hitbox) - centerX(this.hitbox);
+        const direction: Direction = distance < 0 ? -1 : 1;
+        const inZone: boolean = this.hitbox.x > start && (this.hitbox.x + this.hitbox.width) < end;
+
+        if (!inZone) {
+            this.currentDirection = direction;
+            this.timeUntilNextDecision = this.nextDecisionDuration;
+            this.navToDirection(deltaSeconds, direction, method)
+            return
+        };
+        this.idle(deltaSeconds)
     }
 }

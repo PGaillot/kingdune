@@ -4,8 +4,8 @@ import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 import { WorldContext } from "./npc";
 import { Pyon } from "./pyon";
 
-const MAX_PYONS: number = 2;
-const SECONDS_BETWEEN_PYON_CREATION: number = 60;
+const MAX_PYONS: number = 10;
+const SECONDS_BETWEEN_PYON_CREATION: number = 5;
 
 export class PyonsCamp {
 

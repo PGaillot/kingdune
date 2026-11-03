@@ -34,7 +34,7 @@ export class Worker extends Npc<'build' | 'repair' | 'dig'> {
                 break
             case "dig":
                 if (this.task === undefined) return;
-                const hasArrived: boolean = this.runTo(this.task.hitbox, deltaSeconds);
+                const hasArrived: boolean = this.goToHitbox(this.task.hitbox, deltaSeconds, 'run');
                 if (hasArrived) this.work(deltaSeconds)
                 if (this.task === undefined) this.state = 'idle'
                 break;
