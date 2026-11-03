@@ -1,16 +1,16 @@
-import { GameMeter, GRAVITY, Pixel, REBOUND_FRICTION } from "./config";
+import { GameMeter, GRAVITY, MeterPerSecond, REBOUND_FRICTION, Second } from "./config";
 
 export type PhysicsObject = {
-    x: number,
-    y: number,
-    vX: number,
-    vY: number
+    x: GameMeter,
+    y: GameMeter,
+    vX: MeterPerSecond,
+    vY: MeterPerSecond
 }
 
 /** en m/s Sous cette vitesse (pour un rebond) l'objet s'arrete */
-const MIN_BOUNCE_SPEED: number = 0.3;
+const MIN_BOUNCE_SPEED: MeterPerSecond = 0.3;
 
-export function applyPhysics(deltaSeconds: number, object: PhysicsObject, limitY: GameMeter): void {
+export function applyPhysics(deltaSeconds: Second, object: PhysicsObject, limitY: GameMeter): void {
     object.vY -= GRAVITY * deltaSeconds;
     object.y += (object.vY * deltaSeconds);
     if (object.y < limitY) {

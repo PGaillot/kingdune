@@ -520,8 +520,18 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
      `MIN_BOUNCE_SPEED` = 0,3 m/s (positif, signe moins dans la comparaison). Bugs rencontrés :
      copie `{ x: this.x, … }` passée au lieu de `this` (modifiée puis jetée) ; double signe
      moins (la pièce ne se posait jamais). Les sorties du HUD sont aussi gérées (filtre par
-     référence, `removePurseItem`). Le `droppedBy` reste dans `Collectible`. Le HUD travaille en **mètres, y vers le haut**, dans
-     un repère local (0 = fond de la bourse), conversion en pixels seulement dans `draw()`.
+     référence, `removePurseItem`). Le `droppedBy` reste dans `Collectible`.
+     **Pièces du HUD branchées (03/11/2026, commité)** : repère local du sac, **centre en
+     bas**, en mètres, y vers le haut ; `PurseItem` naît à `x = 0`, `y = purseHeight` ;
+     `applyPhysics(…, item, 0)` dans un `forEach` à part (pas dans un `filter` : effet de
+     bord) ; `positionInPurse()` convertit seulement dans `drawCollectible()` (position
+     écran du sac + mètres × `METER_UNIT`, **moins** pour `y`). Tri : `purseWidth`/
+     `purseHeight` en `GameMeter`, `margin`/`pursePositionX`/`pursePositionY` en `Pixel`.
+     Nouveaux types dans `config.ts` : `MeterPerSecond`, `Radian`. Bugs rencontrés : pièce
+     née en pixels écran (posée dès la 1re frame), conversion faite sur le sol au lieu du
+     dessin, `-` sur tout le résultat, `* METER_UNIT` en trop ou oublié (règle : une unité
+     par champ, une seule conversion). Restent : pièces enfoncées à moitié (`y` = centre),
+     toutes empilées au même `x`, `fillText` du compteur (debug).
   2. Collision : chaque pièce = **un cercle** invisible (la rotation reste visuelle). Par frame :
      gravité → vitesse → position ; puis, répété 4 à 8 fois : écarter les paires de pièces qui
      se chevauchent (moitié chacune, le long de la ligne des centres) et repousser dans les bords.

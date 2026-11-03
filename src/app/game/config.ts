@@ -1,6 +1,8 @@
 export type GameMeter = number;
 export type Pixel = number;
-export type Second = number
+export type Second = number;
+export type MeterPerSecond = number;
+export type Radian = number; // pour les angles, c'est pas des degrès hein ! c'est des radians (*note :aller concprendre ce qu'es un radian*)
 
 export type KeyboardKey = KeyboardEvent['code'];
 
