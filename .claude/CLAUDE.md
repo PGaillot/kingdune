@@ -514,10 +514,13 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
 - **Physique de la bourse (plan validé, à faire plus tard)** : dans Kingdom, les pièces tombent,
   s'empilent, glissent les unes sur les autres (effet **pousse-pièce**) et **débordent** du sac
   quand il y en a trop : c'est du gameplay, donc pas de « places d'arrivée » trichées.
-  1. Extraire la physique de `Collectible.update()` dans une **fonction pure** (`physics.ts`
-     dans `src/app/game/`) sur un petit type `{ x, y, vX, vY }` + `deltaSeconds` + hauteur du
-     sol (typage structurel : `Collectible` et `PurseItem` collent sans changement). Le
-     `droppedBy` reste dans `Collectible`. Le HUD travaille en **mètres, y vers le haut**, dans
+  1. **Fait (03/11/2026, commité)** : `applyPhysics(deltaSeconds, object, limitY: GameMeter)`
+     dans `src/app/game/physics.ts`, type `PhysicsObject` `{ x, y, vX, vY }`. Elle **modifie**
+     l'objet (renvoie `void`) ; `Collectible.update()` lui passe `this` (typage structurel).
+     `MIN_BOUNCE_SPEED` = 0,3 m/s (positif, signe moins dans la comparaison). Bugs rencontrés :
+     copie `{ x: this.x, … }` passée au lieu de `this` (modifiée puis jetée) ; double signe
+     moins (la pièce ne se posait jamais). Les sorties du HUD sont aussi gérées (filtre par
+     référence, `removePurseItem`). Le `droppedBy` reste dans `Collectible`. Le HUD travaille en **mètres, y vers le haut**, dans
      un repère local (0 = fond de la bourse), conversion en pixels seulement dans `draw()`.
   2. Collision : chaque pièce = **un cercle** invisible (la rotation reste visuelle). Par frame :
      gravité → vitesse → position ; puis, répété 4 à 8 fois : écarter les paires de pièces qui

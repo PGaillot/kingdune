@@ -1,6 +1,7 @@
 import { Hitbox, overlaps } from "../../hitbox";
+import { applyPhysics } from "../physics";
 import { Camera } from "../camera";
-import { REBOUND_FRICTION, GameMeter, GRAVITY, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
+import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
 import { Character } from "./character";
 
 
@@ -48,21 +49,7 @@ export class Collectible {
 
 
     update(deltaSeconds: Second): void {
-        this.vY -= GRAVITY * deltaSeconds;
-        this.y += (this.vY * deltaSeconds);
-        if (this.y < GROUND) {
-            this.y = GROUND;
-
-            if (this.vY < 0 && this.vY > -0.3) {
-                this.vY = 0;
-                this.vX = 0;
-            } else {
-                this.vY = -this.vY * REBOUND_FRICTION;
-                this.vX = this.vX * REBOUND_FRICTION;
-            }
-        }
-        this.x += (this.vX * deltaSeconds);
-
+        applyPhysics(deltaSeconds, this, GROUND)
         if (this.droppedBy === undefined) return
         const isOverlap: boolean = overlaps(this.hitbox, this.droppedBy.hitbox);
         if (!isOverlap) this.droppedBy = undefined;
