@@ -32,9 +32,16 @@ export class PurseHUD {
     items: PurseItem[] = []
 
     updatePurse(deltaSeconds: number): void {
+        //filtre les nouveau items
         this.purse.content.filter((collectible: Collectible) =>
-            !this.items.some((purseItem: PurseItem) => purseItem.collectible === collectible)
-        ).forEach((collectible: Collectible) => this.addCollectible(collectible))
+            !this.items.some((purseItem: PurseItem) => purseItem.collectible === collectible))
+            .forEach((collectible: Collectible) => this.addCollectible(collectible))
+
+        //filtre les items "partit"
+        this.items.filter((item: PurseItem) =>
+            !this.purse.content.includes(item.collectible))
+            .forEach((item: PurseItem) => this.removePurseItem(item))
+
         this.timer += deltaSeconds;
     };
 
@@ -58,9 +65,10 @@ export class PurseHUD {
         this.lastChange = this.timer;
     }
 
-    hidePurse(): void { }
-
-    displayPurse(): void { }
+    removePurseItem(purseItem: PurseItem): void {
+        this.items = this.items.filter((item: PurseItem) => item !== purseItem)
+        this.lastChange = this.timer;
+    }
 
     draw(ctx: CanvasRenderingContext2D): void {
         if (!this.isVisible) return
