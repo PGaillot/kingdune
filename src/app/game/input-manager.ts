@@ -46,7 +46,7 @@ export class InputManager {
 
     private isDoubleTap(keyRecord: KeyRecord): boolean {
         if (keyRecord.releasedAt === undefined) return false;
-        return (keyRecord.pressedAt - keyRecord.releasedAt) < this.doubleTapDelay && this.isDown(keyRecord);
+        return (keyRecord.pressedAt - keyRecord.releasedAt) <= this.doubleTapDelay && this.isDown(keyRecord);
     }
 
     private isTap(keyRecord: KeyRecord): boolean {

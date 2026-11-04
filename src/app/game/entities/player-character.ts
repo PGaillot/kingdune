@@ -18,7 +18,7 @@ const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
 
 export class PlayerCharacter extends Character {
 
-    purse: Purse = new Purse(20);
+    purse: Purse = new Purse();
     public target: Purchasable | undefined;
     private purseHUD: PurseHUD;
 
@@ -49,9 +49,9 @@ export class PlayerCharacter extends Character {
             this.target = onOverlappingCheck.reduce((a: Purchasable, b: Purchasable) =>
                 Math.abs(centerX(a.hitbox) - centerX(this.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(this.hitbox)) ? a : b
             )
-        } else {
-            this.target = undefined;
+            return
         }
+        this.target = undefined;
     }
 
     pay(): void {

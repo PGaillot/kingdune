@@ -22,6 +22,7 @@ import { WorldContext } from "../entities/npc";
 import { PyonsCamp } from "../entities/pyons-camp";
 import { Pyon } from "../entities/pyon";
 import { Celestial } from "../entities/celestial";
+import { Fremen } from "../entities/fremen";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -41,6 +42,8 @@ export class World {
     hunters: Hunter[] = [];
     pyonsCamps: PyonsCamp[] = [];
     pyons: Pyon[] = [];
+    fremens: Fremen[] = [];
+
 
     moon: Celestial;
     sun: Celestial;
@@ -51,17 +54,14 @@ export class World {
      */
     constructor(public readonly radius: GameMeter, catchbasinCount: number = 20) {
         this.clock = new Clock(0)
-
         this.sun = new Celestial(3, SUN_IMAGE, this.clock, 0)
         this.moon = new Celestial(3, MOON_IMAGE, this.clock, 180)
-
         this.ground = new Ground(this.leftEnd, this.width);
         this.catchbasins = this.getRandomCatchbasinPositions(catchbasinCount).map((x) => new Catchbasin(x));
         this.sietch = new Sietch();
         this.buildSietchZone();
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
         this.hunters.push(new Hunter(this.center, GROUND, this.worldContext));
-
         this.workers.push(new Worker(1, GROUND, this.worldContext))
         this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
         for (let index = 0; index < 5; index++) {
@@ -69,8 +69,10 @@ export class World {
             this.muaddibs.push(new Muaddib(position, GROUND, this.worldContext))
         }
 
-        this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext))
-        this.pyonsCamps.push(new PyonsCamp(34, this.worldContext))
+        this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext));
+        this.pyonsCamps.push(new PyonsCamp(34, this.worldContext));
+
+        this.fremens.push(new Fremen(-4, GROUND, this.worldContext))
     }
 
     get worldContext(): WorldContext {
@@ -236,11 +238,18 @@ export class World {
             if (pyon) this.pyons.push(pyon);
         })
 
+
+        this.fremens.forEach((fremen: Fremen) => {
+            fremen.updateWorldContexte(this.worldContext);
+            fremen.update(deltaSeconds)
+        });
+
         this.pyons.forEach((pyon: Pyon) => {
+            pyon.updateWorldContexte(this.worldContext);
             pyon.update(deltaSeconds)
         })
 
-        this.muaddibs.forEach((muaddib) => {
+        this.muaddibs.forEach((muaddib: Muaddib) => {
             muaddib.updateWorldContexte(this.worldContext);
             muaddib.update(deltaSeconds)
         });
@@ -265,6 +274,7 @@ export class World {
         this.workers.forEach((worker: Worker) => worker.draw(ctx, camera))
         this.hunters.forEach((hunter: Hunter) => hunter.draw(ctx, camera));
         this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => pyonsCamp.draw(ctx, camera));
+        this.fremens.forEach((fremen: Fremen) => fremen.draw(ctx, camera));
         this.pyons.forEach((pyon: Pyon) => pyon.draw(ctx, camera));
 
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));

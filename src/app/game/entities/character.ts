@@ -48,12 +48,12 @@ export class Character {
 
   /** Déplace le personnage en restant dans les bornes [worldStart, worldEnd]. */
   protected move(direction: Direction, speed: number, deltaSeconds: Second): void {
-    const next = this.x + direction * speed * deltaSeconds;
+    const next: GameMeter = this.x + direction * speed * deltaSeconds;
     const haflCharacter: GameMeter = this.hitbox.width / 2;
     this.x = Math.min(Math.max(next, this.worldStart + haflCharacter), this.worldEnd - haflCharacter);
   };
 
-  walk(direction: Direction, deltaSeconds: Second) {
+  walk(direction: Direction, deltaSeconds: Second): void {
     this.move(direction, this.options.speed, deltaSeconds)
   }
 

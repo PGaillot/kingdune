@@ -13,7 +13,6 @@ export class Hunter extends Npc<'hunt' | 'protect_sietch'> {
         super(x, y, 2, 4, worldContext, { ...DEFAULT_OPTIONS, ...options });
     }
 
-
     override update(deltaSeconds: Second): void {
         switch (this.state) {
             case "idle":

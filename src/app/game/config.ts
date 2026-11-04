@@ -25,7 +25,7 @@ export type ScreenPoint = { x: Pixel, y: Pixel }
 
 export const METER_UNIT: Pixel = 40; // la taille d'un mètre en pixels dans le jeu
 
-export const DAY_LENGTH: Second = 1 * 60;
+export const DAY_LENGTH: Second = 5 * 60;
 export const DAY_LIGHT_GRADIENT: string[] = ['#D9A066', '#D9A066', '#E8D597'];
 export const NIGHT_GRADIENT: string[] = ['#0F0E24', '#0F0E24', '#24384D'];
 
