@@ -252,7 +252,12 @@ export class World {
 
         this.pyons.forEach((pyon: Pyon) => {
             pyon.updateWorldContexte(this.worldContext);
-            pyon.update(deltaSeconds)
+            pyon.update(deltaSeconds);
+            if (pyon.purse.contentCount >= 1) { // si le pyon recupere une piece (du naïb uniquement ?) il devient un Fremen !  
+                this.pyons = this.pyons.filter((p: Pyon) => p !== pyon);
+                this.fremens.push(new Fremen(pyon.x, pyon.y, pyon.worldContext));
+                // bug restant : une seul piece peux transformer plusieurs Pyon d'un coup ! 
+            }
         })
 
         this.muaddibs.forEach((muaddib: Muaddib) => {
