@@ -390,6 +390,17 @@ pyon toutes les 60 s via `createPyonTimer: number | undefined`). Même principe 
 réécrit `pyonsCreated` à chaque frame (photo dans un champ ; piste : passer le nombre en
 paramètre d'`update()`). Bug rencontré : `0` est falsy (`if (timer)` ne démarrait jamais).
 
+**Fremen et ramassage partagé (04/11/2026)** : `Fremen extends Npc` (`entities/fremen.ts`, erre
+dans `sietchZone`) ; un pyon qui a une pièce dans sa `Purse` devient un Fremen (le `World`
+le retire de `pyons` et pousse un `Fremen`). Type structurel `PurseCharacter` (`{ purse, hitbox }`,
+dans `purse.ts`) ; `World.purseCharacters` = joueur + pyons. Bug réglé (commité) :
+une pièce allait dans plusieurs bourses (`return` dans un `forEach` = `continue`, `find` sans
+`return true` = parcours complet) → `find` qui **choisit**, puis un seul `add` (requête /
+commande séparées). Signalés, pas réglés : `purse.ts` ↔ `collectible.ts` s'importent
+mutuellement (types seulement, piste `import type`) ; tableaux modifiés pendant leur `forEach` ; toute pièce au sol transforme
+un pyon (« du naib uniquement ? » à décider) ; `Fremen` prend `CharacterOptions` au lieu de
+`Partial` ; joueur en `new Purse()` illimitée ; Fremen de test à `-4`.
+
 **À la reprise (02/11/2026) : zones d'errance des PNJ** (piste discutée, pas codée) :
 - la **machine à états choisit la zone** et la passe en paramètre à chaque frame, rien de
   stocké (pyon `idle` → hitbox de son camp ; hunter/worker la nuit → `sietchZone`) ;

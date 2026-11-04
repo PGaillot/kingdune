@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, PurseCharacter, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -23,6 +23,7 @@ import { PyonsCamp } from "../entities/pyons-camp";
 import { Pyon } from "../entities/pyon";
 import { Celestial } from "../entities/celestial";
 import { Fremen } from "../entities/fremen";
+import { PurseCharacter } from "../entities/purse";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -192,7 +193,6 @@ export class World {
             positions.push(position);
         }
         return positions;
-
     }
 
     createCollectible(collectibles: Collectible[]) {
@@ -212,17 +212,15 @@ export class World {
 
         this.collectibles.forEach((collectible: Collectible) => {
             collectible.update(deltaSeconds);
-
-            this.purseCharacters.forEach((character: PurseCharacter) => {
-                if (overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character)) {
-                    const collectibleOverflow: Collectible | undefined = character.purse.add(collectible);
-                    if (collectibleOverflow === undefined) {
-                        this.collectibles = this.collectibles.filter((other: Collectible) => other !== collectible)
-                    }
+            const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) =>
+                overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character)
+            )
+            if (receiver !== undefined) {
+                const collectibleOverflow: Collectible | undefined = receiver.purse.add(collectible);
+                if (collectibleOverflow === undefined) {
+                    this.collectibles = this.collectibles.filter((other: Collectible) => other !== collectible);
                 }
-            })
-
-
+            }
         })
 
         this.player.update(deltaSeconds)

@@ -73,9 +73,6 @@ export class Npc<AdditionalState extends string = never> extends Character {
     }
 
     idleInArea(deltaSeconds: Second, hitbox: Hitbox, method: 'run' | 'walk' = 'walk', margin: GameMeter = 0): void {
-        // tant que le centre du NPC est pas entre le start et le end, alors on va dans cette direction;
-        // si le start et plus grand que le end ? ou que c'est trop petit on fait quoi ? on plante ?
-
         const start: GameMeter = hitbox.x - margin;
         const end: GameMeter = hitbox.x + hitbox.width + margin
 
