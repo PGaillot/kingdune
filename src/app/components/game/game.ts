@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { World } from '../../game/world/world';
 import { Camera } from '../../game/camera';
-import { Pixel, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/config';
+import { Pixel, SCREEN_HEIGHT, SCREEN_WIDTH, WORLD_RADIUS } from '../../game/config';
 import { PlayerCharacter } from '../../game/entities/player-character';
 import { InputManager } from '../../game/input-manager';
 import { PlayerController } from '../../game/entities/player-controller';
@@ -45,20 +45,18 @@ export class Game {
   private lastTimestamp = 0;
 
   // Monde
-  public readonly world: World = new World(40); // rayon de 40 cases autour de la case centrale, soit 81 cases
+  public readonly world: World = new World(WORLD_RADIUS); // rayon de 40 cases autour de la case centrale, soit 81 cases
+
+  protected inputManager: InputManager = new InputManager();
+  protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
+  public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
+
+  private readonly hitboxDebug: boolean = true;
 
   // player
   get player(): PlayerCharacter {
     return this.world.player;
   }
-
-  protected inputManager: InputManager = new InputManager();
-  protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
-
-  public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
-
-
-  hitboxDebug: boolean = true;
 
   private get hitboxObjects(): HitboxObject[] {
     return [
@@ -91,10 +89,10 @@ export class Game {
 
   private render(): void {
     if (!this.ctx) return;
-    const ctx = this.ctx;
+    const ctx: CanvasRenderingContext2D = this.ctx;
     this.world.draw(ctx, this.camera);
 
-    // DEBUG
+    // HITBOX DEBUG
     if (this.hitboxDebug)
       this.hitboxObjects.forEach((object: HitboxObject) => {
         drawHitbox(ctx, this.camera, object.hitbox)

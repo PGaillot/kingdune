@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, PurseCharacter, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -43,8 +43,6 @@ export class World {
     pyonsCamps: PyonsCamp[] = [];
     pyons: Pyon[] = [];
     fremens: Fremen[] = [];
-
-
     moon: Celestial;
     sun: Celestial;
     /**
@@ -114,6 +112,10 @@ export class World {
 
     public get leftEnd(): GameMeter {
         return -this.rightEnd;
+    }
+
+    get purseCharacters(): PurseCharacter[] {
+        return [this.player, ...this.pyons]
     }
 
     get purchasables(): Purchasable[] {
@@ -199,7 +201,6 @@ export class World {
 
     public update(deltaSeconds: number) {
         this.clock.updateClock(deltaSeconds);
-
         this.catchbasins = this.catchbasins.filter((catchbasin: Catchbasin) => {
             const completeCatchbasin: boolean = catchbasin.workChargeLeft <= 0;
             if (completeCatchbasin) {
@@ -211,12 +212,17 @@ export class World {
 
         this.collectibles.forEach((collectible: Collectible) => {
             collectible.update(deltaSeconds);
-            if (overlaps(this.player.hitbox, collectible.hitbox) && collectible.canBePickedBy(this.player)) {
-                const collectibleOverflow: Collectible | undefined = this.player.purse.add(collectible);
-                if (collectibleOverflow === undefined) {
-                    this.collectibles = this.collectibles.filter((other: Collectible) => other !== collectible)
+
+            this.purseCharacters.forEach((character: PurseCharacter) => {
+                if (overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character)) {
+                    const collectibleOverflow: Collectible | undefined = character.purse.add(collectible);
+                    if (collectibleOverflow === undefined) {
+                        this.collectibles = this.collectibles.filter((other: Collectible) => other !== collectible)
+                    }
                 }
-            }
+            })
+
+
         })
 
         this.player.update(deltaSeconds)

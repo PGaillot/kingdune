@@ -1,8 +1,7 @@
 import { Hitbox, overlaps } from "../../hitbox";
 import { applyPhysics } from "../physics";
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
-import { Character } from "./character";
+import { GameMeter, GROUND, METER_UNIT, Pixel, PurseCharacter, ScreenPoint, Second } from "../config";
 
 
 export type CollectibleOptions = {
@@ -24,7 +23,7 @@ const DEFAULT_OPTIONS: CollectibleOptions = {
 export class Collectible {
 
     readonly options: CollectibleOptions;
-    droppedBy: Character | undefined = undefined;
+    droppedBy: PurseCharacter | undefined = undefined;
     /** la vitesse sur X pour la physique tout ca tout ça ! */
     vX: number = 0;
     /** la vitesse sur Y pour la physique, faut bien que ça tombe. */
@@ -55,7 +54,7 @@ export class Collectible {
         if (!isOverlap) this.droppedBy = undefined;
     }
 
-    canBePickedBy(character: Character): boolean {
+    canBePickedBy(character: PurseCharacter): boolean {
         return character !== this.droppedBy
     }
 

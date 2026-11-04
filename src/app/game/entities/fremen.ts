@@ -15,5 +15,5 @@ export class Fremen extends Npc {
 
     override update(deltaSeconds: Second): void {
         this.idleInArea(deltaSeconds, this.worldContext.sietchZone, 'walk');
-    }
+    };
 }
