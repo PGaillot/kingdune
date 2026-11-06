@@ -33,7 +33,8 @@ SUN_IMAGE.src = '/ressources/celestial/sun.png';
 
 const HAMMER_IMAGE: HTMLImageElement = new Image();
 HAMMER_IMAGE.src = '/ressources/tools/hammer.png';
-
+const MAULA_PISTOL_IMAGE: HTMLImageElement = new Image();
+MAULA_PISTOL_IMAGE.src = '/ressources/tools/maula-pistol.png';
 export class World {
     clock: Clock;
     readonly player: PlayerCharacter;
@@ -50,7 +51,8 @@ export class World {
     fremens: Fremen[] = [];
     moon: Celestial;
     sun: Celestial;
-    workersShop: Shop
+    workersShop: Shop;
+    pistolShop: Shop;
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
@@ -76,8 +78,8 @@ export class World {
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext));
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext));
 
-        this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'indianred', toolPrice: 3 })
-
+        this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'darkgreen', toolPrice: 3 })
+        this.pistolShop = new Shop(6, { type: 'maula-pistol', height: 1, width: 1, image: MAULA_PISTOL_IMAGE }, { color: 'indianred', toolPrice: 2 })
     }
 
     get worldContext(): WorldContext {
@@ -126,12 +128,12 @@ export class World {
     }
 
     get purchasables(): Purchasable[] {
-        return [...this.catchbasins, this.sietch, ...this.walls, this.workersShop]
+        return [...this.catchbasins, this.sietch, ...this.walls, this.workersShop, this.pistolShop]
     }
 
 
     get shops(): Shop[] {
-        return [this.workersShop]
+        return [this.workersShop, this.pistolShop]
     }
 
 
@@ -285,6 +287,9 @@ export class World {
             if (fremen.tool) {
                 this.fremens = this.fremens.filter((f: Fremen) => f !== fremen);
                 switch (fremen.tool.type) {
+                    case "maula-pistol":
+                        this.hunters.push(new Hunter(fremen.hitbox.x, fremen.hitbox.y, fremen.worldContext))
+                        break
                     default:
                         this.workers.push(new Worker(fremen.hitbox.x, fremen.hitbox.y, fremen.worldContext))
                 }

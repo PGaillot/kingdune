@@ -25,7 +25,7 @@ export type ShopOption = {
     toolPrice: number,
 }
 
-export type ToolType = 'hammer';
+export type ToolType = 'hammer' | 'maula-pistol';
 
 export class Tool {
 
