@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, Pixel, SCREEN_HEIGHT, SCREEN_WIDTH, ScreenPoint } from "../config";
 import { Biome } from "./biomes/biome";
 import { RockBiome } from "./biomes/rock.biome";
 import { DuneBiome } from "./biomes/dune.biome";
@@ -38,8 +38,13 @@ export class Ground {
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
+
+        ctx.fillStyle = "orange";
+        ctx.fillRect(0, camera.convert({ x: 0, y: 0 }).y, SCREEN_WIDTH, SCREEN_HEIGHT)
+
         this.groundGrid.forEach((biome: Biome, index: number) => {
             this.drawBiome(ctx, camera, index, biome)
         });
+
     }
 }

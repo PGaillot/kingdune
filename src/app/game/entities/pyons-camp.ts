@@ -7,11 +7,15 @@ import { Pyon } from "./pyon";
 const MAX_PYONS: number = 2;
 const SECONDS_BETWEEN_PYON_CREATION: number = 60;
 
+const PYON_CAMP_IMAGE: HTMLImageElement = new Image();
+PYON_CAMP_IMAGE.src = '/ressources/pyons_camp/pyons-camp.png'
+
 export class PyonsCamp {
 
     height: GameMeter = 3;
     width: GameMeter = 6;
-
+    imageHeight: GameMeter = 3;
+    imageWidth: GameMeter = 6;
     pyonsCreated: Pyon[] = [];
     createPyonTimer: number | undefined;
 
@@ -37,12 +41,8 @@ export class PyonsCamp {
         // si le max de Pyon pour ce camps ne depasse pas le nombre de pyon actuel && que aucun timer ne tourne, 
         const isMaxPyons: boolean = this.pyonsCreated.length >= MAX_PYONS;
         const haveTimer: boolean = this.createPyonTimer !== undefined
-        if (!isMaxPyons && !haveTimer) {
-            // alors on lance un timer de la durée de création d'un Pyon 
-            this.createPyonTimer = 0
-        }
+        if (!isMaxPyons && !haveTimer) this.createPyonTimer = 0
         if (this.createPyonTimer !== undefined && this.createPyonTimer > SECONDS_BETWEEN_PYON_CREATION) {
-            // une fois le timer terminé on crée un pion et on l'ajoute dans le monde ... mais la y'a pas le monde ...
             this.createPyonTimer = undefined;
             return this.createPyon()
         } else if (this.createPyonTimer !== undefined) {
@@ -52,9 +52,11 @@ export class PyonsCamp {
     }
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
         const positionInCamera: ScreenPoint = camera.convert({ x: this.hitbox.x, y: this.hitbox.y })
-        ctx.fillStyle = 'hotpink';
-        ctx.fillRect(positionInCamera.x, positionInCamera.y - (this.height * METER_UNIT), this.hitbox.width * METER_UNIT, this.hitbox.height * METER_UNIT)
+        ctx.drawImage(PYON_CAMP_IMAGE, positionInCamera.x, positionInCamera.y - (this.imageHeight * METER_UNIT), this.imageWidth * METER_UNIT, this.imageHeight * METER_UNIT)
+        ctx.restore();
     }
 
     createPyon(): Pyon {

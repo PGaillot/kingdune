@@ -2,7 +2,7 @@ import { Hitbox, overlaps } from "../../hitbox";
 import { applyPhysics } from "../physics";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
-import { PurseCharacter } from "./purse";
+import type { PurseCharacter } from "./purse";
 
 export type CollectibleOptions = {
     height: GameMeter,

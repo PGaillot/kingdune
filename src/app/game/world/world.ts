@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, Second, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -23,12 +23,16 @@ import { PyonsCamp } from "../entities/pyons-camp";
 import { Pyon } from "../entities/pyon";
 import { Celestial } from "../entities/celestial";
 import { Fremen } from "../entities/fremen";
-import { PurseCharacter } from "../entities/purse";
+import type { PurseCharacter } from "../entities/purse";
+import { Shop, Tool } from "../entities/buildings/shop";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
 MOON_IMAGE.src = '/ressources/celestial/moon.png';
 SUN_IMAGE.src = '/ressources/celestial/sun.png';
+
+const HAMMER_IMAGE: HTMLImageElement = new Image();
+HAMMER_IMAGE.src = '/ressources/tools/hammer.png';
 
 export class World {
     clock: Clock;
@@ -46,6 +50,7 @@ export class World {
     fremens: Fremen[] = [];
     moon: Celestial;
     sun: Celestial;
+    workersShop: Shop
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
@@ -71,7 +76,8 @@ export class World {
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext));
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext));
 
-        this.fremens.push(new Fremen(-4, GROUND, this.worldContext))
+        this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'indianred', toolPrice: 3 })
+
     }
 
     get worldContext(): WorldContext {
@@ -96,7 +102,7 @@ export class World {
             x: x0,
             y: GROUND,
             strokeDebugColor: 'aqua'
-        }
+        };
     }
 
     public get center(): GameMeter {
@@ -120,8 +126,14 @@ export class World {
     }
 
     get purchasables(): Purchasable[] {
-        return [...this.catchbasins, this.sietch, ...this.walls]
+        return [...this.catchbasins, this.sietch, ...this.walls, this.workersShop]
     }
+
+
+    get shops(): Shop[] {
+        return [this.workersShop]
+    }
+
 
     get workersTasks(): Workable[] {
         const workablesInPending: Workable[] = this.workables.filter((workable: Workable) => this.workersOnTask(workable) < workable.workerRequired)
@@ -143,6 +155,10 @@ export class World {
         return [...this.catchbasins]
     }
 
+    get availableTools(): Tool[] {
+        return this.shops.flatMap((shop: Shop) => shop.tools)
+    }
+
     private getLastSietchWall(direction: Direction): Wall {
         const walls: Wall[] = this.walls.filter((wall: Wall) => wall.orientation === direction)
         const builtWalls: Wall[] = walls.filter((wall: Wall) => wall.currentLevel > 0);
@@ -158,7 +174,7 @@ export class World {
 
     /** Distribue les taches entre les workers */
     taskDistributor(): void {
-        // qui quel worker est le plus proche et est dispoinible de chaque taches ?
+        // quel worker est le plus proche et est dispoinible de chaque taches ?
         this.workersTasks.forEach((task: Workable) => {
             const availableWorkers: Worker[] = this.availableWorkers;
             if (availableWorkers.length >= 1) {
@@ -166,6 +182,25 @@ export class World {
                     Math.abs(centerX(a.hitbox) - centerX(task.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(task.hitbox)) ? a : b
                 )
                 workerReady.task = task;
+            }
+        })
+    };
+
+    /** Distribue les Tools au Fremen */
+    toolsDistributor(deltaSeconds: Second): void {
+        // quel frement est le plus proche de chaque Tool ?
+        this.availableTools.forEach((tool: Tool) => {
+            const fremens: Fremen[] = this.fremens;
+            if (fremens.length >= 1) {
+                const fremenReady: Fremen = fremens.reduce((a: Fremen, b: Fremen) =>
+                    Math.abs(centerX(a.hitbox) - centerX(tool.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(tool.hitbox)) ? a : b
+                )
+                if (overlaps(fremenReady.hitbox, tool.hitbox)) {
+                    fremenReady.tool = tool; // deviens le metier;
+                    tool.remove();
+                } else {
+                    fremenReady.goToHitbox(tool.hitbox, deltaSeconds, 'run')
+                }
             }
         })
     };
@@ -199,7 +234,7 @@ export class World {
         this.collectibles = [...this.collectibles, ...collectibles]
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: Second) {
         this.clock.updateClock(deltaSeconds);
         this.catchbasins = this.catchbasins.filter((catchbasin: Catchbasin) => {
             const completeCatchbasin: boolean = catchbasin.workChargeLeft <= 0;
@@ -245,6 +280,17 @@ export class World {
 
         this.fremens.forEach((fremen: Fremen) => {
             fremen.updateWorldContexte(this.worldContext);
+            // Chercher tout les outils disponible et repatir les outils au fremen les plus proche.
+            // ils viennent eu centreX du batiment, font dispaitre un tool, supprime le fremen et tranforme dans le type recherché.
+            if (fremen.tool) {
+                this.fremens = this.fremens.filter((f: Fremen) => f !== fremen);
+                switch (fremen.tool.type) {
+                    default:
+                        this.workers.push(new Worker(fremen.hitbox.x, fremen.hitbox.y, fremen.worldContext))
+                }
+
+            }
+
             fremen.update(deltaSeconds)
         });
 
@@ -254,7 +300,6 @@ export class World {
             if (pyon.purse.contentCount >= 1) { // si le pyon recupere une piece (du naïb uniquement ?) il devient un Fremen !  
                 this.pyons = this.pyons.filter((p: Pyon) => p !== pyon);
                 this.fremens.push(new Fremen(pyon.x, pyon.y, pyon.worldContext));
-                // bug restant : une seul piece peux transformer plusieurs Pyon d'un coup ! 
             }
         })
 
@@ -264,6 +309,7 @@ export class World {
         });
 
         this.taskDistributor();
+        this.toolsDistributor(deltaSeconds);
     }
 
     public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {
@@ -279,10 +325,10 @@ export class World {
 
         this.ground.draw(ctx, camera);
         this.purchasables.forEach((purchasable: Purchasable) => targetHighlight(ctx, camera, purchasable, this.player.target === purchasable))
+        this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => pyonsCamp.draw(ctx, camera));
         this.muaddibs.forEach((muaddib: Muaddib) => muaddib.draw(ctx, camera));
         this.workers.forEach((worker: Worker) => worker.draw(ctx, camera))
         this.hunters.forEach((hunter: Hunter) => hunter.draw(ctx, camera));
-        this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => pyonsCamp.draw(ctx, camera));
         this.fremens.forEach((fremen: Fremen) => fremen.draw(ctx, camera));
         this.pyons.forEach((pyon: Pyon) => pyon.draw(ctx, camera));
 
