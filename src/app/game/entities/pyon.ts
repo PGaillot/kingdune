@@ -1,6 +1,7 @@
+import { Hitbox } from "../../hitbox";
 import { GameMeter, Second } from "../config";
 import { CharacterOptions } from "./character";
-import { Npc } from "./npc";
+import { Npc, WorldContext } from "./npc";
 import { Purse } from "./purse";
 import { PyonsCamp } from "./pyons-camp";
 
@@ -19,11 +20,12 @@ export class Pyon extends Npc {
     // dans ce cas pas de bou-bourse ... 
     purse: Purse = new Purse();
 
-    constructor(x: GameMeter, y: GameMeter, public createdBy: PyonsCamp, options?: Partial<CharacterOptions>) {
-        super(x, y, 3, 5, createdBy.worldContext, { ...DEFAULT_PYON_OPTIONS, ...options })
+    constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext, public createdBy?: PyonsCamp, options?: Partial<CharacterOptions>) {
+        super(x, y, 3, 5, worldContext, { ...DEFAULT_PYON_OPTIONS, ...options })
     }
 
     override update(deltaSeconds: Second): void {
-        this.idleInArea(deltaSeconds, this.createdBy.hitbox, 'walk', 3)
+        const idleZone: Hitbox = this.createdBy === undefined ? this.worldContext.sietchZone : this.createdBy.hitbox;
+        this.idleInArea(deltaSeconds, idleZone, 'walk', 3)
     }
 }

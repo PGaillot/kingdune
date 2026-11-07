@@ -21,8 +21,18 @@ export class PyonsCamp {
 
     constructor(
         public x: GameMeter,
-        public worldContext: WorldContext
-    ) { }
+        public worldContext: WorldContext,
+        private readonly initialPyons: number = 0
+    ) {
+        if (this.initialPyons > MAX_PYONS) {
+            this.initialPyonsNumber = MAX_PYONS;
+        } else {
+            this.initialPyonsNumber = initialPyons;
+        }
+
+    }
+
+    initialPyonsNumber: number;
 
     get hitbox(): Hitbox {
         return {
@@ -60,6 +70,6 @@ export class PyonsCamp {
     }
 
     createPyon(): Pyon {
-        return new Pyon(centerX(this.hitbox), GROUND, this);
+        return new Pyon(centerX(this.hitbox), GROUND, this.worldContext, this);
     }
 }

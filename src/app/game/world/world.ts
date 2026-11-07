@@ -25,6 +25,9 @@ import { Celestial } from "../entities/celestial";
 import { Fremen } from "../entities/fremen";
 import type { PurseCharacter } from "../entities/purse";
 import { Shop, Tool } from "../entities/buildings/shop";
+import { taskDistributor } from "../task-distributor";
+import { toolsDistributor } from "../tool-distributor";
+import { getRandomBetweenMinMax } from "../../utils/random.utils";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -53,6 +56,8 @@ export class World {
     sun: Celestial;
     workersShop: Shop;
     pistolShop: Shop;
+    initialSietchPyons: number = 4;
+
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
      * de gauche de droite et le centre de celui ci.
@@ -67,19 +72,23 @@ export class World {
         this.sietch = new Sietch();
         this.buildSietchZone();
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
-        this.hunters.push(new Hunter(this.center, GROUND, this.worldContext));
-        this.workers.push(new Worker(1, GROUND, this.worldContext))
         this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
         for (let index = 0; index < 5; index++) {
             const position: number = Math.round((Math.random()) * this.width)
             this.muaddibs.push(new Muaddib(position, GROUND, this.worldContext))
         }
 
-        this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext));
-        this.pyonsCamps.push(new PyonsCamp(34, this.worldContext));
+        this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext, 2));
+        this.pyonsCamps.push(new PyonsCamp(34, this.worldContext, 2));
 
         this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'darkgreen', toolPrice: 3 })
         this.pistolShop = new Shop(6, { type: 'maula-pistol', height: 1, width: 1, image: MAULA_PISTOL_IMAGE }, { color: 'indianred', toolPrice: 2 })
+
+        this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => {
+            for (let i = 0; i < pyonsCamp.initialPyonsNumber; i++) {
+                this.pyons.push(pyonsCamp.createPyon())
+            }
+        })
     }
 
     get worldContext(): WorldContext {
@@ -158,7 +167,13 @@ export class World {
     }
 
     get availableTools(): Tool[] {
-        return this.shops.flatMap((shop: Shop) => shop.tools)
+        const allTools: Tool[] = this.shops.flatMap((shop: Shop) => shop.tools);
+        const toolsTargeted: Tool[] = this.fremens.flatMap((fremen: Fremen) => fremen.toolTargeted ?? [])
+        return allTools.filter((tool: Tool) => !toolsTargeted.includes(tool))
+    }
+
+    get availableFremens(): Fremen[] {
+        return this.fremens.filter((fremen: Fremen) => fremen.toolTargeted === undefined)
     }
 
     private getLastSietchWall(direction: Direction): Wall {
@@ -174,43 +189,15 @@ export class World {
         )
     }
 
-    /** Distribue les taches entre les workers */
-    taskDistributor(): void {
-        // quel worker est le plus proche et est dispoinible de chaque taches ?
-        this.workersTasks.forEach((task: Workable) => {
-            const availableWorkers: Worker[] = this.availableWorkers;
-            if (availableWorkers.length >= 1) {
-                const workerReady: Worker = availableWorkers.reduce((a: Worker, b: Worker) =>
-                    Math.abs(centerX(a.hitbox) - centerX(task.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(task.hitbox)) ? a : b
-                )
-                workerReady.task = task;
-            }
-        })
-    };
-
-    /** Distribue les Tools au Fremen */
-    toolsDistributor(deltaSeconds: Second): void {
-        // quel frement est le plus proche de chaque Tool ?
-        this.availableTools.forEach((tool: Tool) => {
-            const fremens: Fremen[] = this.fremens;
-            if (fremens.length >= 1) {
-                const fremenReady: Fremen = fremens.reduce((a: Fremen, b: Fremen) =>
-                    Math.abs(centerX(a.hitbox) - centerX(tool.hitbox)) < Math.abs(centerX(b.hitbox) - centerX(tool.hitbox)) ? a : b
-                )
-                if (overlaps(fremenReady.hitbox, tool.hitbox)) {
-                    fremenReady.tool = tool; // deviens le metier;
-                    tool.remove();
-                } else {
-                    fremenReady.goToHitbox(tool.hitbox, deltaSeconds, 'run')
-                }
-            }
-        })
-    };
 
     private buildSietchZone(): void {
         const sietchIndex: number = this.ground.toIndex(this.sietch.position - this.sietch.width / 2);
         this.ground.setZone(sietchIndex, this.sietch.width, new RockBiome());
         this.walls = [...mirrored(14, (x: GameMeter) => new Wall(x)), ...mirrored(26, (x: GameMeter) => new Wall(x))];
+        for (let i = 0; i < this.initialSietchPyons; i++) {
+            const randomX: GameMeter = getRandomBetweenMinMax(this.sietchZone.x, this.sietchZone.x + this.sietchZone.width);
+            this.pyons.push(new Pyon(randomX, GROUND, this.worldContext))
+        }
     }
 
     getRandomCatchbasinPositions(catchbasinCount: number): GameMeter[] {
@@ -284,16 +271,16 @@ export class World {
             fremen.updateWorldContexte(this.worldContext);
             // Chercher tout les outils disponible et repatir les outils au fremen les plus proche.
             // ils viennent eu centreX du batiment, font dispaitre un tool, supprime le fremen et tranforme dans le type recherché.
-            if (fremen.tool) {
+            if (fremen.toolTargeted && overlaps(fremen.hitbox, fremen.toolTargeted.hitbox)) {
                 this.fremens = this.fremens.filter((f: Fremen) => f !== fremen);
-                switch (fremen.tool.type) {
+                switch (fremen.toolTargeted.type) {
                     case "maula-pistol":
-                        this.hunters.push(new Hunter(fremen.hitbox.x, fremen.hitbox.y, fremen.worldContext))
+                        this.hunters.push(new Hunter(fremen.hitbox.x + (fremen.hitbox.width / 2), fremen.hitbox.y, fremen.worldContext))
                         break
                     default:
-                        this.workers.push(new Worker(fremen.hitbox.x, fremen.hitbox.y, fremen.worldContext))
+                        this.workers.push(new Worker(fremen.hitbox.x + (fremen.hitbox.width / 2), fremen.hitbox.y, fremen.worldContext))
                 }
-
+                fremen.toolTargeted.remove()
             }
 
             fremen.update(deltaSeconds)
@@ -313,8 +300,8 @@ export class World {
             muaddib.update(deltaSeconds)
         });
 
-        this.taskDistributor();
-        this.toolsDistributor(deltaSeconds);
+        taskDistributor(this.workersTasks, this.availableWorkers);
+        toolsDistributor(this.availableTools, this.availableFremens);
     }
 
     public draw(ctx: CanvasRenderingContext2D, camera: Camera): void {

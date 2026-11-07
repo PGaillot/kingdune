@@ -10,13 +10,24 @@ const DEFAULT_FREMEN_OPTION: Partial<CharacterOptions> = {
 /** Un Fremen est un Pyon qui a recu une piéce, il attend qu'on lui donne un taff de dispo. */
 export class Fremen extends Npc {
 
-    tool: Tool | undefined;
+    toolTargeted: Tool | undefined;
 
     constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext, option?: CharacterOptions) {
         super(x, y, 1, 2, worldContext, { ...DEFAULT_FREMEN_OPTION, ...option })
     };
 
     override update(deltaSeconds: Second): void {
-        this.idleInArea(deltaSeconds, this.worldContext.sietchZone, 'walk');
+        switch (this.state) {
+            case "idle":
+                if (this.toolTargeted === undefined) {
+                    this.idleInArea(deltaSeconds, this.worldContext.sietchZone, 'walk');
+                } else {
+                    this.goToHitbox(this.toolTargeted.hitbox, deltaSeconds, 'run')
+                }
+                break
+            case "escape":
+                this.idleInArea(deltaSeconds, this.worldContext.sietchZone, 'run');
+                break
+        }
     };
 }
