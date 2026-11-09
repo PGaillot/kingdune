@@ -23,6 +23,7 @@ const DEFAULT_OPTIONS: CollectibleOptions = {
 export class Collectible {
 
     readonly options: CollectibleOptions;
+    from: PurseCharacter | undefined = undefined;
     droppedBy: PurseCharacter | undefined = undefined;
     /** la vitesse sur X pour la physique tout ca tout ça ! */
     vX: number = 0;

@@ -133,7 +133,7 @@ export class World {
     }
 
     get purseCharacters(): PurseCharacter[] {
-        return [this.player, ...this.pyons]
+        return [this.player, ...this.pyons, ...this.workers, ...this.hunters, ...this.fremens]
     }
 
     get purchasables(): Purchasable[] {
@@ -236,9 +236,10 @@ export class World {
 
         this.collectibles.forEach((collectible: Collectible) => {
             collectible.update(deltaSeconds);
-            const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) =>
-                overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character)
-            )
+            const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) => {
+                const receiverIsPyon: boolean = character instanceof Pyon;
+                return overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character) && (!receiverIsPyon || collectible.from === this.player)
+            })
             if (receiver !== undefined) {
                 const collectibleOverflow: Collectible | undefined = receiver.purse.add(collectible);
                 if (collectibleOverflow === undefined) {

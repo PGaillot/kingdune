@@ -25,6 +25,8 @@ export class Purse {
     public add(collectible: Collectible): undefined | Collectible {
         if (this.maxSize === undefined || this.content.length < this.maxSize) {
             collectible.resetSpeed();
+            collectible.from = undefined;
+            collectible.droppedBy = undefined;
             this.content.push(collectible)
             return
         }

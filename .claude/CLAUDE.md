@@ -397,9 +397,20 @@ dans `purse.ts`) ; `World.purseCharacters` = joueur + pyons. Bug réglé (commit
 une pièce allait dans plusieurs bourses (`return` dans un `forEach` = `continue`, `find` sans
 `return true` = parcours complet) → `find` qui **choisit**, puis un seul `add` (requête /
 commande séparées). Signalés, pas réglés : `purse.ts` ↔ `collectible.ts` s'importent
-mutuellement (types seulement, piste `import type`) ; tableaux modifiés pendant leur `forEach` ; toute pièce au sol transforme
-un pyon (« du naib uniquement ? » à décider) ; `Fremen` prend `CharacterOptions` au lieu de
+mutuellement (types seulement, piste `import type`) ; tableaux modifiés pendant leur `forEach` ; `Fremen` prend `CharacterOptions` au lieu de
 `Partial` ; joueur en `new Purse()` illimitée ; Fremen de test à `-4`.
+
+**Recrutement par le naib uniquement (09/11/2026, pas commité, testé)** : un pyon ne devient
+Fremen qu'avec une pièce **lâchée par le naib**. `Collectible.from` (durable, écrit dans
+`dropCollectible()`) ≠ `droppedBy` (temporaire, effacé dès que la pièce ne touche plus le naib).
+Condition du `find` : `overlaps && canBePickedBy && (!receiverIsPyon || from === this.player)`
+(implication `!A || B`). `from` est effacé dans `Purse.add()` (seulement si la pièce est
+vraiment rangée : valeur par défaut sûre). Concepts vus : identité par référence (`===`), `find`
+avec accolades sans `return`, court-circuit du `||`. **Voulu** : `purseCharacters` élargi aux
+workers, hunters et Fremen (`Fremen` a une `Purse`) : prérequis de la **prochaine étape, les PNJ
+rendent leurs pièces au naib** (comme Kingdom). Restent : priorité de ramassage donnée par
+l'ordre du tableau ; `droppedBy` pas effacé dans `add()` ; piste d'une méthode de `Collectible`
+(« je viens d'être rangée ») appelée par `add()` à la place de `resetSpeed()`.
 
 **À la reprise (02/11/2026) : zones d'errance des PNJ** (piste discutée, pas codée) :
 - la **machine à états choisit la zone** et la passe en paramètre à chaque frame, rien de
