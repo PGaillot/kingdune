@@ -47,6 +47,9 @@ export class Collectible {
         }
     };
 
+    private get isNotFalling(): boolean {
+        return this.vX === 0 && this.vY >= 0;
+    }
 
     update(deltaSeconds: Second): void {
         applyPhysics(deltaSeconds, this, GROUND)
@@ -56,7 +59,7 @@ export class Collectible {
     }
 
     canBePickedBy(character: PurseCharacter): boolean {
-        return character !== this.droppedBy
+        return character !== this.droppedBy && this.isNotFalling
     }
 
     resetSpeed(): void {
@@ -85,9 +88,7 @@ export class Collectible {
                 dimentionOptions.dW,
                 dimentionOptions.dH
             )
-
         }
         ctx.restore();
     }
-
 }
