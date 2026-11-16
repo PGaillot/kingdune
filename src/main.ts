@@ -1,4 +1,4 @@
-import { Game } from './app/components/game/game'
+import { Game } from './app/game'
 
 const canvas = document.querySelector<HTMLCanvasElement>("#game");
 

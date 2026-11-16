@@ -6,14 +6,10 @@
     "build": "tsc --noEmit && vite build"
   },
   "private": true,
-  "dependencies": {
-    "tslib": "^2.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
-    "vite": "^8.3.8",
-    "vitest": "^4.0.8"
+    "vite": "^8.3.8"
   }
 }

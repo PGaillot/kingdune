@@ -1,10 +1,10 @@
-import { World } from '../../game/world/world';
-import { Camera } from '../../game/camera';
-import { Pixel, SCREEN_HEIGHT, SCREEN_WIDTH, Second, WORLD_RADIUS } from '../../game/config';
-import { PlayerCharacter } from '../../game/entities/player-character';
-import { InputManager } from '../../game/input-manager';
-import { PlayerController } from '../../game/entities/player-controller';
-import { drawHitbox, Hitbox } from '../../hitbox';
+import { World } from './game/world/world';
+import { Camera } from './game/camera';
+import { SCREEN_HEIGHT, SCREEN_WIDTH, WORLD_RADIUS } from './game/config';
+import { PlayerCharacter } from './game/entities/player-character';
+import { InputManager } from './game/input-manager';
+import { PlayerController } from './game/entities/player-controller';
+import { drawHitbox, Hitbox } from './hitbox';
 
 type HitboxObject = { hitbox: Hitbox };
 
@@ -23,17 +23,14 @@ export class Game {
     window.addEventListener('blur', (event: FocusEvent) => this.inputManager.onBlur());
   }
 
-  protected readonly SCREEN_WIDTH: Pixel = SCREEN_WIDTH;
-  protected readonly SCREEN_HEIGHT: Pixel = SCREEN_HEIGHT;
-  // private readonly pressedKeys = new Set<string>();
-  private ctx: CanvasRenderingContext2D | null = null;
+  private ctx: CanvasRenderingContext2D;
   private lastTimestamp = 0;
 
   // Monde
   public readonly world: World = new World(WORLD_RADIUS); // rayon de 40 cases autour de la case centrale, soit 81 cases
 
-  protected inputManager: InputManager = new InputManager();
-  protected playerController: PlayerController = new PlayerController(this.inputManager, this.player);
+  private inputManager: InputManager = new InputManager();
+  private playerController: PlayerController = new PlayerController(this.inputManager, this.player);
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
   private readonly hitboxDebug: boolean = true;
@@ -63,18 +60,16 @@ export class Game {
     this.world.update(deltaSeconds)
     this.camera.follow({ x: this.player.x, y: this.player.y })
     this.render();
-    requestAnimationFrame((next: Second) => this.loop(next))
+    requestAnimationFrame((next: number) => this.loop(next))
   }
 
   private render(): void {
-    if (this.ctx === null) return;
-    const ctx: CanvasRenderingContext2D = this.ctx;
-    this.world.draw(ctx, this.camera);
+    this.world.draw(this.ctx, this.camera);
 
     // HITBOX DEBUG
     if (this.hitboxDebug)
       this.hitboxObjects.forEach((object: HitboxObject) => {
-        drawHitbox(ctx, this.camera, object.hitbox)
+        drawHitbox(this.ctx, this.camera, object.hitbox)
       })
   }
 }

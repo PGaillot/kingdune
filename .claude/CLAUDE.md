@@ -9,12 +9,19 @@
   un monde infini ni ouvert. Il ne saute pas.
 - **Rendu** : tout est dessiné à la main dans un `<canvas>` (boucle `requestAnimationFrame` +
   `deltaSeconds`). Les entités du jeu (`Character`, `Npc`, `Muaddib`, `Hunter`…) sont des classes
-  TypeScript simples, pas des composants Angular. Angular sert de coquille (composant `Game`,
-  entrées clavier, UI autour du canvas).
+  TypeScript simples. **Plus de framework** (Angular retiré le 16/11/2026, voir « Outillage ») :
+  `src/main.ts` trouve le canvas et crée un `Game` (classe TS pure : boucle, entrées clavier,
+  caméra).
 - **Graphismes** : pas encore définis (papier, pixel art, 3D… on verra). Pour l'instant, on dessine
   des **blocs de couleur** et ça suffit. Ne pas investir dans le visuel.
 - **Aucune librairie** : pas de moteur de jeu (Phaser, PixiJS…), pas de librairie de physique ni
   d'UI. Tout est fait à la main.
+- **Outillage (depuis le 16/11/2026)** : **Bun** gère les paquets et lance les scripts (`bun.lock`,
+  plus de npm), **Vite** sert et compile (`bun run dev`, `bun run build`). Vite ne vérifie pas les
+  types : `build` lance d'abord `tsc --noEmit` (un seul `tsconfig.json`, `include: ["src"]`).
+  Point d'entrée : `index.html` **à la racine** (canvas `#game` + `<script type="module">`,
+  différé, donc le canvas existe quand `main.ts` s'exécute). `public/` est servi à la racine
+  (`/ressources/...`). Pas de tests pour l'instant (`vitest` retiré).
 
 ## Univers : on joue les Fremen
 
@@ -128,12 +135,13 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
 ## Conventions
 
 - **Commentaires de code en français.**
-- Les règles Angular ci-dessous s'appliquent à la partie Angular (composants, services). La logique
-  de jeu reste en classes TypeScript pures.
+- Tout le jeu est en classes TypeScript pures (plus d'Angular).
 
 ## Organisation des fichiers
 
-- `src/app/components/` : uniquement les composants Angular (`game/` = la coquille autour du canvas).
+- `index.html` (racine) et `src/main.ts` : point d'entrée, branchent le canvas sur `Game`.
+- `src/app/game.ts` : la classe `Game` (boucle `requestAnimationFrame`, écouteurs clavier,
+  caméra, debug des hitbox). Ex-composant Angular.
 - `src/app/game/` : la logique de jeu en TypeScript pur.
   - `config.ts` (unités, constantes), `camera.ts` (systèmes transverses) à la racine.
   - `world/` : le décor (`World`, `Ground`, `Catchbasin`, `Sietch`).
@@ -156,6 +164,17 @@ Le but de ce projet est **d'apprendre**. C'est l'utilisateur qui écrit le code.
   désigne ses pieds, donc on remonte de sa hauteur pour trouver le coin haut-gauche de `fillRect`.
 
 ## État d'avancement (à mettre à jour)
+
+**Sortie d'Angular (fait, 16/11/2026)** : composant `Game` réécrit en classe TS pure (le
+constructeur reçoit le canvas, règle sa taille, lance une erreur sans contexte 2D, donc `ctx` n'est
+plus `| null` : invariant établi dans le constructeur ; `addEventListener` remplace le `host`).
+Fichiers Angular, `.angular/`, `.vscode/`, `game.spec.ts`, `tslib`, `jsdom`, `vitest` supprimés.
+Bugs rencontrés : `querySelector("game")` (balise, pas id) ; `<canvas #game>` (syntaxe de template
+Angular, pas un id) ; `requestAnimationFrame` retiré de `loop()` avec `frameId` → une seule frame,
+dessinée avant le chargement des images (`drawImage` sur une image pas chargée ne dessine rien,
+sans erreur) ; `tsconfig` « chef d'orchestre » (`files: []` + `references`) sans ses enfants
+(TS18002) ; `(next: Second)` alors que rAF donne des millisecondes. **Reste** : `<link
+rel="stylesheet" src=…>` (`link` attend `href`), `styles.css` vide de toute façon.
 
 **Fait** : `World` (largeur, bornes `leftEnd`/`rightEnd`, contient un `Ground` et une `Clock` qui donne la couleur du
 ciel), `Ground` (bande dessinée sur toute la largeur du monde), `Camera` (suivi du personnage avec
@@ -607,57 +626,8 @@ drapeau dessiné avec la taille de la dune (à revoir si le PNG n'a pas la même
 
 ---
 
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
-
 ## TypeScript Best Practices
 
 - Use strict type checking
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
-
-## Angular Best Practices
-
-- Always use standalone components over NgModules
-- Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Use signals for state management
-- Implement lazy loading for feature routes
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
-- Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
-
-## Accessibility Requirements
-
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
-
-### Components
-
-- Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
-- Prefer Reactive forms instead of Template-driven ones
-- Do NOT use `ngClass`, use `class` bindings instead
-- Do NOT use `ngStyle`, use `style` bindings instead
-- When using external templates/styles, use paths relative to the component TS file.
-
-## State Management
-
-- Use signals for local component state
-- Use `computed()` for derived state
-- Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
-
-## Templates
-
-- Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
-- Do not assume globals like (`new Date()`) are available.
-
-## Services
-
-- Design services around a single responsibility
-- Use the `providedIn: 'root'` option for singleton services
-- Use the `inject()` function instead of constructor injection
