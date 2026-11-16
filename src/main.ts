@@ -1,6 +1,5 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
+import { Game } from './app/components/game/game'
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+const canvas = document.querySelector<HTMLCanvasElement>("#game");
+
+if (canvas) new Game(canvas).start()

@@ -28,6 +28,7 @@ import { Shop, Tool } from "../entities/buildings/shop";
 import { taskDistributor } from "../task-distributor";
 import { toolsDistributor } from "../tool-distributor";
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
+import { Bush } from "../entities/bush";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -57,6 +58,8 @@ export class World {
     workersShop: Shop;
     pistolShop: Shop;
     initialSietchPyons: number = 4;
+
+    bushs: Bush[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
@@ -89,6 +92,8 @@ export class World {
                 this.pyons.push(pyonsCamp.createPyon())
             }
         })
+
+        this.bushs.push(new Bush(-18))
     }
 
     get worldContext(): WorldContext {
@@ -324,6 +329,8 @@ export class World {
         this.hunters.forEach((hunter: Hunter) => hunter.draw(ctx, camera));
         this.fremens.forEach((fremen: Fremen) => fremen.draw(ctx, camera));
         this.pyons.forEach((pyon: Pyon) => pyon.draw(ctx, camera));
+
+        this.bushs.forEach((bush: Bush) => bush.draw(ctx, camera));
 
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
         this.player.draw(ctx, camera);
