@@ -19,6 +19,15 @@ const FAKE_ZONE:Hitbox = {
     y:0
 }
 
+/**
+ * Un des rares animal vivant sur de desert d'Arakis.
+ * Ici en temps de crise elle est chassé afin d'en extraire son eau.
+ * @param x sa position horizontale
+ * @param x sa position vertical (en general GROUND)
+ * @param worldContext le contexte du monde qui l'entoure
+ * @param attachAt le buisson auquel elle est attaché, ou rien si celui-ci a disparu ...
+ * @param options taille, vitesse, couleur sont des options facultatives. Des valeurs sont appliqué par defaut si undefined.
+ */
 export class Muaddib extends Npc {
 
     constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext,public attachAt?:Bush, options?: Partial<CharacterOptions>) {
