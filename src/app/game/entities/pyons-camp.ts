@@ -18,6 +18,7 @@ export class PyonsCamp {
     imageWidth: GameMeter = 6;
     pyonsCreated: Pyon[] = [];
     createPyonTimer: number | undefined;
+    initialPyonsNumber: number;
 
     constructor(
         public x: GameMeter,
@@ -29,10 +30,8 @@ export class PyonsCamp {
         } else {
             this.initialPyonsNumber = initialPyons;
         }
-
     }
 
-    initialPyonsNumber: number;
 
     get hitbox(): Hitbox {
         return {

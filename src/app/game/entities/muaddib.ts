@@ -1,4 +1,5 @@
 import { GameMeter } from "../config";
+import { Bush } from "./bush";
 import { CharacterOptions } from "./character";
 import { Npc, WorldContext } from "./npc";
 
@@ -11,7 +12,7 @@ const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
 
 export class Muaddib extends Npc {
 
-    constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext, options?: Partial<CharacterOptions>) {
+    constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext,public attatchAt?:Bush, options?: Partial<CharacterOptions>) {
         super(x, y, 2, 4, worldContext, { ...DEFAULT_OPTIONS, ...options });
     }
 }

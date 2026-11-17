@@ -76,11 +76,6 @@ export class World {
         this.buildSietchZone();
         this.collectibles.push(...disperse<WaterRing>(15, -15, 15, (x: GameMeter) => new WaterRing(x, GROUND)));
         this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
-        for (let index = 0; index < 5; index++) {
-            const position: number = Math.round((Math.random()) * this.width)
-            this.muaddibs.push(new Muaddib(position, GROUND, this.worldContext))
-        }
-
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext, 2));
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext, 2));
 
@@ -93,7 +88,7 @@ export class World {
             }
         })
 
-        this.bushs.push(new Bush(-18))
+        this.bushs.push(new Bush(-18, this.worldContext))
     }
 
     get worldContext(): WorldContext {
@@ -254,6 +249,13 @@ export class World {
         })
 
         this.player.update(deltaSeconds)
+
+        this.bushs.forEach((bush:Bush) => {
+            bush.updateWorldContext(this.worldContext)
+            bush.muaddidsCreated = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attatchAt === bush)
+            const muaddib: Muaddib | undefined = bush.update(deltaSeconds);
+            if(muaddib) this.muaddibs.push(muaddib);
+        })
 
         this.workers.forEach((worker: Worker) => {
             worker.updateWorldContexte(this.worldContext)
