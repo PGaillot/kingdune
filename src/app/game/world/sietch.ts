@@ -4,7 +4,7 @@ import { CENTER, GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
 import { Purchasable } from "../interfaces/purchasable";
 
 const SIETCH_IMAGE_LVL_0: HTMLImageElement = new Image();
-SIETCH_IMAGE_LVL_0.src = '/ressources/sietch/sietch_level_0.png'
+SIETCH_IMAGE_LVL_0.src = 'ressources/sietch/sietch_level_0.png'
 
 export class Sietch implements Purchasable {
     height: GameMeter = 1;

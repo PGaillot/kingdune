@@ -4,7 +4,7 @@ import { Purchasable } from "./interfaces/purchasable";
 import { centerX } from "../hitbox";
 
 const PLACEHOLDER: HTMLImageElement = new Image();
-PLACEHOLDER.src = '/ressources/waterring/waterring_placeholder_1.png';
+PLACEHOLDER.src = 'ressources/waterring/waterring_placeholder_1.png';
 
 export function targetHighlight(ctx: CanvasRenderingContext2D, camera: Camera, object: Purchasable, isTarget: boolean): void {
 

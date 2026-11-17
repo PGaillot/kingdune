@@ -8,10 +8,10 @@ const IMAGE_LVL_1: HTMLImageElement = new Image();
 const IMAGE_LVL_2: HTMLImageElement = new Image();
 const IMAGE_LVL_3: HTMLImageElement = new Image();
 
-IMAGE_LVL_0.src = '/ressources/wall/wall_level_0.png';
-IMAGE_LVL_1.src = '/ressources/wall/wall_level_1.png';
-IMAGE_LVL_2.src = '/ressources/wall/wall_level_2.png';
-IMAGE_LVL_3.src = '/ressources/wall/wall_level_3.png';
+IMAGE_LVL_0.src = 'ressources/wall/wall_level_0.png';
+IMAGE_LVL_1.src = 'ressources/wall/wall_level_1.png';
+IMAGE_LVL_2.src = 'ressources/wall/wall_level_2.png';
+IMAGE_LVL_3.src = 'ressources/wall/wall_level_3.png';
 
 const WALL_LEVEL: Record<number, { price: number, life: number, image: HTMLImageElement }> = {
     0: { price: 0, life: 0, image: IMAGE_LVL_0 },

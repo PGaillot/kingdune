@@ -14,10 +14,10 @@ export type CatchbasinOptions = {
 }
 
 const IMAGE: HTMLImageElement = new Image();
-IMAGE.src = '/ressources/catchbasin/catchbasin_1.png';
+IMAGE.src = 'ressources/catchbasin/catchbasin_1.png';
 
 const MARKER: HTMLImageElement = new Image();
-MARKER.src = '/ressources/catchbasin/catchbasin_flag_1.png';
+MARKER.src = 'ressources/catchbasin/catchbasin_flag_1.png';
 
 const DEFAULT_CATCHBASIN_OPTION: CatchbasinOptions = {
     image: IMAGE,

@@ -8,7 +8,7 @@ const MAX_PYONS: number = 2;
 const SECONDS_BETWEEN_PYON_CREATION: number = 60;
 
 const PYON_CAMP_IMAGE: HTMLImageElement = new Image();
-PYON_CAMP_IMAGE.src = '/ressources/pyons_camp/pyons-camp.png'
+PYON_CAMP_IMAGE.src = 'ressources/pyons_camp/pyons-camp.png'
 
 export class PyonsCamp {
 

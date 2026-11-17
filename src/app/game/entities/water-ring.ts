@@ -2,7 +2,7 @@ import { GameMeter } from "../config";
 import { Collectible, CollectibleOptions } from "./collectible";
 
 const WATERRING_IMAGE: HTMLImageElement = new Image();
-WATERRING_IMAGE.src = '/ressources/waterring/waterring_1.png';
+WATERRING_IMAGE.src = 'ressources/waterring/waterring_1.png';
 
 const WATERRING_OPTIONS: Partial<CollectibleOptions> = {
     height: 1,

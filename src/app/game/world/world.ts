@@ -32,13 +32,13 @@ import { Bush } from "../entities/bush";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
-MOON_IMAGE.src = '/ressources/celestial/moon.png';
-SUN_IMAGE.src = '/ressources/celestial/sun.png';
+MOON_IMAGE.src = 'ressources/celestial/moon.png';
+SUN_IMAGE.src = 'ressources/celestial/sun.png';
 
 const HAMMER_IMAGE: HTMLImageElement = new Image();
-HAMMER_IMAGE.src = '/ressources/tools/hammer.png';
+HAMMER_IMAGE.src = 'ressources/tools/hammer.png';
 const MAULA_PISTOL_IMAGE: HTMLImageElement = new Image();
-MAULA_PISTOL_IMAGE.src = '/ressources/tools/maula-pistol.png';
+MAULA_PISTOL_IMAGE.src = 'ressources/tools/maula-pistol.png';
 export class World {
     clock: Clock;
     readonly player: PlayerCharacter;

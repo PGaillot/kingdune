@@ -8,7 +8,7 @@ import { WorldContext } from "./npc";
 const MAX_MUADDIBS:number = 3;
 const SECONDS_BETWEEN_MUADDIB_CREATION: number = 10;
 const BUSH_IMAGE: HTMLImageElement = new Image();
-BUSH_IMAGE.src = '/ressources/bush/bush.png';
+BUSH_IMAGE.src = 'ressources/bush/bush.png';
 
 /**
  * Inspiré des **Buisson du desert**, ils apparaissent sur les biomes roches 
