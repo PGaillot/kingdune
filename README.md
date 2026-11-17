@@ -1,4 +1,6 @@
-# Kingdune
+<p align="center">
+  <img src="public/ressources/title-image.png" alt="Description" >
+</p>
 
 ## Projet
 
