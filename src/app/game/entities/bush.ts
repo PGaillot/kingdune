@@ -1,6 +1,6 @@
 import { Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, ScreenPoint, Second } from "../config";
 import { Muaddib } from "./muaddib";
 import { WorldContext } from "./npc";
 
@@ -10,26 +10,26 @@ const SECONDS_BETWEEN_MUADDIB_CREATION: number = 10;
 const BUSH_IMAGE: HTMLImageElement = new Image();
 BUSH_IMAGE.src = '/ressources/bush/bush.png';
 
-
+/**
+ * Inspiré des **Buisson du desert**, ils apparaissent sur les biomes roches 
+ * avec une distance minimale entre deux buisson, et disparraissent quand ils 
+ * se retrouvent dans la sietch zone (entre des murs).
+ * C'est dans ces buisson qu'apparaissent les Muaddibs, au maximum de 3 par buisson.
+ * @param positionX est la postion ou apparait le centre du buisson.
+ * @param worldContext le contexte du monde, mis a jours via updateWorldContext()
+ * @param initialMuaddids permet d'initaliser un Buisson avec déjà des Muaddibs. Vaut 0 si undefined.
+ */
 export class Bush {
-
-    muaddidsCreated: Muaddib[] = [];
-    initialMuaddibsCount:number = 0;
     createMuaddibTimer: number | undefined;
-
     height: GameMeter = 1;
     width: GameMeter = 2;
     
     constructor(
         private readonly positionX: GameMeter,
         public worldContext:WorldContext,
-        readonly initalMuaddids:number = 0
+        public readonly initialMuaddids:number = 0
     ) {
-        if(initalMuaddids > MAX_MUADDIBS){
-            this.initialMuaddibsCount = MAX_MUADDIBS
-        } else {
-            this.initialMuaddibsCount = initalMuaddids;
-        }
+        this.initialMuaddids = Math.min(this.initialMuaddids, MAX_MUADDIBS)
     }
 
     get hitbox(): Hitbox {
@@ -45,8 +45,8 @@ export class Bush {
         this.worldContext = worldContext;
     }
 
-    update(deltaSeconds: number):Muaddib | undefined{
-        const isMaxMuaddibs:boolean = false;
+    update(deltaSeconds: Second, muaddibsAttached: number):Muaddib | undefined{
+        const isMaxMuaddibs:boolean = muaddibsAttached >= MAX_MUADDIBS;
         const haveTimer:boolean = this.createMuaddibTimer !== undefined;
         if(!isMaxMuaddibs && !haveTimer) this.createMuaddibTimer = 0;
         if(this.createMuaddibTimer !== undefined && this.createMuaddibTimer > SECONDS_BETWEEN_MUADDIB_CREATION){
@@ -67,6 +67,6 @@ export class Bush {
     }
 
     createMuaddib():Muaddib {
-        return new Muaddib(this.hitbox.x, this.hitbox.y, this.worldContext, this)
+        return new Muaddib(this.positionX, this.hitbox.y, this.worldContext, this)
     }
 }

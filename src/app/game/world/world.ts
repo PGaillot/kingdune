@@ -59,7 +59,7 @@ export class World {
     pistolShop: Shop;
     initialSietchPyons: number = 4;
 
-    bushs: Bush[] = [];
+    bushes: Bush[] = [];
 
     /**
      * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
@@ -78,6 +78,7 @@ export class World {
         this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext, 2));
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext, 2));
+        this.bushes.push(new Bush(-18, this.worldContext, 20))
 
         this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'darkgreen', toolPrice: 3 })
         this.pistolShop = new Shop(6, { type: 'maula-pistol', height: 1, width: 1, image: MAULA_PISTOL_IMAGE }, { color: 'indianred', toolPrice: 2 })
@@ -88,7 +89,12 @@ export class World {
             }
         })
 
-        this.bushs.push(new Bush(-18, this.worldContext))
+        this.bushes.forEach((bush: Bush) => {
+            for (let i = 0; i < bush.initialMuaddids; i++) {
+                this.muaddibs.push(bush.createMuaddib())
+            }
+        })
+
     }
 
     get worldContext(): WorldContext {
@@ -250,10 +256,10 @@ export class World {
 
         this.player.update(deltaSeconds)
 
-        this.bushs.forEach((bush:Bush) => {
+        this.bushes.forEach((bush:Bush) => {
             bush.updateWorldContext(this.worldContext)
-            bush.muaddidsCreated = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attatchAt === bush)
-            const muaddib: Muaddib | undefined = bush.update(deltaSeconds);
+            const muaddibsCreatedCount:number = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attachAt === bush).length
+            const muaddib: Muaddib | undefined = bush.update(deltaSeconds, muaddibsCreatedCount);
             if(muaddib) this.muaddibs.push(muaddib);
         })
 
@@ -332,7 +338,7 @@ export class World {
         this.fremens.forEach((fremen: Fremen) => fremen.draw(ctx, camera));
         this.pyons.forEach((pyon: Pyon) => pyon.draw(ctx, camera));
 
-        this.bushs.forEach((bush: Bush) => bush.draw(ctx, camera));
+        this.bushes.forEach((bush: Bush) => bush.draw(ctx, camera));
 
         this.collectibles.forEach((collectible: Collectible) => collectible.draw(ctx, camera));
         this.player.draw(ctx, camera);
