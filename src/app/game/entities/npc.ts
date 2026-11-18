@@ -1,17 +1,20 @@
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Character, CharacterOptions } from "./character";
-import { GameMeter, Second } from "../config";
+import { GameMeter, Second, Side } from "../config";
 import { Direction } from "../config";
 import { centerX, Hitbox } from "../../hitbox";
 import { Clock } from "../clock";
+import { Wall } from "./wall";
 
 export type NpcState = 'idle' | 'escape';
 
 export type WorldContext = {
     readonly sietchZone: Hitbox,
+    readonly sideWalls:Record<Side, Wall>,
     readonly clock: Clock,
     readonly world: {
         start: GameMeter,
+        center:GameMeter,
         end: GameMeter
     }
 }

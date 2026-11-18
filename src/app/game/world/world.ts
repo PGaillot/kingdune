@@ -1,5 +1,5 @@
 import { Camera } from "../camera";
-import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, Second, type GameMeter } from "../config";
+import { CENTER, DAY_LIGHT_GRADIENT, Direction, GROUND, NIGHT_GRADIENT, SCREEN_HEIGHT, SCREEN_WIDTH, Second, Side, type GameMeter } from "../config";
 import { Sietch } from "./sietch";
 import { Ground } from "./ground";
 import { Catchbasin } from "./catchbasin";
@@ -101,8 +101,13 @@ export class World {
         return {
             sietchZone: this.sietchZone,
             clock: this.clock,
+            sideWalls : {
+                [-1] : this.getLastSietchWall(-1),
+                [1]: this.getLastSietchWall(1),
+            },
             world: {
                 start: this.leftEnd,
+                center:this.center,
                 end: this.rightEnd
             }
         }
@@ -180,6 +185,14 @@ export class World {
 
     get availableFremens(): Fremen[] {
         return this.fremens.filter((fremen: Fremen) => fremen.toolTargeted === undefined)
+    }
+
+    getHuntersBySides(side:Side):Hunter[]{
+        return this.hunters.filter((hunter:Hunter) => hunter.assignedSide === side)
+    }
+
+    get sideWithLessHunter():Side {
+        return this.getHuntersBySides(-1).length < this.getHuntersBySides(1).length ? -1 : 1;
     }
 
     private getLastSietchWall(direction: Direction): Wall {
@@ -289,7 +302,7 @@ export class World {
                 this.fremens = this.fremens.filter((f: Fremen) => f !== fremen);
                 switch (fremen.toolTargeted.type) {
                     case "maula-pistol":
-                        this.hunters.push(new Hunter(fremen.hitbox.x + (fremen.hitbox.width / 2), fremen.hitbox.y, fremen.worldContext))
+                        this.hunters.push(new Hunter(fremen.hitbox.x + (fremen.hitbox.width / 2), fremen.hitbox.y, this.sideWithLessHunter, fremen.worldContext))
                         break
                     default:
                         this.workers.push(new Worker(fremen.hitbox.x + (fremen.hitbox.width / 2), fremen.hitbox.y, fremen.worldContext))

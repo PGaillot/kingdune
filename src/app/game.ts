@@ -45,10 +45,12 @@ export class Game {
   }
 
   private get hitboxObjects(): HitboxObject[] {
+    // const huntZones:{hitbox:Hitbox}[] = this.world.hunters.map((hunter:Hunter) => ({hitbox:hunter.huntZone}));
     return [
-      this.world.sietch,
-      { hitbox: this.world.sietchZone },
-      // ...this.world.walls
+      // this.world.sietch,
+      // { hitbox: this.world.sietchZone },
+      // ...this.world.walls,
+      // ...huntZones
     ]
   }
 

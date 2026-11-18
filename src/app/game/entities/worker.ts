@@ -6,7 +6,6 @@ import { Purse } from "./purse";
 
 const DEFAULT_OPTIONS: Partial<CharacterOptions> = { color: 'green' }
 
-
 export class Worker extends Npc<'build' | 'repair' | 'dig'> {
 
     task: Workable | undefined;
@@ -23,7 +22,6 @@ export class Worker extends Npc<'build' | 'repair' | 'dig'> {
         if (this.task === undefined) return;
         this.task.workChargeLeft -= this.workForce * deltaSeconds;
         if (this.task.workChargeLeft <= 0) this.task = undefined;
-
     }
 
     override update(deltaSeconds: Second): void {

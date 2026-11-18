@@ -8,6 +8,7 @@ export type KeyboardKey = KeyboardEvent['code'];
 
 /** -1 = gauche, 0 = immobile, 1 = droite */
 export type Direction = -1 | 0 | 1;
+export type Side = Exclude<Direction, 0> 
 
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
