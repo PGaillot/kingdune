@@ -4,7 +4,9 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH, WORLD_RADIUS } from './game/config';
 import { PlayerCharacter } from './game/entities/player-character';
 import { InputManager } from './game/input-manager';
 import { PlayerController } from './game/entities/player-controller';
-import { drawHitbox, Hitbox } from './hitbox';
+import { Hitbox } from './hitbox';
+import { PurseCharacter } from './game/entities/purse';
+import {  drawDebugWaterringsCount, drawDebugHitbox } from './debug';
 
 type HitboxObject = { hitbox: Hitbox };
 
@@ -34,6 +36,7 @@ export class Game {
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
   private readonly hitboxDebug: boolean = true;
+  private readonly waterringsCountDebug:boolean = true;
 
   // player
   get player(): PlayerCharacter {
@@ -69,9 +72,17 @@ export class Game {
     this.world.draw(this.ctx, this.camera);
 
     // HITBOX DEBUG
-    if (this.hitboxDebug)
-      this.hitboxObjects.forEach((object: HitboxObject) => {
-        drawHitbox(this.ctx, this.camera, object.hitbox)
+    if (this.hitboxDebug) {
+        this.hitboxObjects.forEach((object: HitboxObject) => {
+        drawDebugHitbox(this.ctx, this.camera, object.hitbox)
       })
+    }
+
+    if(this.waterringsCountDebug){
+        this.world.purseCharacters.forEach((character:PurseCharacter) => {
+          drawDebugWaterringsCount(this.ctx, this.camera, character)
+      })
+    }
+        
   }
 }
