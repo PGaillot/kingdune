@@ -1,8 +1,8 @@
 import { GameMeter, Second } from "../config";
-import { Tool } from "./buildings/shop";
 import { CharacterOptions } from "./character";
 import { Npc, WorldContext } from "./npc";
 import { Purse } from "./purse";
+import { Tool } from "./tool";
 
 const DEFAULT_FREMEN_OPTION: Partial<CharacterOptions> = {
     color: 'cadetblue',

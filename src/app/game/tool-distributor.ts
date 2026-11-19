@@ -1,6 +1,6 @@
 import { centerX } from "../hitbox";
-import { Tool } from "./entities/buildings/shop";
 import { Fremen } from "./entities/fremen";
+import { Tool } from "./entities/tool";
 
 /** Distribue les Tools au Fremen */
 export function toolsDistributor(availableTools: Tool[], availableFremens: Fremen[]): void {
