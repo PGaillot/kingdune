@@ -174,7 +174,7 @@ export class World {
     }
 
     get workables(): Workable[] {
-        return [...this.catchbasins]
+        return [...this.catchbasins, ...this.walls]
     }
 
     get availableTools(): Tool[] {
@@ -251,6 +251,11 @@ export class World {
                 this.createCollectible(reward)
             }
             return !completeCatchbasin
+        })
+
+        this.walls.forEach((wall: Wall) => {
+            const completeWall: boolean = wall.workChargeLeft <= 0 && wall.workInProgress;
+            if (completeWall) wall.complete();
         })
 
         this.collectibles.forEach((collectible: Collectible) => {
