@@ -24,11 +24,12 @@ import { Pyon } from "../entities/pyon";
 import { Celestial } from "../entities/celestial";
 import { Fremen } from "../entities/fremen";
 import type { PurseCharacter } from "../entities/purse";
-import { Shop, Tool } from "../entities/buildings/shop";
+import { Shop } from "../entities/buildings/shop";
 import { taskDistributor } from "../task-distributor";
 import { toolsDistributor } from "../tool-distributor";
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Bush } from "../entities/bush";
+import { Tool } from "../entities/tool";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
