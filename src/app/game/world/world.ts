@@ -101,13 +101,13 @@ export class World {
         return {
             sietchZone: this.sietchZone,
             clock: this.clock,
-            sideWalls : {
-                [-1] : this.getLastSietchWall(-1),
+            sideWalls: {
+                [-1]: this.getLastSietchWall(-1),
                 [1]: this.getLastSietchWall(1),
             },
             world: {
                 start: this.leftEnd,
-                center:this.center,
+                center: this.center,
                 end: this.rightEnd
             }
         }
@@ -187,11 +187,11 @@ export class World {
         return this.fremens.filter((fremen: Fremen) => fremen.toolTargeted === undefined)
     }
 
-    getHuntersBySides(side:Side):Hunter[]{
-        return this.hunters.filter((hunter:Hunter) => hunter.assignedSide === side)
+    getHuntersBySides(side: Side): Hunter[] {
+        return this.hunters.filter((hunter: Hunter) => hunter.assignedSide === side)
     }
 
-    get sideWithLessHunter():Side {
+    get sideWithLessHunter(): Side {
         return this.getHuntersBySides(-1).length < this.getHuntersBySides(1).length ? -1 : 1;
     }
 
@@ -274,11 +274,11 @@ export class World {
 
         this.player.update(deltaSeconds)
 
-        this.bushes.forEach((bush:Bush) => {
+        this.bushes.forEach((bush: Bush) => {
             bush.updateWorldContext(this.worldContext)
-            const muaddibsCreatedCount:number = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attachAt === bush).length
+            const muaddibsCreatedCount: number = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attachAt === bush).length
             const muaddib: Muaddib | undefined = bush.update(deltaSeconds, muaddibsCreatedCount);
-            if(muaddib) this.muaddibs.push(muaddib);
+            if (muaddib) this.muaddibs.push(muaddib);
         })
 
         this.workers.forEach((worker: Worker) => {
@@ -297,7 +297,6 @@ export class World {
             const pyon: Pyon | undefined = pyonsCamp.update(deltaSeconds);
             if (pyon) this.pyons.push(pyon);
         })
-
 
         this.fremens.forEach((fremen: Fremen) => {
             fremen.updateWorldContexte(this.worldContext);

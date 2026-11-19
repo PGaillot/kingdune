@@ -31,27 +31,41 @@ export class Catchbasin implements Purchasable, Workable {
     readonly options: CatchbasinOptions;
 
     private width: GameMeter = 1;
+
     private height: GameMeter = 2;
-    get workerRequired(): number {
-        return this.marked ? 1 : 0;
-    };
-
-    public readonly price: number = 1; // le prix qu'il en coute en WaterRing pour la fouiller et la faire disparaitre.
-
-    constructor(readonly x: GameMeter, option?: Partial<CatchbasinOptions>) {
-        this.options = { ...DEFAULT_CATCHBASIN_OPTION, ...option }
-    }
 
     private initialWorkCharge: number = 2.5;
 
-    workChargeLeft: number = this.initialWorkCharge;
-    public requestedAt: number | undefined = undefined;
+    public readonly price: number = 1; // le prix qu'il en coute en WaterRing pour la fouiller et la faire disparaitre.
 
+    workChargeLeft: number = this.initialWorkCharge;
+
+    public requestedAt: number | undefined = undefined;
 
     private get marked(): boolean {
         return this.requestedAt !== undefined
     };
 
+    get currentPrice(): number | undefined {
+        return this.marked ? undefined : this.price;
+    }
+
+    get workerRequired(): number {
+        return this.marked ? 1 : 0;
+    };
+
+    public get hitbox(): Hitbox {
+        return {
+            height: this.height,
+            width: this.width,
+            x: this.x - (this.width / 2),
+            y: GROUND
+        }
+    };
+
+    constructor(readonly x: GameMeter, option?: Partial<CatchbasinOptions>) {
+        this.options = { ...DEFAULT_CATCHBASIN_OPTION, ...option }
+    }
 
     complete(): WaterRing[] {
         const randomWaterringNumber: number = Math.floor(Math.random() + 1.5);
@@ -62,18 +76,6 @@ export class Catchbasin implements Purchasable, Workable {
         })
     }
 
-    get currentPrice(): number | undefined {
-        return this.marked ? undefined : this.price;
-    }
-
-    public get hitbox(): Hitbox {
-        return {
-            height: this.height,
-            width: this.width,
-            x: this.x - (this.width / 2),
-            y: GROUND
-        }
-    };
 
     public onPaid(): void {
         this.mark()
