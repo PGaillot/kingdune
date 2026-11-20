@@ -17,13 +17,13 @@ Vous pouvez "jouer" ou plutôt essayer un truc [ICI](https://pgaillot.github.io/
 
 ### Les Touches
 
-| Action            | Touche                                 |
-| ----------------- | -------------------------------------- |
-| droite            | `→` ou `d`                             |
-| gauche            | `←` ou `q`                             |
-| courir            | double appui maintenu sur `→` ou `←`   |
-| lâcher un anneau  | appui court sur `↓` ou `s`             |
-| payer             | appui long sur `↓` ou `s`              |
+| Action           | Touche                               |
+| ---------------- | ------------------------------------ |
+| droite           | `→` ou `d`                           |
+| gauche           | `←` ou `q`                           |
+| courir           | double appui maintenu sur `→` ou `←` |
+| lâcher un anneau | appui court sur `↓` ou `s`           |
+| payer            | appui long sur `↓` ou `s`            |
 
 _Les lettres sont données pour un clavier AZERTY (en QWERTY : `a` à la place de `q`)._
 
@@ -115,6 +115,10 @@ Pendant les travaux :
   <tr align="center" valign="middle"><th>Anneau</th><th>Placeholder</th><th>Taille</th></tr>
   <tr align="center" valign="middle"><td><img src="public/ressources/doc/waterring_1_x2.png" alt="Anneau d'eau"></td><td><img src="public/ressources/doc/waterring_placeholder_1_x2.png" alt="Placeholder d'anneau"></td><td>1 m × 1 m</td></tr>
 </table>
+
+## Les sons
+
+Les sons et tout ce qui peut sortir des haut-parleurs sont réalisés avec un micro de l'amour et des VST par [SeBL4RD](https://github.com/SeBL4RD), encore merci !
 
 ## Development server
 
