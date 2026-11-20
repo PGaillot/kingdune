@@ -82,24 +82,21 @@ export class PlayerCharacter extends Character {
 
     moveWithStamina(askedPace: Pace, direction: Direction, deltaSeconds: Second): void {
         let pace: Pace = askedPace;
-        // on prend la descision
+
         if (this.stamina <= STAMINA_MIN) {
             this.breathless = true
-        }
-
-        if (this.stamina > STAMINA_MIN_FOR_RUN) {
+        } else if (this.stamina > STAMINA_MIN_FOR_RUN) {
             this.breathless = false
         }
 
-        if (pace === 'run' && this.breathless) {
-            pace = 'walk'
-        }
-        // applique le choix
+        if (pace === 'run' && this.breathless) pace = 'walk'
+
         if (pace === "run") {
             this.run(direction, deltaSeconds);
         } else if (pace === "walk") {
             this.walk(direction, deltaSeconds);
         }
+
         this.stamina = clamp(this.stamina + STAMINA_RATE_BY_PACE[pace] * deltaSeconds, STAMINA_MIN, STAMINA_MAX);
     }
 
