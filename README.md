@@ -17,21 +17,26 @@ Vous pouvez "jouer" ou plutôt essayer un truc [ICI](https://pgaillot.github.io/
 
 ### Les Touches
 
-| Action | Touche     |
-| ------ | ---------- |
-| droite | `→` ou `d` |
-| gauche | `←` ou `q` |
-| action | `↓` ou `s` |
+| Action            | Touche                                 |
+| ----------------- | -------------------------------------- |
+| droite            | `→` ou `d`                             |
+| gauche            | `←` ou `q`                             |
+| courir            | double appui maintenu sur `→` ou `←`   |
+| lâcher un anneau  | appui court sur `↓` ou `s`             |
+| payer             | appui long sur `↓` ou `s`              |
+
+_Les lettres sont données pour un clavier AZERTY (en QWERTY : `a` à la place de `q`)._
 
 ### Les Personnages
 
 Pour le moment j'ai pas encore dessiné les personnages en pixels donc :
 
 - Vous jouez le Naïb representé par un rectangle violet.
-- Les rectangle blancs sont des "sans abris"
+- Les rectangle beiges sont des "sans abris"
 - les bleu clair sont des fremens du sietch
 - les verts des ouvriers
 - les noirs des chasseurs
+- les petits gris des muad'dib (souris du désert)
 
 ## Les Batiments
 
@@ -50,12 +55,18 @@ Pour le moment j'ai pas encore dessiné les personnages en pixels donc :
 ### les Murs
 
 <table>
-  <tr align="center" valign="middle"><th>Niveau</th><th>Image</th><th>Prix</th><th>Vie</th><th>Work charge</th></tr>
-  <tr align="center" valign="middle"><td>0</td><td><img src="public/ressources/doc/wall_level_0_x2.png" alt="Mur Level 0"></td><td>0</td><td>0</td><td>0</td></tr>
-  <tr align="center" valign="middle"><td>1</td><td><img src="public/ressources/doc/wall_level_1_x2.png" alt="Mur Level 1"></td><td>1</td><td>10</td><td>1.5</td></tr>
-  <tr align="center" valign="middle"><td>2</td><td><img src="public/ressources/doc/wall_level_2_x2.png" alt="Mur Level 2"></td><td>3</td><td>25</td><td>2.5</td></tr>
-  <tr align="center" valign="middle"><td>3</td><td><img src="public/ressources/doc/wall_level_3_x2.png" alt="Mur Level 3"></td><td>5</td><td>50</td><td>5</td></tr>
+  <tr align="center" valign="middle"><th>Niveau</th><th>Image</th><th>Prix</th><th>Vie</th><th>Work charge</th><th>Workers</th></tr>
+  <tr align="center" valign="middle"><td>0</td><td><img src="public/ressources/doc/wall_level_0_x2.png" alt="Mur Level 0"></td><td>0</td><td>0</td><td>0</td><td>-</td></tr>
+  <tr align="center" valign="middle"><td>1</td><td><img src="public/ressources/doc/wall_level_1_x2.png" alt="Mur Level 1"></td><td>1</td><td>10</td><td>2.5</td><td>2</td></tr>
+  <tr align="center" valign="middle"><td>2</td><td><img src="public/ressources/doc/wall_level_2_x2.png" alt="Mur Level 2"></td><td>3</td><td>25</td><td>5</td><td>2</td></tr>
+  <tr align="center" valign="middle"><td>3</td><td><img src="public/ressources/doc/wall_level_3_x2.png" alt="Mur Level 3"></td><td>5</td><td>50</td><td>10</td><td>2</td></tr>
 </table>
+
+Pendant les travaux :
+
+<p align="center">
+  <img src="public/ressources/doc/wall_work_in_progress_x2.png" alt="Mur en travaux">
+</p>
 
 ### Les Camps de sans-abris
 
