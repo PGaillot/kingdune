@@ -6,7 +6,8 @@ import { InputManager } from './game/input-manager';
 import { PlayerController } from './game/entities/player-controller';
 import { Hitbox } from './hitbox';
 import { PurseCharacter } from './game/entities/purse';
-import {  drawDebugWaterringsCount, drawDebugHitbox } from './debug';
+import { drawDebugWaterringsCount, drawDebugHitbox } from './debug';
+import { AudioManager } from './game/audio-manager';
 
 type HitboxObject = { hitbox: Hitbox };
 
@@ -29,14 +30,15 @@ export class Game {
   private lastTimestamp = 0;
 
   // Monde
-  public readonly world: World = new World(WORLD_RADIUS); // rayon de 40 cases autour de la case centrale, soit 81 cases
 
+  private audioManager: AudioManager = new AudioManager();
   private inputManager: InputManager = new InputManager();
+  public readonly world: World = new World(WORLD_RADIUS, this.audioManager);
   private playerController: PlayerController = new PlayerController(this.inputManager, this.player);
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
   private readonly hitboxDebug: boolean = true;
-  private readonly waterringsCountDebug:boolean = true;
+  private readonly waterringsCountDebug: boolean = true;
 
   // player
   get player(): PlayerCharacter {
@@ -73,16 +75,15 @@ export class Game {
 
     // HITBOX DEBUG
     if (this.hitboxDebug) {
-        this.hitboxObjects.forEach((object: HitboxObject) => {
+      this.hitboxObjects.forEach((object: HitboxObject) => {
         drawDebugHitbox(this.ctx, this.camera, object.hitbox)
       })
     }
 
-    if(this.waterringsCountDebug){
-        this.world.purseCharacters.forEach((character:PurseCharacter) => {
-          drawDebugWaterringsCount(this.ctx, this.camera, character)
+    if (this.waterringsCountDebug) {
+      this.world.purseCharacters.forEach((character: PurseCharacter) => {
+        drawDebugWaterringsCount(this.ctx, this.camera, character)
       })
     }
-        
   }
 }

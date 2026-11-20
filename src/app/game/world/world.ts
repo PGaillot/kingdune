@@ -30,6 +30,7 @@ import { toolsDistributor } from "../tool-distributor";
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Bush } from "../entities/bush";
 import { Tool } from "../entities/tool";
+import { AudioManager, SoundEventType } from "../audio-manager";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -67,7 +68,7 @@ export class World {
      * de gauche de droite et le centre de celui ci.
      * @param radius 
      */
-    constructor(public readonly radius: GameMeter, catchbasinCount: number = 20) {
+    constructor(public readonly radius: GameMeter, public audioManager: AudioManager, catchbasinCount: number = 20) {
         this.clock = new Clock(0)
         this.sun = new Celestial(3, SUN_IMAGE, this.clock, 0)
         this.moon = new Celestial(3, MOON_IMAGE, this.clock, 180)
@@ -260,7 +261,8 @@ export class World {
         })
 
         this.collectibles.forEach((collectible: Collectible) => {
-            collectible.update(deltaSeconds);
+            const soundEvent: SoundEventType | undefined = collectible.update(deltaSeconds);
+            if (soundEvent) this.audioManager.playSoundEvent(soundEvent);
             const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) => {
                 const receiverIsPyon: boolean = character instanceof Pyon;
                 return overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character) && (!receiverIsPyon || collectible.from === this.player)
