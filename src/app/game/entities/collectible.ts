@@ -1,9 +1,10 @@
 import { Hitbox, overlaps } from "../../hitbox";
-import { applyPhysics, PhysicsEventType } from "../physics";
+import { applyPhysics, MIN_BOUNCE_SPEED, PhysicsEvent } from "../physics";
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
+import { GameMeter, GROUND, METER_UNIT, MeterPerSecond, Pixel, ScreenPoint, Second } from "../config";
 import type { PurseCharacter } from "./purse";
-import { SoundEventType } from "../audio-manager";
+import { AudioEvent } from "../audio-manager";
+import { inverseLerp } from "../../utils/inverse-lerp";
 
 export type CollectibleOptions = {
     height: GameMeter,
@@ -20,6 +21,8 @@ const DEFAULT_OPTIONS: CollectibleOptions = {
     purseImageHeight: 0.2,
     purseImageWidth: 0.5,
 }
+
+const MAX_BOUNCE_HIT: MeterPerSecond = 4;
 
 export class Collectible {
 
@@ -52,13 +55,15 @@ export class Collectible {
         return this.vX === 0 && this.vY >= 0;
     }
 
-    update(deltaSeconds: Second): SoundEventType | undefined {
-        const event: PhysicsEventType | undefined = applyPhysics(deltaSeconds, this, GROUND);
-        let soundEvent: SoundEventType | undefined;
+    update(deltaSeconds: Second): AudioEvent | undefined {
+        const event: PhysicsEvent | undefined = applyPhysics(deltaSeconds, this, GROUND);
+        let soundEvent: AudioEvent | undefined;
         if (event !== undefined) {
-            switch (event) {
+            switch (event.type) {
                 case 'hitGround':
-                    soundEvent = 'hitGround'
+                    const hitValue: MeterPerSecond = event.value;
+                    const hitVolume: number = inverseLerp(hitValue, MIN_BOUNCE_SPEED, MAX_BOUNCE_HIT);
+                    soundEvent = { type: 'hitGround', volume: hitVolume }
             }
         }
         if (this.droppedBy === undefined) return soundEvent

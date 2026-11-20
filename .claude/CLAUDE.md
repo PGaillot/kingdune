@@ -230,9 +230,18 @@ deux fois ; `- 1` en trop dans le tirage ; `catch` vide ; `DecodeErrorCallback` 
 fonction) pris pour un type d'erreur. Appris : le **serveur de dev Vite renvoie `index.html` en
 200** pour un fichier absent (SPA fallback) : `response.ok` ne le voit pas, seul le
 `Content-Type` (`text/html`) le trahit. **Restent** : tester le `Content-Type` ; sable et roche
-mélangés dans `hitGround` (le `World` choisira selon le biome) ; volume selon la vitesse du choc
-(le paramètre `volume` existe) ; `catch((error: Error))` (en vrai `unknown`) ; l'avertissement
+mélangés dans `hitGround` (le `World` choisira selon le biome) ; `catch((error: Error))` (en vrai `unknown`) ; l'avertissement
 d'autoplay au démarrage est normal (contexte créé avant le geste).
+**Volume selon le choc (fait, commité le 20/11/2026)** : `applyPhysics()` renvoie un
+`PhysicsEvent` (`{ type, value }`, `value` = `Math.abs(vY)`, vitesse du choc toujours positive) ;
+`Collectible.update()` le traduit en `AudioEvent` (`{ type, volume }`, dans `audio-manager.ts`)
+avec `inverseLerp(valeur, min, max)` (`src/app/utils/inverse-lerp.ts`, normalisation 0 → 1
+bridée par `clamp`) entre `MIN_BOUNCE_SPEED` (exporté de `physics.ts`) et `MAX_BOUNCE_HIT` (4 m/s) ;
+`playSoundEvent(audioEvent)`. Deux types séparés voulus par l'utilisateur (un choc ne fait pas
+forcément un son). Bug rencontré : `vY` négatif au choc → volume bridé à 0, silence. Débattu :
+l'utilisateur garde `value` générique ; conseillé une **union discriminée** (champs nommés par
+type d'événement) au deuxième événement physique (YAGNI d'ici là). Piste : volume au carré
+(perception non linéaire).
 
 **Stamina (faite, commitée le 20/11/2026)** : le contrôleur **demande** une allure (`Pace` =
 `'run' | 'walk' | 'idle'`, dans `config.ts`), `PlayerCharacter.moveWithStamina()` peut la

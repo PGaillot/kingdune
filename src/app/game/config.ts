@@ -15,7 +15,6 @@ export const SCREEN_WIDTH: Pixel = 800;
 export const GROUND: GameMeter = 0;
 export const CENTER: GameMeter = 0;
 
-
 export const WORLD_RADIUS: number = 40;
 export const GRAVITY: number = 9.81 // m/s²
 export const REBOUND_FRICTION: number = 0.4;

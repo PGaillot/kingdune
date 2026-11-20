@@ -7,6 +7,8 @@ const SOUNDS_FILES_URL: string = '/ressources/sound_fx'
 
 export type SoundEventType = 'hitGround'
 
+export type AudioEvent = { type: SoundEventType, volume: number }
+
 const SOUNDS_EVENTS: SoundEvent[] = [
     {
         name: 'hitGround',
@@ -77,11 +79,12 @@ export class AudioManager {
         source.start();
     }
 
-    public playSoundEvent(soundEventType: SoundEventType, volume?: number): void {
+    public playSoundEvent(audioEvent: AudioEvent): void {
+        const soundEventType: SoundEventType = audioEvent.type
         if (this.soundsBuffered[soundEventType] === undefined) return
         const soundCount: number = this.soundsBuffered[soundEventType].length;
         const randomNumber: number = Math.floor(getRandomBetweenMinMax(0, soundCount));
         const audioBuffer: AudioBuffer = this.soundsBuffered[soundEventType][randomNumber];
-        this.playSound(audioBuffer, volume)
+        this.playSound(audioBuffer, audioEvent.volume)
     }
 }

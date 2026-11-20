@@ -7,13 +7,15 @@ export type PhysicsObject = {
     vY: MeterPerSecond
 }
 
+export type PhysicsEvent = { type: PhysicsEventType, value: number }
+
 export type PhysicsEventType = 'hitGround'
 
 /** en m/s Sous cette vitesse (pour un rebond) l'objet s'arrete */
-const MIN_BOUNCE_SPEED: MeterPerSecond = 0.3;
+export const MIN_BOUNCE_SPEED: MeterPerSecond = 0.3;
 
-export function applyPhysics(deltaSeconds: Second, object: PhysicsObject, limitY: GameMeter): PhysicsEventType | undefined {
-    let event: PhysicsEventType | undefined;
+export function applyPhysics(deltaSeconds: Second, object: PhysicsObject, limitY: GameMeter): PhysicsEvent | undefined {
+    let event: PhysicsEvent | undefined;
 
     object.vY -= GRAVITY * deltaSeconds;
     object.y += (object.vY * deltaSeconds);
@@ -23,7 +25,7 @@ export function applyPhysics(deltaSeconds: Second, object: PhysicsObject, limitY
             object.vY = 0;
             object.vX = 0;
         } else {
-            event = 'hitGround'
+            event = { type: 'hitGround', value: Math.abs(object.vY) }
             object.vY = -object.vY * REBOUND_FRICTION;
             object.vX = object.vX * REBOUND_FRICTION;
         }

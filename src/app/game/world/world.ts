@@ -30,7 +30,7 @@ import { toolsDistributor } from "../tool-distributor";
 import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Bush } from "../entities/bush";
 import { Tool } from "../entities/tool";
-import { AudioManager, SoundEventType } from "../audio-manager";
+import { AudioEvent, AudioManager } from "../audio-manager";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -261,8 +261,8 @@ export class World {
         })
 
         this.collectibles.forEach((collectible: Collectible) => {
-            const soundEvent: SoundEventType | undefined = collectible.update(deltaSeconds);
-            if (soundEvent) this.audioManager.playSoundEvent(soundEvent);
+            const audioEvent: AudioEvent | undefined = collectible.update(deltaSeconds);
+            if (audioEvent) this.audioManager.playSoundEvent(audioEvent);
             const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) => {
                 const receiverIsPyon: boolean = character instanceof Pyon;
                 return overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character) && (!receiverIsPyon || collectible.from === this.player)
