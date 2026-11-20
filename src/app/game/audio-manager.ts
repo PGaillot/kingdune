@@ -1,7 +1,7 @@
 import { getRandomBetweenMinMax } from "../utils/random.utils";
 
-export type SoundEvent = { name: SoundEventType, url: { folderName: string, filesName: string[] } }
-export type SoundBuffered = Partial<Record<string, { fileName: string, buffer: AudioBuffer[] }>>
+export type SoundEvent = { name: SoundEventType, folder: { name: string, filesName: string[] } }
+export type SoundBuffered = Partial<Record<SoundEventType, AudioBuffer[]>>
 
 const SOUNDS_FILES_URL: string = '/ressources/sound_fx'
 
@@ -10,8 +10,8 @@ export type SoundEventType = 'hitGround'
 const SOUNDS_EVENTS: SoundEvent[] = [
     {
         name: 'hitGround',
-        url: {
-            folderName: 'waterring',
+        folder: {
+            name: 'waterring',
             filesName: [
                 'waterring_impact_sand_0.mp3',
                 'waterring_impact_sand_1.mp3',
@@ -37,17 +37,24 @@ export class AudioManager {
          * et en joue un au hasard si il y en à plusieurs.
          */
         SOUNDS_EVENTS.forEach((soundEvent: SoundEvent) => {
-            soundEvent.url.filesName.forEach((fileName: string) => {
-                this.loadSound(this.createSoundUrl(soundEvent.url.folderName, fileName)).
+            soundEvent.folder.filesName.forEach((fileName: string) => {
+                const soundUrl: string = this.createSoundUrl(soundEvent.folder.name, fileName)
+                this.loadSound(soundUrl).
                     then((audioBuffer: AudioBuffer) => {
                         const soundEventName: SoundEventType = soundEvent.name
                         if (!this.soundsBuffered[soundEventName]) {
-                            this.soundsBuffered[soundEventName] = { fileName, buffer: [] }
+                            this.soundsBuffered[soundEventName] = []
                         }
-                        this.soundsBuffered[soundEvent.name] = { fileName, buffer: [...this.soundsBuffered[soundEvent.name]!.buffer, audioBuffer] }
-                    })
+                        this.soundsBuffered[soundEventName].push(audioBuffer)
+                    }).
+                    catch(console.error)
             })
         })
+    }
+
+    public audioResume(): void {
+        if (AUDIO_MIX.state === "suspended")
+            AUDIO_MIX.resume().catch(console.warn);
     }
 
     private createSoundUrl(folderName: string, fileName: string): string {
@@ -55,25 +62,26 @@ export class AudioManager {
     }
 
     private async loadSound(url: string): Promise<AudioBuffer> {
-        const reponse = await fetch(url);
-        const octets = await reponse.arrayBuffer();
-        return AUDIO_MIX.decodeAudioData(octets);
+        const reponse: Response = await fetch(url);
+        if (!reponse.ok) throw new Error(`status ${reponse.status} : ${url} have problem.`)
+        const octets: ArrayBuffer = await reponse.arrayBuffer();
+        return AUDIO_MIX.decodeAudioData(octets)
     }
 
     private playSound(sound: AudioBuffer, volume: number = 1) {
         const source: AudioBufferSourceNode = AUDIO_MIX.createBufferSource();
         source.buffer = sound;
-        const gainOptions = AUDIO_MIX.createGain();
-        gainOptions.gain.value = volume;
-        source.connect(gainOptions).connect(AUDIO_MIX.destination);
+        const nodeVolume = AUDIO_MIX.createGain();
+        nodeVolume.gain.value = volume;
+        source.connect(nodeVolume).connect(AUDIO_MIX.destination);
         source.start();
     }
 
     public playSoundEvent(soundEventType: SoundEventType, volume?: number): void {
         if (this.soundsBuffered[soundEventType] === undefined) return
-        const soundCount: number = this.soundsBuffered[soundEventType].buffer.length;
+        const soundCount: number = this.soundsBuffered[soundEventType].length;
         const randomNumber: number = Math.floor(getRandomBetweenMinMax(0, soundCount));
-        const audioBuffer: AudioBuffer = this.soundsBuffered[soundEventType].buffer[randomNumber];
+        const audioBuffer: AudioBuffer = this.soundsBuffered[soundEventType][randomNumber];
         this.playSound(audioBuffer, volume)
     }
 }

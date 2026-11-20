@@ -21,7 +21,7 @@ export class Game {
     this.ctx = ctx;
 
 
-    window.addEventListener('keydown', (event: KeyboardEvent) => this.inputManager.inputPress(event));
+    window.addEventListener('keydown', (event: KeyboardEvent) => { this.inputManager.inputPress(event); this.audioManager.audioResume() });
     window.addEventListener('keyup', (event: KeyboardEvent) => this.inputManager.inputRelease(event));
     window.addEventListener('blur', (event: FocusEvent) => this.inputManager.onBlur());
   }

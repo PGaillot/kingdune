@@ -206,6 +206,34 @@ chaque sous-classe a sa constante de défauts hors de la classe, `Npc` relaie la
 `PlayerController` : une direction, puis `run()` **ou** `walk()`. Course au double tap OK.
 Gauche + droite en même temps = arrêt : comportement voulu.
 
+**Sons des anneaux (faits, commités le 20/11/2026)** : `AudioManager`
+(`src/app/game/audio-manager.ts`), **Web Audio API** (choisie d'emblée plutôt que
+`HTMLAudioElement` : un seul `Audio` partagé ne rejoue pas tant qu'il joue, donc un seul son
+entendu). Un seul manager, possédé par `Game`, passé au constructeur du `World`. Vocabulaire des
+**sound events** (FMOD/Wwise) : le jeu dit `playSoundEvent('hitGround')`, le manager choisit une
+variante au hasard. `SOUNDS_EVENTS` (nom, dossier, fichiers) chargés une fois au démarrage
+(`fetch` → `arrayBuffer` → `decodeAudioData`) dans `soundsBuffered`
+(`Partial<Record<SoundEventType, AudioBuffer[]>>`) ; un `AudioBufferSourceNode` + `GainNode` neuf
+par son (sons superposés). `AUDIO_MIX` (l'`AudioContext`) reste une constante du module (déjà
+privée au fichier, passage en champ jugé inutile). Chaîne d'événements comme `complete()` :
+`applyPhysics()` **renvoie** `'hitGround' | undefined` (seulement dans la branche du vrai rebond,
+pas au repos), `Collectible.update()` le traduit en `SoundEventType` et le renvoie, le `World`
+appelle le manager. `audioResume()` appelé sur `keydown` dans `Game` (règle anti-autoplay ; seul
+`keydown` compte comme geste, pas `keyup`/`blur` ; Chrome ne relance pas tout seul).
+`loadSound()` lance sa propre erreur si `!response.ok`, le `catch` l'affiche. Bugs rencontrés :
+son joué dans `draw()` à chaque frame ; `this.x >= 0` pris pour « au sol » ; événement à chaque
+frame au repos (la gravité repasse sous le sol) ; un `AudioManager` par anneau ;
+`.fileName.length` (lettres du nom) au lieu du nombre de sons ; `return` qui sautait le
+`return soundEvent` ; `!` + `?? []` après l'accès (plante quand même) ; `.buffer` resté après
+le changement de type (Vite ne vérifie pas les types : lancer `tsc`) ; `applyPhysics()` appelé
+deux fois ; `- 1` en trop dans le tirage ; `catch` vide ; `DecodeErrorCallback` (type de
+fonction) pris pour un type d'erreur. Appris : le **serveur de dev Vite renvoie `index.html` en
+200** pour un fichier absent (SPA fallback) : `response.ok` ne le voit pas, seul le
+`Content-Type` (`text/html`) le trahit. **Restent** : tester le `Content-Type` ; sable et roche
+mélangés dans `hitGround` (le `World` choisira selon le biome) ; volume selon la vitesse du choc
+(le paramètre `volume` existe) ; `catch((error: Error))` (en vrai `unknown`) ; l'avertissement
+d'autoplay au démarrage est normal (contexte créé avant le geste).
+
 **Stamina (faite, commitée le 20/11/2026)** : le contrôleur **demande** une allure (`Pace` =
 `'run' | 'walk' | 'idle'`, dans `config.ts`), `PlayerCharacter.moveWithStamina()` peut la
 **refuser**. `stamina` et `breathless` en `private`. **Hystérésis** : essoufflé à
