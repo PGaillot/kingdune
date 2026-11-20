@@ -3,7 +3,7 @@ import { getRandomBetweenMinMax } from "../utils/random.utils";
 export type SoundEvent = { name: SoundEventType, folder: { name: string, filesName: string[] } }
 export type SoundBuffered = Partial<Record<SoundEventType, AudioBuffer[]>>
 
-const SOUNDS_FILES_URL: string = '/ressources/sound_fx'
+const SOUNDS_FILES_URL: string = 'ressources/sound_fx'
 
 export type SoundEventType = 'hitGround'
 
