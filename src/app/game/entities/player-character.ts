@@ -9,9 +9,9 @@ import { Collectible } from "./collectible";
 import { Purse } from "./purse";
 import { PurseHUD } from "./purse-hud";
 
-const STAMINA_MAX: number = 10;
+const STAMINA_MAX: number = 5;
 const STAMINA_MIN: number = 0;
-const STAMINA_MIN_FOR_RUN = 3;
+const STAMINA_MIN_FOR_RUN = 2;
 
 
 const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
@@ -32,7 +32,8 @@ export class PlayerCharacter extends Character {
     purse: Purse = new Purse();
     public target: Purchasable | undefined;
     private purseHUD: PurseHUD;
-    stamina: number = STAMINA_MAX;
+    private stamina: number = STAMINA_MAX;
+    private breathless: boolean = false;
 
     constructor(
         x: GameMeter,
@@ -81,20 +82,25 @@ export class PlayerCharacter extends Character {
 
     moveWithStamina(askedPace: Pace, direction: Direction, deltaSeconds: Second): void {
         let pace: Pace = askedPace;
-        console.log(this.stamina)
-
-        if (pace === 'run' && this.stamina > STAMINA_MIN_FOR_RUN) {
-            pace = 'run'
-        } else {
-            pace = 'walk'
+        // on prend la descision
+        if (this.stamina <= STAMINA_MIN) {
+            this.breathless = true
         }
 
+        if (this.stamina > STAMINA_MIN_FOR_RUN) {
+            this.breathless = false
+        }
+
+        if (pace === 'run' && this.breathless) {
+            pace = 'walk'
+        }
+        // applique le choix
+        if (pace === "run") {
+            this.run(direction, deltaSeconds);
+        } else if (pace === "walk") {
+            this.walk(direction, deltaSeconds);
+        }
         this.stamina = clamp(this.stamina + STAMINA_RATE_BY_PACE[pace] * deltaSeconds, STAMINA_MIN, STAMINA_MAX);
-
-
-        if (pace === 'run') this.run(direction, deltaSeconds)
-        if (pace === 'walk') this.walk(direction, deltaSeconds)
-
     }
 
     override draw(ctx: CanvasRenderingContext2D, camera: Camera): void {

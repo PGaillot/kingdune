@@ -206,6 +206,18 @@ chaque sous-classe a sa constante de défauts hors de la classe, `Npc` relaie la
 `PlayerController` : une direction, puis `run()` **ou** `walk()`. Course au double tap OK.
 Gauche + droite en même temps = arrêt : comportement voulu.
 
+**Stamina (faite, commitée le 20/11/2026)** : le contrôleur **demande** une allure (`Pace` =
+`'run' | 'walk' | 'idle'`, dans `config.ts`), `PlayerCharacter.moveWithStamina()` peut la
+**refuser**. `stamina` et `breathless` en `private`. **Hystérésis** : essoufflé à
+`STAMINA_MIN` (0), plus essoufflé au-dessus de 2 ; essoufflé + course demandée → marche.
+`STAMINA_RATE_BY_PACE` (`Record<Pace, number>`, par seconde) et `clamp()`
+(`src/app/utils/clamp.ts`). `breathless` est stocké car il ne se déduit pas de la stamina (un
+souvenir, comme l'orientation). Bugs rencontrés : alternance course/marche autour d'un seul
+seuil ; `if (pace = "run")` ; `return` qui sautaient la mise à jour de la stamina. Signalés, pas
+réglés : `STAMINA_MIN_FOR_RUN` est devenu un seuil de récupération (nom trompeur) ;
+`update(deltaSeconds: number)` au lieu de `Second`. Piste de design : rendre l'essoufflement
+visible (marche plus lente, arrêt) pour que la règle se comprenne sans texte.
+
 **Ramassage et dépôt (fait)** : `overlaps(a, b)` dans `src/app/hitbox.ts` (AABB écrite à la main,
 X et Y) ; `hitbox` en **getter** sur `Character` et `Collectible` (recalculée à chaque lecture).
 `Collectible` a ses options (`width`, `height`, `color`), `x`/`y`, `draw()` (remonté depuis
