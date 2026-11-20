@@ -1,12 +1,18 @@
 import { centerX, overlaps } from "../../hitbox";
+import { clamp } from "../../utils/clamp";
 import { Camera } from "../camera";
-import { GameMeter } from "../config";
+import { Direction, GameMeter, Pace, Second } from "../config";
 import { Purchasable } from "../interfaces/purchasable";
 import { World } from "../world/world";
 import { Character, CharacterOptions } from "./character";
 import { Collectible } from "./collectible";
 import { Purse } from "./purse";
 import { PurseHUD } from "./purse-hud";
+
+const STAMINA_MAX: number = 10;
+const STAMINA_MIN: number = 0;
+const STAMINA_MIN_FOR_RUN = 3;
+
 
 const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
     width: 1,
@@ -16,11 +22,17 @@ const DEFAULT_OPTIONS: Partial<CharacterOptions> = {
     runFactor: 1.9,
 }
 
+const STAMINA_RATE_BY_PACE: StaminaRates = { 'idle': 1, 'walk': 0.6, 'run': -0.8 }
+
+
+export type StaminaRates = Record<Pace, number>;
+
 export class PlayerCharacter extends Character {
 
     purse: Purse = new Purse();
     public target: Purchasable | undefined;
     private purseHUD: PurseHUD;
+    stamina: number = STAMINA_MAX;
 
     constructor(
         x: GameMeter,
@@ -32,6 +44,8 @@ export class PlayerCharacter extends Character {
         super(x, y, worldStart, worldEnd, { ...DEFAULT_OPTIONS, ...options });
         this.purseHUD = new PurseHUD(this.purse);
     }
+
+
 
     dropCollectible(world: World): void {
         const collectible: Collectible | undefined = this.purse.remove();
@@ -63,6 +77,24 @@ export class PlayerCharacter extends Character {
             }
             this.target.onPaid();
         }
+    }
+
+    moveWithStamina(askedPace: Pace, direction: Direction, deltaSeconds: Second): void {
+        let pace: Pace = askedPace;
+        console.log(this.stamina)
+
+        if (pace === 'run' && this.stamina > STAMINA_MIN_FOR_RUN) {
+            pace = 'run'
+        } else {
+            pace = 'walk'
+        }
+
+        this.stamina = clamp(this.stamina + STAMINA_RATE_BY_PACE[pace] * deltaSeconds, STAMINA_MIN, STAMINA_MAX);
+
+
+        if (pace === 'run') this.run(direction, deltaSeconds)
+        if (pace === 'walk') this.walk(direction, deltaSeconds)
+
     }
 
     override draw(ctx: CanvasRenderingContext2D, camera: Camera): void {

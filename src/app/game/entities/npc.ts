@@ -10,11 +10,11 @@ export type NpcState = 'idle' | 'escape';
 
 export type WorldContext = {
     readonly sietchZone: Hitbox,
-    readonly sideWalls:Record<Side, Wall>,
+    readonly sideWalls: Record<Side, Wall>,
     readonly clock: Clock,
     readonly world: {
         start: GameMeter,
-        center:GameMeter,
+        center: GameMeter,
         end: GameMeter
     }
 }

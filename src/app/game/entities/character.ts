@@ -1,4 +1,5 @@
 import { Hitbox } from "../../hitbox";
+import { clamp } from "../../utils/clamp";
 import { Camera } from "../camera";
 import { GameMeter, METER_UNIT, ScreenPoint, Second } from "../config";
 import { Direction } from "../config";
@@ -50,7 +51,7 @@ export class Character {
   protected move(direction: Direction, speed: number, deltaSeconds: Second): void {
     const next: GameMeter = this.x + direction * speed * deltaSeconds;
     const haflCharacter: GameMeter = this.hitbox.width / 2;
-    this.x = Math.min(Math.max(next, this.worldStart + haflCharacter), this.worldEnd - haflCharacter);
+    this.x = clamp(next, this.worldStart + haflCharacter, this.worldEnd - haflCharacter)
   };
 
   walk(direction: Direction, deltaSeconds: Second): void {

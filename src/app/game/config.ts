@@ -8,7 +8,7 @@ export type KeyboardKey = KeyboardEvent['code'];
 
 /** -1 = gauche, 0 = immobile, 1 = droite */
 export type Direction = -1 | 0 | 1;
-export type Side = Exclude<Direction, 0> 
+export type Side = Exclude<Direction, 0>
 
 export const SCREEN_HEIGHT: Pixel = 450;
 export const SCREEN_WIDTH: Pixel = 800;
@@ -19,6 +19,8 @@ export const CENTER: GameMeter = 0;
 export const WORLD_RADIUS: number = 40;
 export const GRAVITY: number = 9.81 // m/s²
 export const REBOUND_FRICTION: number = 0.4;
+
+export type Pace = 'run' | 'walk' | 'idle';
 
 /** Un point dans le monde du jeu, en mètres. Le sol est à y = 0 et la hauteur monte. */
 export type WorldPoint = { x: GameMeter, y: GameMeter }
