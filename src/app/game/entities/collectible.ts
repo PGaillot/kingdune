@@ -1,8 +1,10 @@
 import { Hitbox, overlaps } from "../../hitbox";
-import { applyPhysics } from "../physics";
+import { applyPhysics, PhysicsEventType } from "../physics";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, Pixel, ScreenPoint, Second } from "../config";
 import type { PurseCharacter } from "./purse";
+
+const WATERRING_HITGROUND_SOUND: HTMLAudioElement = new Audio('/ressources/sound_fx/waterring/waterring_impact_sand_0.mp3');
 
 export type CollectibleOptions = {
     height: GameMeter,
@@ -11,6 +13,9 @@ export type CollectibleOptions = {
     purseImage?: HTMLImageElement,
     purseImageHeight: GameMeter,
     purseImageWidth: GameMeter,
+    sounds: {
+        hitGroundSounds: HTMLAudioElement
+    }
 }
 
 const DEFAULT_OPTIONS: CollectibleOptions = {
@@ -18,6 +23,9 @@ const DEFAULT_OPTIONS: CollectibleOptions = {
     width: 1,
     purseImageHeight: 0.2,
     purseImageWidth: 0.5,
+    sounds: {
+        hitGroundSounds: WATERRING_HITGROUND_SOUND
+    }
 }
 
 export class Collectible {
@@ -53,6 +61,10 @@ export class Collectible {
 
     update(deltaSeconds: Second): void {
         applyPhysics(deltaSeconds, this, GROUND)
+        const event: { event: PhysicsEventType } | undefined = applyPhysics(deltaSeconds, this, GROUND);
+        if (event !== undefined) {
+            this.options.sounds.hitGroundSounds.play();
+        }
         if (this.droppedBy === undefined) return
         const isOverlap: boolean = overlaps(this.hitbox, this.droppedBy.hitbox);
         if (!isOverlap) this.droppedBy = undefined;
