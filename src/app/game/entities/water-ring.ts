@@ -10,6 +10,11 @@ const WATERRING_OPTIONS: Partial<CollectibleOptions> = {
     image: WATERRING_IMAGE
 }
 
+/**
+ * La Monnaie, des anneaux d'eau.
+ * Pratique comme monnaie d'echange quand on vit sur Arakis.
+ * ils ont une petite physique, et peuvent meme faire un petit bruit sympa quand ils tombent.
+ */
 export class WaterRing extends Collectible {
     constructor(x: GameMeter, y: GameMeter, options?: Partial<CollectibleOptions>) {
         super(x, y, { ...WATERRING_OPTIONS, ...options })

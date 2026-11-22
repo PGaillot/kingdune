@@ -12,6 +12,12 @@ export type ToolOption = {
     image: HTMLImageElement,
 }
 
+/**
+ * Les Outils sont en vente dans les magasins, et cette classe permet de créer des outils.
+ * une fois qu'un magasin dispose d'un outil, un fremen va venir le chercher et tranformera ce fremen
+ * en l'employé correspondant. (la reparition des metier se passe dans {@link toolsDistributor},
+ *  et la tranfomation en metier se passe dans l'upadate du fremen dans World)
+ */
 export class Tool {
 
     constructor(private x: GameMeter, private y: GameMeter, private options: ToolOption, private createdBy: Shop) { }

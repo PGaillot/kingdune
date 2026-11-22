@@ -10,6 +10,14 @@ const SECONDS_BETWEEN_PYON_CREATION: number = 60;
 const PYON_CAMP_IMAGE: HTMLImageElement = new Image();
 PYON_CAMP_IMAGE.src = 'ressources/pyons_camp/pyons-camp.png'
 
+
+/**
+ * C'est un lieu / batiment un peu spécial mais important dans le jeu, 
+ * il fait apparaitre à un rythme régulier 1 Pyon toute les *SECONDS_BETWEEN_PYON_CREATION* secondes,
+ * tant que son maximum de *MAX_PYONS* n'est pas atteint.
+ * TODO: le nombre de pyon camp doit etre definit à l'avance dans le niveau car il impacte beaucoup la difficulté de celui-ci.
+ * TODO: Les Camps ne peuvent être actif (généré des pyons), que si il sont dans le biome Dune, si le biome sous celui ci change, le camps se détruit.
+ */
 export class PyonsCamp {
 
     height: GameMeter = 3;

@@ -4,6 +4,12 @@ import { Biome } from "./biomes/biome";
 import { RockBiome } from "./biomes/rock.biome";
 import { DuneBiome } from "./biomes/dune.biome";
 
+
+/**
+ * Le Sol c'est ce qui permet ne pas tomber vers le centre de la terre.
+ * Ici il sert aussi à repartir les biomes même si c'est pas vraiment 
+ * correctement implémenté.
+ */
 export class Ground {
 
     private borderWidth: GameMeter = 5;
@@ -11,7 +17,6 @@ export class Ground {
     thickness: GameMeter = 0.2;
     color: string = 'chocolate';
     groundGrid: Biome[] = [];
-
 
     constructor(private leftEnd: GameMeter, cellCount: number) {
         for (let i = 0; i < cellCount; i++) {

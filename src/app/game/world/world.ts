@@ -41,6 +41,14 @@ const HAMMER_IMAGE: HTMLImageElement = new Image();
 HAMMER_IMAGE.src = 'ressources/tools/hammer.png';
 const MAULA_PISTOL_IMAGE: HTMLImageElement = new Image();
 MAULA_PISTOL_IMAGE.src = 'ressources/tools/maula-pistol.png';
+
+/**
+ * La classe pour contruire le Monde,
+ * donc le terrain et tout ce que le monde contient,
+ * elle prend une Largeur, et retourne la fin
+ * de gauche de droite et le centre de celui ci.
+ * @param radius 
+ */
 export class World {
     clock: Clock;
     readonly player: PlayerCharacter;
@@ -63,11 +71,6 @@ export class World {
 
     bushes: Bush[] = [];
 
-    /**
-     * La classe pour contruire le Terrain, elle prend une Largeur, et retourne la fin
-     * de gauche de droite et le centre de celui ci.
-     * @param radius 
-     */
     constructor(public readonly radius: GameMeter, public audioManager: AudioManager, catchbasinCount: number = 20) {
         this.clock = new Clock(0)
         this.sun = new Celestial(3, SUN_IMAGE, this.clock, 0)

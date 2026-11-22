@@ -6,6 +6,12 @@ import { Purchasable } from "../interfaces/purchasable";
 const SIETCH_IMAGE_LVL_0: HTMLImageElement = new Image();
 SIETCH_IMAGE_LVL_0.src = 'ressources/sietch/sietch_level_0.png'
 
+
+/**
+ * Le Batiment principale, c'est le centre de notre village
+ * et permet d'améliorer celui-ci, chaque amélioration coute des
+ * watering.
+ */
 export class Sietch implements Purchasable {
     height: GameMeter = 1;
     width: GameMeter = 3;

@@ -1,7 +1,9 @@
 import { Hitbox } from "../../hitbox"
 import { Camera } from "../camera";
 
-// Interface des trucs 'achetable' pour lesquels on peux claquer des anneaux ! 
+/**
+ * Interface des trucs 'achetable' pour lesquels on peux claquer des Waterring ! 
+ */
 export interface Purchasable {
     hitbox: Hitbox,
     /** si c'est undefied c'est qu'on peux pas l'acheter. (dune deja marqué par exemple) */

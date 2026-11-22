@@ -26,6 +26,14 @@ const DEFAULT_CATCHBASIN_OPTION: CatchbasinOptions = {
     imageWidth: 3
 }
 
+/**
+ * De petit tas de sables qui pourrai etre d'ancienne cache de 
+ * fremens passé par là ! on peux y trouver un peu d'eau.
+ * Lancer une fouille couteras 1 Waterring, et auras une chance d'en produire deux.
+ * dans il en rend au moins 1 (1 chance sur 2 d'avoir 2 pièce rendu pour  une payé.)
+ * @param x la position (centré) du cachebasin en GameMeter
+ * @param options une serie d'option, qui sont facultatives.
+ */
 export class Catchbasin implements Purchasable, Workable {
 
     readonly options: CatchbasinOptions;

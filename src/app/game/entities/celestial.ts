@@ -5,9 +5,10 @@ import { DAY_LENGTH, GameMeter, GROUND, METER_UNIT, Pixel, SCREEN_HEIGHT, SCREEN
 export class Celestial {
 
     /**
-     * La class des Objets céléste, permet de faire des trucs dans le ciels, et de les faires tourner.
+     * La class des Objets céléste, permet de créer des trucs
+     * dans le ciels, et de les faires tourner.
      * trop classe.
-     * @param size 
+     * @param size hauteur et largeur.
      * @param image 
      * @param clock 
      * @param offset le decalage en ° de l'objet céléste (par rapport au soleil)

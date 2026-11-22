@@ -15,6 +15,11 @@ export type PurseItem = {
 
 export const HIDE_PURSE_DELAY: Second = 3 // en secondes.
 
+/**
+ * Version visible de laa bourse, c'est elle qui s'affiche tout en haut de droite 
+ * de la fenêtre de jeu. Elle permet d'avoir une idée approximative de votre 
+ * niveau de richesse dans le jeu.
+ */
 export class PurseHUD {
     purseWidth: GameMeter = 2;
     purseHeight: GameMeter = 3;

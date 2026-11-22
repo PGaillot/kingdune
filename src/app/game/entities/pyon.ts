@@ -11,13 +11,14 @@ const DEFAULT_PYON_OPTIONS: Partial<CharacterOptions> = {
     runFactor: 2.3
 }
 
+
+/**
+ * Le Pyon est un NPC qui apparait de facon régulière au PyonsCamp.
+ * Il n'est pas rataché au sietch, Il reste autour de son camp
+ * en attendant un waterring donnée par le Joueur (uniquement).
+ * Un fois que celui ci à reccuperé un waterring, il se tranforme en fremen.
+ */
 export class Pyon extends Npc {
-
-    // meme si dans absolue il n'y faut qu'une piece pour devenir un FREMEN, faut bien la stocker,
-    // et autant garder la même facon de faire.
-
-    // ou alors faire juste une fonction des qu'il recoit une piece pas besoin de la stoker , il devient direct un fremen.
-    // dans ce cas pas de bou-bourse ... 
     purse: Purse = new Purse();
 
     constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext, public createdBy?: PyonsCamp, options?: Partial<CharacterOptions>) {

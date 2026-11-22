@@ -26,6 +26,14 @@ const WALL_LEVEL: Record<number, { price: number, life: number, workCharge: numb
     3: { price: 5, life: 50, workCharge: 10, image: IMAGE_LVL_3 },
 }
 
+/**
+ * Les Murs on de multiple utilité ils bornent le sietch et protége celui ci.
+ * TODO: La nuit, les hunter se rangent derrière afin de proteger le sietch en tirant sur ses attaquants.
+ * Ils ont plusieurs niveau qui peuvent etre passé si le joureur paye le nombre de waterring correspondant.
+ * le sietch est **toujours** entouré au minimum de 4 murs (deux a droite et deux a gauche).
+ * les mur contruits les plus loins (peu importe leur niveau) de gauche et de droite, definissent la taille du sietch.
+ * si aucun mur n'est construit, alors les deux les plus proche du centre deffinissent le sietch.
+ */
 export class Wall implements Purchasable, Workable {
 
     constructor(public positionX: GameMeter, private level: number = 0) { }

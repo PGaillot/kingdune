@@ -28,6 +28,11 @@ const SOUNDS_EVENTS: SoundEvent[] = [
 
 const AUDIO_MIX: AudioContext = new AudioContext();
 
+
+/**
+ * La getion des sons du projet passe ici.
+ * on les met buffer dans la memoire au lancement du jeu.
+ */
 export class AudioManager {
     private soundsBuffered: SoundBuffered = {}
     constructor() {
