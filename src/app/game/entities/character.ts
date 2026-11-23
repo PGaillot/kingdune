@@ -15,7 +15,7 @@ export type CharacterOptions = {
 const DEFAULT_CHARACTER: CharacterOptions = {
   width: 1,
   height: 2,
-  speed: 1.75,
+  speed: 1.25,
   color: 'red',
   runFactor: 1.85,
 }

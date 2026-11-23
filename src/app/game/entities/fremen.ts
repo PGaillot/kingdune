@@ -6,6 +6,7 @@ import { Tool } from "./tool";
 
 const DEFAULT_FREMEN_OPTION: Partial<CharacterOptions> = {
     color: 'cadetblue',
+    runFactor: 1.5
 }
 
 /** Un Fremen est un Pyon qui a recu une piéce, il attend qu'on lui donne un taff de dispo. */
