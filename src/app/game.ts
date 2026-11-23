@@ -6,10 +6,11 @@ import { InputManager } from './game/input-manager';
 import { PlayerController } from './game/entities/player-controller';
 import { Hitbox } from './hitbox';
 import { PurseCharacter } from './game/entities/purse';
-import { drawDebugWaterringsCount, drawDebugHitbox } from './debug';
+import { drawDebugWaterringsCount, drawDebugHitbox, drawViewHitbox } from './debug';
 import { AudioManager } from './game/audio-manager';
 
 type HitboxObject = { hitbox: Hitbox };
+type ViewObject = { view: Hitbox };
 
 export class Game {
 
@@ -38,6 +39,8 @@ export class Game {
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
   private readonly hitboxDebug: boolean = true;
+  private readonly viewsDebug: boolean = true;
+
   private readonly waterringsCountDebug: boolean = true;
 
   // player
@@ -59,6 +62,15 @@ export class Game {
     ]
   }
 
+  private get charactersViews(): ViewObject[] {
+    return [
+      ...this.world.hunters,
+      ...this.world.workers,
+      ...this.world.fremens,
+      ...this.world.pyons
+    ]
+  }
+
   private loop(timestamp: number): void {
     const deltaSeconds = this.lastTimestamp ? (timestamp - this.lastTimestamp) / 1000 : 0;
     this.lastTimestamp = timestamp;
@@ -77,6 +89,13 @@ export class Game {
     if (this.hitboxDebug) {
       this.hitboxObjects.forEach((object: HitboxObject) => {
         drawDebugHitbox(this.ctx, this.camera, object.hitbox)
+      })
+    }
+
+    // VIEWS DEBUG
+    if (this.viewsDebug) {
+      this.charactersViews.forEach((object: ViewObject) => {
+        drawViewHitbox(this.ctx, this.camera, object.view)
       })
     }
 

@@ -1,7 +1,7 @@
 import { Hitbox } from "../../hitbox";
 import { clamp } from "../../utils/clamp";
 import { Camera } from "../camera";
-import { GameMeter, METER_UNIT, ScreenPoint, Second } from "../config";
+import { DEFAULT_VIEW_DISTANCE, GameMeter, METER_UNIT, ScreenPoint, Second } from "../config";
 import { Direction } from "../config";
 
 export type CharacterOptions = {
@@ -10,6 +10,7 @@ export type CharacterOptions = {
   readonly speed: GameMeter,
   readonly color: string,
   readonly runFactor: number,
+  readonly viewDistance: GameMeter, // distance de vison
 }
 
 const DEFAULT_CHARACTER: CharacterOptions = {
@@ -18,11 +19,13 @@ const DEFAULT_CHARACTER: CharacterOptions = {
   speed: 1.25,
   color: 'red',
   runFactor: 1.85,
+  viewDistance: DEFAULT_VIEW_DISTANCE
 }
 
 export class Character {
 
   readonly options: CharacterOptions;
+  protected movingDirection: Direction = 0;
 
   constructor(
     public x: GameMeter,
@@ -49,6 +52,7 @@ export class Character {
 
   /** Déplace le personnage en restant dans les bornes [worldStart, worldEnd]. */
   protected move(direction: Direction, speed: number, deltaSeconds: Second): void {
+    this.movingDirection = direction;
     const next: GameMeter = this.x + direction * speed * deltaSeconds;
     const haflCharacter: GameMeter = this.hitbox.width / 2;
     this.x = clamp(next, this.worldStart + haflCharacter, this.worldEnd - haflCharacter)

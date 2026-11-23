@@ -24,7 +24,7 @@ export class Npc<AdditionalState extends string = never> extends Character {
     private nextDecisionDuration: number = 0;
 
     private timeUntilNextDecision: number = this.nextDecisionDuration;
-    private currentDirection: Direction = 0;
+    private wanderDirection: Direction = 0;
     public state: NpcState | AdditionalState = 'idle';
 
     constructor(
@@ -37,6 +37,26 @@ export class Npc<AdditionalState extends string = never> extends Character {
     ) {
         super(x, y, worldContext.world.start, worldContext.world.end, options);
         this.nextDecisionDuration = getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
+    }
+
+    /**
+     * Le champ de vison du personnage,
+     * devant lui quand il est en mouvement
+     * et centré quand il est imobile.
+     */
+    get view(): Hitbox {
+        const isIdle: boolean = this.movingDirection === 0;
+        const positionXIdle: GameMeter = this.x - this.options.viewDistance / 2;
+        const positionXRight: GameMeter = this.x;
+        const positionXLeft: GameMeter = this.x - this.options.viewDistance;
+        const positionMovementX: GameMeter = this.movingDirection > 0 ? positionXRight : positionXLeft;
+        return {
+            x: isIdle ? positionXIdle : positionMovementX,
+            y: this.y,
+            width: this.options.viewDistance,
+            height: this.options.height,
+            fillDebugColor: 'yellow'
+        }
     }
 
     updateWorldContexte(context: WorldContext): void {
@@ -65,10 +85,10 @@ export class Npc<AdditionalState extends string = never> extends Character {
         this.timeUntilNextDecision -= deltaSeconds;
         if (this.timeUntilNextDecision <= 0) {
             const randomDirection: Direction = Math.round((Math.random() * 2) - 1) as Direction;
-            this.currentDirection = randomDirection;
+            this.wanderDirection = randomDirection;
             this.timeUntilNextDecision = this.nextDecisionDuration;
         }
-        this.walk(this.currentDirection, deltaSeconds)
+        this.walk(this.wanderDirection, deltaSeconds)
     }
 
     update(deltaSeconds: Second): void {
@@ -84,7 +104,7 @@ export class Npc<AdditionalState extends string = never> extends Character {
         const inZone: boolean = this.hitbox.x > start && (this.hitbox.x + this.hitbox.width) < end;
 
         if (!inZone) {
-            this.currentDirection = direction;
+            this.wanderDirection = direction;
             this.timeUntilNextDecision = this.nextDecisionDuration;
             this.navToDirection(deltaSeconds, direction, method)
             return

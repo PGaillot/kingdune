@@ -6,6 +6,7 @@ export interface Hitbox {
     x: GameMeter,
     y: GameMeter,
     strokeDebugColor?: string;
+    fillDebugColor?: string;
 }
 
 export function overlaps(a: Hitbox, b: Hitbox): boolean {
