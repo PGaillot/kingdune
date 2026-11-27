@@ -13,9 +13,12 @@ export class Cooldown {
 
     private timeCompleted: Second;
 
-    /** @param duration la dure totale du cooldow */
-    constructor(private readonly duration: Second) {
-        this.timeCompleted = this.duration;
+    /** 
+     * @param duration la dure totale du cooldow 
+     * @param startReady par defaut à `true` : savoir si il demare pret ou pas. Ouai tout est dans le titre.
+     */
+    constructor(private readonly duration: Second, startReady: boolean = true) {
+        this.timeCompleted = startReady ? this.duration : INITIAL_VALUE;
     }
 
     /** Met à jour le cooldown, ne fait rien si le temps de déjà écoulé. */

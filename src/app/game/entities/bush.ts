@@ -1,11 +1,12 @@
 import { Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, ScreenPoint, Second } from "../config";
+import { Cooldown } from "../cooldown";
 import { Muaddib } from "./muaddib";
 import { WorldContext } from "./npc";
 
 
-const MAX_MUADDIBS:number = 3;
+const MAX_MUADDIBS: number = 3;
 const SECONDS_BETWEEN_MUADDIB_CREATION: number = 10;
 const BUSH_IMAGE: HTMLImageElement = new Image();
 BUSH_IMAGE.src = 'ressources/bush/bush.png';
@@ -20,14 +21,14 @@ BUSH_IMAGE.src = 'ressources/bush/bush.png';
  * @param initialMuaddids permet d'initaliser un Buisson avec déjà des Muaddibs. Vaut 0 si undefined.
  */
 export class Bush {
-    createMuaddibTimer: number | undefined;
     height: GameMeter = 1;
     width: GameMeter = 2;
-    
+    private createCooldown: Cooldown = new Cooldown(SECONDS_BETWEEN_MUADDIB_CREATION, false)
+
     constructor(
         private readonly positionX: GameMeter,
-        public worldContext:WorldContext,
-        public readonly initialMuaddids:number = 0
+        public worldContext: WorldContext,
+        public readonly initialMuaddids: number = 0
     ) {
         this.initialMuaddids = Math.min(this.initialMuaddids, MAX_MUADDIBS)
     }
@@ -45,16 +46,14 @@ export class Bush {
         this.worldContext = worldContext;
     }
 
-    update(deltaSeconds: Second, muaddibsAttached: number):Muaddib | undefined{
-        const isMaxMuaddibs:boolean = muaddibsAttached >= MAX_MUADDIBS;
-        const haveTimer:boolean = this.createMuaddibTimer !== undefined;
-        if(!isMaxMuaddibs && !haveTimer) this.createMuaddibTimer = 0;
-        if(this.createMuaddibTimer !== undefined && this.createMuaddibTimer > SECONDS_BETWEEN_MUADDIB_CREATION){
-            this.createMuaddibTimer = undefined;
+    update(deltaSeconds: Second, muaddibsAttached: number): Muaddib | undefined {
+        const isMaxMuaddibs: boolean = muaddibsAttached >= MAX_MUADDIBS;
+        if (isMaxMuaddibs) return undefined
+        if (this.createCooldown.isReady) {
+            this.createCooldown.start()
             return this.createMuaddib()
-        } else if(this.createMuaddibTimer !== undefined) {
-            this.createMuaddibTimer += deltaSeconds;
         }
+        this.createCooldown.update(deltaSeconds)
         return undefined
     }
 
@@ -66,7 +65,7 @@ export class Bush {
         ctx.restore();
     }
 
-    createMuaddib():Muaddib {
+    createMuaddib(): Muaddib {
         return new Muaddib(this.positionX, this.hitbox.y, this.worldContext, this)
     }
 }

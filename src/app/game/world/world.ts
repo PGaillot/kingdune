@@ -84,7 +84,7 @@ export class World {
         this.player = new PlayerCharacter(this.center, GROUND, this.leftEnd, this.rightEnd);
         this.pyonsCamps.push(new PyonsCamp(-32, this.worldContext, 2));
         this.pyonsCamps.push(new PyonsCamp(34, this.worldContext, 2));
-        this.bushes.push(new Bush(-18, this.worldContext, 20))
+        this.bushes.push(new Bush(-18, this.worldContext))
 
         this.workersShop = new Shop(-6, { type: 'hammer', height: 1, width: 1, image: HAMMER_IMAGE }, { color: 'darkgreen', toolPrice: 3 })
         this.pistolShop = new Shop(6, { type: 'maula-pistol', height: 1, width: 1, image: MAULA_PISTOL_IMAGE }, { color: 'indianred', toolPrice: 2 })
