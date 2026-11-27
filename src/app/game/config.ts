@@ -29,7 +29,8 @@ export type ScreenPoint = { x: Pixel, y: Pixel }
 
 export const METER_UNIT: Pixel = 40; // la taille d'un mètre en pixels dans le jeu
 
-export const DEFAULT_VIEW_DISTANCE: GameMeter = 5
+export const DEFAULT_VIEW_DISTANCE: GameMeter = 4;
+export const DELAY_BETWEEN_THROW_COLLECTIBLE: Second = 0.2; // le delay entre deux piece lancé aux joueurs par un npc avec un bourse
 
 export const DAY_LENGTH: Second = 5 * 60;
 export const DAY_LIGHT_GRADIENT: string[] = ['#D9A066', '#D9A066', '#E8D597'];

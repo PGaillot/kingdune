@@ -1,6 +1,6 @@
 import { Camera } from "./game/camera";
 import { METER_UNIT, Pixel, ScreenPoint } from "./game/config";
-import { PurseCharacter } from "./game/entities/purse";
+import { PurseHolder } from "./game/entities/purse";
 import { centerX, Hitbox } from "./hitbox";
 
 export function drawDebugHitbox(ctx: CanvasRenderingContext2D, camera: Camera, hitbox: Hitbox) {
@@ -21,7 +21,7 @@ export function drawViewHitbox(ctx: CanvasRenderingContext2D, camera: Camera, hi
 }
 
 
-export function drawDebugWaterringsCount(ctx: CanvasRenderingContext2D, camera: Camera, character: PurseCharacter): void {
+export function drawDebugWaterringsCount(ctx: CanvasRenderingContext2D, camera: Camera, character: PurseHolder): void {
     if (character.purse.contentCount === 0) return
     ctx.save()
     const position: ScreenPoint = camera.convert({ x: centerX(character.hitbox), y: character.hitbox.y })

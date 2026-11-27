@@ -318,7 +318,7 @@ encore des pixels en dur (`METER_UNIT + 20`) ; le demi-décalage est fait en pix
 hors de la classe (`WATERRING_IMAGE`), comme `Catchbasin` ; `Collectible.draw()` fait le narrowing
 (`if (this.options.image)`), sinon carré argenté, entre `save()`/`restore()`. Le placeholder des
 pièces est une constante dans `target-highlight.ts`, dessinée en `opacity(0.35)`. Décidé : le
-`Purchasable` dirait *avec quelle monnaie* il se paie, l'image du placeholder appartient à la monnaie ;
+`Purchasable` dirait _avec quelle monnaie_ il se paie, l'image du placeholder appartient à la monnaie ;
 pas codé tant qu'il n'y a qu'une monnaie (YAGNI), mais d'autres monnaies viendront. Monde agrandi exprès : `new World(40)` et
 25 dunes.
 
@@ -334,7 +334,7 @@ sert à rien.
 
 - **Fait** : image du siètch niveau 0 (commité : `sietch_level_0.png`, 240×112 px = 15 m × 7 m,
   centrée sur `CENTER`, `save()`/`imageSmoothingEnabled = false`/`restore()`). `Worker extends
-  Npc` (`workForce`, `task: Workable | undefined`, `work()` vide). Interface `Workable` :
+Npc` (`workForce`, `task: Workable | undefined`, `work()` vide). Interface `Workable` :
   `workChargeLeft`, `workerRequired`, `requestedAt: number | undefined`, `complete()`, `hitbox`.
   Le type `Task` a été **retiré** (copie de la charge = deux sources de vérité ; le `Workable`
   **est** la tâche). `Catchbasin` : plus de booléen `marked`, remplacé par `requestedAt`
@@ -353,7 +353,7 @@ sert à rien.
   ce nombre atteint `workerRequired`. Répartiteur dans le `World` pour commencer.
 - **Fait le 30/10/2026 au soir (pas commité)** : `Npc<AdditionalState extends string = never>`
   avec `state: NpcState | AdditionalState = 'idle'` ; `Worker extends Npc<'build' | 'repair' |
-  'dig'>`, `Hunter extends Npc<'hunt' | 'protect_sietch'>` (plus de redéclaration de `state`).
+'dig'>`, `Hunter extends Npc<'hunt' | 'protect_sietch'>` (plus de redéclaration de `state`).
   Concept expliqué : `extends` dans `< >` = **contrainte**, pas héritage ; `'lave'` est un type.
 - **Fait le 30/10/2026, fin de soirée (pas commité)** :
   - `Npc.runTo(hitbox, …)` : un seul pas par frame (le `while` a été retiré : la game loop **est**
@@ -460,8 +460,8 @@ paramètre d'`update()`). Bug rencontré : `0` est falsy (`if (timer)` ne démar
 
 **Fremen et ramassage partagé (04/11/2026)** : `Fremen extends Npc` (`entities/fremen.ts`, erre
 dans `sietchZone`) ; un pyon qui a une pièce dans sa `Purse` devient un Fremen (le `World`
-le retire de `pyons` et pousse un `Fremen`). Type structurel `PurseCharacter` (`{ purse, hitbox }`,
-dans `purse.ts`) ; `World.purseCharacters` = joueur + pyons. Bug réglé (commité) :
+le retire de `pyons` et pousse un `Fremen`). Type structurel `PurseHolder` (`{ purse, hitbox }`,
+dans `purse.ts`, ex-`PurseCharacter`) ; `World.purseHolders` (ex-`purseCharacters`) = joueur + pyons. Bug réglé (commité) :
 une pièce allait dans plusieurs bourses (`return` dans un `forEach` = `continue`, `find` sans
 `return true` = parcours complet) → `find` qui **choisit**, puis un seul `add` (requête /
 commande séparées). Signalés, pas réglés : `purse.ts` ↔ `collectible.ts` s'importent
@@ -474,13 +474,44 @@ Fremen qu'avec une pièce **lâchée par le naib**. `Collectible.from` (durable,
 Condition du `find` : `overlaps && canBePickedBy && (!receiverIsPyon || from === this.player)`
 (implication `!A || B`). `from` est effacé dans `Purse.add()` (seulement si la pièce est
 vraiment rangée : valeur par défaut sûre). Concepts vus : identité par référence (`===`), `find`
-avec accolades sans `return`, court-circuit du `||`. **Voulu** : `purseCharacters` élargi aux
+avec accolades sans `return`, court-circuit du `||`. **Fait depuis** : `purseHolders` élargi aux
 workers, hunters et Fremen (`Fremen` a une `Purse`) : prérequis de la **prochaine étape, les PNJ
 rendent leurs pièces au naib** (comme Kingdom). Restent : priorité de ramassage donnée par
 l'ordre du tableau ; `droppedBy` pas effacé dans `add()` ; piste d'une méthode de `Collectible`
 (« je viens d'être rangée ») appelée par `add()` à la place de `resetSpeed()`.
 
+**Champ de vision (commité le 23/11/2026)** : getter `view` (une `Hitbox` de largeur
+`viewDistance`, devant le personnage s'il marche, centrée s'il est immobile), dessiné en debug
+(`drawViewHitbox`, booléen `viewsDebug` dans `Game`). Depuis déplacé de `Npc` vers `Character`
+(pas commité). `DEFAULT_VIEW_DISTANCE` = 4 m.
+
+**Les PNJ rendent leurs anneaux au naib (fait, commité le 27/11/2026)** :
+- Renommages : le type structurel `PurseCharacter` → `CharacterWithPurse` → **`PurseHolder`** (`purse.ts` ; « Character » promettait trop pour un type structurel : une cache d'eau ou le maître de l'eau auront une bourse) ; getter `World.purseHolders` ;
+  interface **`CollectibleThrower extends PurseHolder`** (`interfaces/collectible-thrower.ts`,
+  ne déclare que `view` et `throwCollectible(throwDistance)`). Nom d'agent en *-er* (le
+  personnage agit), à l'inverse de `Purchasable`/`Workable` (*-able*). On ne redéclare un champ
+  hérité que pour le resserrer. Question laissée ouverte : `view` fait-il partie du contrat ?
+- `Worker` et `Fremen` implémentent l'interface ; `World.collectibleThrowers` (hunters
+  commentés) ; dans `World.update()`, joueur dans la `view` d'un lanceur qui a des anneaux →
+  `throwCollectible(distance)`, l'anneau renvoyé est poussé dans `collectibles`.
+- **`Cooldown`** (`src/app/game/cooldown.ts`, commité à part) : `duration` (`private readonly`),
+  `timeCompleted` compte **vers le haut**, né prêt (`= duration`), `start()` réarme (seulement si
+  prêt), `update()` n'avance que si `!isReady` (règle écrite une seule fois), getters `isReady`,
+  `timeLeft`, `timeElapsed`. JSDoc collée à chaque membre (pas de `@method`/`@readonly` : un
+  getter sans setter est déjà en lecture seule).
+- Bug de départ : le délai était un `number` passé **par valeur** (la fonction modifiait sa
+  copie). Réglé par un objet (`Cooldown`) : la fonction reçoit une copie de la **référence**.
+  Bugs rencontrés ensuite : métronome qui se réarmait seul ; `=== 0` ; condition d'`update()`
+  inversée (jamais prêt) ; `start()` jamais appelé (rafale) ; temps qui ne passait que pendant
+  que le naib était dans la vue. Séparé : **le temps passe** dans `update()` des PNJ (avant le
+  `switch`), **la décision** dans `throwCollectible()` (plus de `deltaSeconds`) ; `start()`
+  après la vérification de la bourse.
+- Signalés, pas réglés : champ + méthode identiques dans `Worker` et `Fremen` (règle de trois) ;
+  `throwDistance` (m) mis dans `vX` (m/s) ; `y` de l'anneau pas remis au sol ; un autre PNJ
+  peut attraper l'anneau en vol ; option `noUnusedParameters` évoquée.
+
 **À la reprise (02/11/2026) : zones d'errance des PNJ** (piste discutée, pas codée) :
+
 - la **machine à états choisit la zone** et la passe en paramètre à chaque frame, rien de
   stocké (pyon `idle` → hitbox de son camp ; hunter/worker la nuit → `sietchZone`) ;
 - une fonction pure « hitbox dans la zone » dans `hitbox.ts` (centre ou corps entier : à
@@ -535,6 +566,7 @@ expliqués : `fill(valeur)` met **le même objet** dans toutes les cases (une se
 `Array.from` renvoie directement les objets créés (l'emballage `{ t: T }` + `map` a été retiré).
 
 **Symétrie, décidé** :
+
 - **Orientation déduite, pas passée** (philosophie du projet : déduire plutôt que stocker) : un
   bâtiment calcule son côté avec un **getter** (à gauche ou à droite du centre). Le centre devient
   une **constante** dans `config.ts` (le siètch est toujours au centre), lue par le `World` et par

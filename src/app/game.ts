@@ -5,9 +5,9 @@ import { PlayerCharacter } from './game/entities/player-character';
 import { InputManager } from './game/input-manager';
 import { PlayerController } from './game/entities/player-controller';
 import { Hitbox } from './hitbox';
-import { PurseCharacter } from './game/entities/purse';
 import { drawDebugWaterringsCount, drawDebugHitbox, drawViewHitbox } from './debug';
 import { AudioManager } from './game/audio-manager';
+import { PurseHolder } from './game/entities/purse';
 
 type HitboxObject = { hitbox: Hitbox };
 type ViewObject = { view: Hitbox };
@@ -39,7 +39,7 @@ export class Game {
   public readonly camera: Camera = new Camera(SCREEN_HEIGHT, SCREEN_WIDTH, { x: this.player.x, y: this.player.y })
 
   private readonly hitboxDebug: boolean = true;
-  private readonly viewsDebug: boolean = true;
+  private readonly viewsDebug: boolean = false;
 
   private readonly waterringsCountDebug: boolean = true;
 
@@ -100,7 +100,7 @@ export class Game {
     }
 
     if (this.waterringsCountDebug) {
-      this.world.purseCharacters.forEach((character: PurseCharacter) => {
+      this.world.purseHolders.forEach((character: PurseHolder) => {
         drawDebugWaterringsCount(this.ctx, this.camera, character)
       })
     }

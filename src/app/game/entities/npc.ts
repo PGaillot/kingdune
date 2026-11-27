@@ -39,26 +39,6 @@ export class Npc<AdditionalState extends string = never> extends Character {
         this.nextDecisionDuration = getRandomBetweenMinMax(nextDecisionDurationMin, nextDecisionDurationMax);
     }
 
-    /**
-     * Le champ de vison du personnage,
-     * devant lui quand il est en mouvement
-     * et centré quand il est imobile.
-     */
-    get view(): Hitbox {
-        const isIdle: boolean = this.movingDirection === 0;
-        const positionXIdle: GameMeter = this.x - this.options.viewDistance / 2;
-        const positionXRight: GameMeter = this.x;
-        const positionXLeft: GameMeter = this.x - this.options.viewDistance;
-        const positionMovementX: GameMeter = this.movingDirection > 0 ? positionXRight : positionXLeft;
-        return {
-            x: isIdle ? positionXIdle : positionMovementX,
-            y: this.y,
-            width: this.options.viewDistance,
-            height: this.options.height,
-            fillDebugColor: 'yellow'
-        }
-    }
-
     updateWorldContexte(context: WorldContext): void {
         this.worldContext = context;
     }

@@ -2,9 +2,9 @@ import { Hitbox, overlaps } from "../../hitbox";
 import { applyPhysics, MIN_BOUNCE_SPEED, PhysicsEvent } from "../physics";
 import { Camera } from "../camera";
 import { GameMeter, GROUND, METER_UNIT, MeterPerSecond, Pixel, ScreenPoint, Second } from "../config";
-import type { PurseCharacter } from "./purse";
 import { AudioEvent } from "../audio-manager";
 import { inverseLerp } from "../../utils/inverse-lerp";
+import { PurseHolder } from "./purse";
 
 export type CollectibleOptions = {
     height: GameMeter,
@@ -27,8 +27,8 @@ const MAX_BOUNCE_HIT: MeterPerSecond = 4;
 export class Collectible {
 
     readonly options: CollectibleOptions;
-    from: PurseCharacter | undefined = undefined;
-    droppedBy: PurseCharacter | undefined = undefined;
+    from: PurseHolder | undefined = undefined;
+    droppedBy: PurseHolder | undefined = undefined;
     /** la vitesse sur X pour la physique tout ca tout ça ! */
     vX: number = 0;
     /** la vitesse sur Y pour la physique, faut bien que ça tombe. */
@@ -72,7 +72,7 @@ export class Collectible {
         return soundEvent
     }
 
-    canBePickedBy(character: PurseCharacter): boolean {
+    canBePickedBy(character: PurseHolder): boolean {
         return character !== this.droppedBy && this.isNotFalling
     }
 

@@ -23,7 +23,7 @@ import { PyonsCamp } from "../entities/pyons-camp";
 import { Pyon } from "../entities/pyon";
 import { Celestial } from "../entities/celestial";
 import { Fremen } from "../entities/fremen";
-import type { PurseCharacter } from "../entities/purse";
+import type { PurseHolder } from "../entities/purse";
 import { Shop } from "../entities/buildings/shop";
 import { taskDistributor } from "../task-distributor";
 import { toolsDistributor } from "../tool-distributor";
@@ -31,6 +31,7 @@ import { getRandomBetweenMinMax } from "../../utils/random.utils";
 import { Bush } from "../entities/bush";
 import { Tool } from "../entities/tool";
 import { AudioEvent, AudioManager } from "../audio-manager";
+import { CollectibleThrower } from "../interfaces/collectible-thrower";
 
 const MOON_IMAGE: HTMLImageElement = new Image();
 const SUN_IMAGE: HTMLImageElement = new Image();
@@ -148,8 +149,17 @@ export class World {
         return -this.rightEnd;
     }
 
-    get purseCharacters(): PurseCharacter[] {
+    get purseHolders(): PurseHolder[] {
         return [this.player, ...this.pyons, ...this.workers, ...this.hunters, ...this.fremens]
+    }
+
+
+    get collectibleThrowers(): CollectibleThrower[] {
+        return [
+            ...this.workers,
+            //  ...this.hunters,
+            ...this.fremens
+        ]
     }
 
     get purchasables(): Purchasable[] {
@@ -266,7 +276,7 @@ export class World {
         this.collectibles.forEach((collectible: Collectible) => {
             const audioEvent: AudioEvent | undefined = collectible.update(deltaSeconds);
             if (audioEvent) this.audioManager.playSoundEvent(audioEvent);
-            const receiver: PurseCharacter | undefined = this.purseCharacters.find((character: PurseCharacter) => {
+            const receiver: PurseHolder | undefined = this.purseHolders.find((character: PurseHolder) => {
                 const receiverIsPyon: boolean = character instanceof Pyon;
                 return overlaps(character.hitbox, collectible.hitbox) && collectible.canBePickedBy(character) && (!receiverIsPyon || collectible.from === this.player)
             })
@@ -285,6 +295,16 @@ export class World {
             const muaddibsCreatedCount: number = this.muaddibs.filter((muaddib: Muaddib) => muaddib.attachAt === bush).length
             const muaddib: Muaddib | undefined = bush.update(deltaSeconds, muaddibsCreatedCount);
             if (muaddib) this.muaddibs.push(muaddib);
+        })
+
+        this.collectibleThrowers.forEach((collectibleThrower: CollectibleThrower) => {
+            if (collectibleThrower.purse.contentCount > 0 && overlaps(this.player.hitbox, collectibleThrower.view)) {
+                const distanceBetweenPlayerAndCharacter: GameMeter = centerX(this.player.hitbox) - centerX(collectibleThrower.hitbox);
+                const collectibleDropped: Collectible | undefined = collectibleThrower.throwCollectible(distanceBetweenPlayerAndCharacter);
+                if (collectibleDropped !== undefined) {
+                    this.collectibles.push(collectibleDropped);
+                }
+            }
         })
 
         this.workers.forEach((worker: Worker) => {

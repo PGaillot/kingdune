@@ -1,7 +1,7 @@
 import { Hitbox } from "../../hitbox";
 import { Collectible } from "./collectible";
 
-export type PurseCharacter = { purse: Purse, hitbox: Hitbox };
+export type PurseHolder = { purse: Purse, hitbox: Hitbox };
 
 
 /**

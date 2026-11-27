@@ -1,6 +1,10 @@
-import { GameMeter, Second } from "../config";
+import { throwCollectible } from "../../utils/throw-collectible";
+import { DELAY_BETWEEN_THROW_COLLECTIBLE, GameMeter, Second } from "../config";
+import { Cooldown } from "../cooldown";
+import { CollectibleThrower } from "../interfaces/collectible-thrower";
 import { Workable } from "../interfaces/workable";
 import { CharacterOptions } from "./character";
+import { Collectible } from "./collectible";
 import { Npc, WorldContext } from "./npc";
 import { Purse } from "./purse";
 
@@ -23,15 +27,20 @@ const DEFAULT_OPTIONS: Partial<CharacterOptions> = { color: 'green' }
  *  @param worldContext des infos sur le monde. c'est très pratique. pour ne pas tomber par exemple.
  *  @param options des options facultative, taille, couleur, image ...
  */
-export class Worker extends Npc<'build' | 'repair' | 'dig'> {
+export class Worker extends Npc<'build' | 'repair' | 'dig'> implements CollectibleThrower {
 
     task: Workable | undefined;
     purse: Purse = new Purse();
     /** La force de travail en WF/s fait baisser la WorkCharge. */
-    workForce: number = 0.5;
+    readonly workForce: number = 0.5;
 
     constructor(x: GameMeter, y: GameMeter, worldContext: WorldContext, options?: Partial<CharacterOptions>) {
         super(x, y, 2, 5, worldContext, { ...DEFAULT_OPTIONS, ...options })
+    }
+    private throwCollectibleCooldown: Cooldown = new Cooldown(DELAY_BETWEEN_THROW_COLLECTIBLE);
+
+    throwCollectible(throwDistance: GameMeter): Collectible | undefined {
+        return throwCollectible(this, throwDistance, this.throwCollectibleCooldown)
     }
 
     // Pour faire travailler le worker !
@@ -42,6 +51,7 @@ export class Worker extends Npc<'build' | 'repair' | 'dig'> {
     }
 
     override update(deltaSeconds: Second): void {
+        this.throwCollectibleCooldown.update(deltaSeconds)
         switch (this.state) {
             case "idle":
                 if (this.task) this.state = 'dig'
