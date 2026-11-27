@@ -90,7 +90,7 @@ export class World {
         this.pistolShop = new Shop(6, { type: 'maula-pistol', height: 1, width: 1, image: MAULA_PISTOL_IMAGE }, { color: 'indianred', toolPrice: 2 })
 
         this.pyonsCamps.forEach((pyonsCamp: PyonsCamp) => {
-            for (let i = 0; i < pyonsCamp.initialPyonsNumber; i++) {
+            for (let i = 0; i < pyonsCamp.initialPyons; i++) {
                 this.pyons.push(pyonsCamp.createPyon())
             }
         })

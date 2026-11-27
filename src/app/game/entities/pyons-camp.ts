@@ -1,6 +1,7 @@
 import { centerX, Hitbox } from "../../hitbox";
 import { Camera } from "../camera";
-import { GameMeter, GROUND, METER_UNIT, ScreenPoint } from "../config";
+import { GameMeter, GROUND, METER_UNIT, ScreenPoint, Second } from "../config";
+import { Cooldown } from "../cooldown";
 import { WorldContext } from "./npc";
 import { Pyon } from "./pyon";
 
@@ -25,19 +26,14 @@ export class PyonsCamp {
     imageHeight: GameMeter = 3;
     imageWidth: GameMeter = 6;
     pyonsCreated: Pyon[] = [];
-    createPyonTimer: number | undefined;
-    initialPyonsNumber: number;
+    private createPyonCooldown: Cooldown = new Cooldown(SECONDS_BETWEEN_PYON_CREATION, false);
 
     constructor(
         public x: GameMeter,
         public worldContext: WorldContext,
-        private readonly initialPyons: number = 0
+        public readonly initialPyons: number = 0
     ) {
-        if (this.initialPyons > MAX_PYONS) {
-            this.initialPyonsNumber = MAX_PYONS;
-        } else {
-            this.initialPyonsNumber = initialPyons;
-        }
+        this.initialPyons = Math.min(this.initialPyons, MAX_PYONS)
     }
 
 
@@ -54,17 +50,14 @@ export class PyonsCamp {
         this.worldContext = worldContext;
     }
 
-    update(deltaSeconds: number): Pyon | undefined {
-        // si le max de Pyon pour ce camps ne depasse pas le nombre de pyon actuel && que aucun timer ne tourne, 
+    update(deltaSeconds: Second): Pyon | undefined {
         const isMaxPyons: boolean = this.pyonsCreated.length >= MAX_PYONS;
-        const haveTimer: boolean = this.createPyonTimer !== undefined
-        if (!isMaxPyons && !haveTimer) this.createPyonTimer = 0
-        if (this.createPyonTimer !== undefined && this.createPyonTimer > SECONDS_BETWEEN_PYON_CREATION) {
-            this.createPyonTimer = undefined;
+        if (isMaxPyons) return undefined
+        if (this.createPyonCooldown.isReady) {
+            this.createPyonCooldown.start()
             return this.createPyon()
-        } else if (this.createPyonTimer !== undefined) {
-            this.createPyonTimer += deltaSeconds;
         }
+        this.createPyonCooldown.update(deltaSeconds)
         return undefined;
     }
 
@@ -76,7 +69,7 @@ export class PyonsCamp {
         ctx.restore();
     }
 
-    createPyon(): Pyon {
+    public createPyon(): Pyon {
         return new Pyon(centerX(this.hitbox), GROUND, this.worldContext, this);
     }
 }

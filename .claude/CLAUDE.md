@@ -504,6 +504,9 @@ l'ordre du tableau ; `droppedBy` pas effacé dans `add()` ; piste d'une méthode
   commence quand une place se libère) ; `update()` du buisson sort tout de suite s'il est plein
   (compteur figé). Bugs rencontrés : cooldown prêt pendant que le buisson est plein → remplaçant
   instantané. Vu : `readonly` dans les paramètres du constructeur = *parameter property* (champ).
+  **Branché aussi dans `PyonsCamp`** (même schéma, `false`, `initialPyons` bridé par `Math.min`
+  comme `Bush`). `Bush.update()` et `PyonsCamp.update()` sont quasi identiques (un *spawner*) :
+  factoriser au troisième. `createPyonCooldown` en `private`, comme dans `Bush`.
 - Bug de départ : le délai était un `number` passé **par valeur** (la fonction modifiait sa
   copie). Réglé par un objet (`Cooldown`) : la fonction reçoit une copie de la **référence**.
   Bugs rencontrés ensuite : métronome qui se réarmait seul ; `=== 0` ; condition d'`update()`
